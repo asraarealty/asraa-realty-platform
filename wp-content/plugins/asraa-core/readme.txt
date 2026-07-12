@@ -1,0 +1,1 @@
+Asraa Core Plugin\nVersion 1.0\n

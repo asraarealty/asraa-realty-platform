@@ -1,0 +1,2 @@
+<?php
+// Breadcrumb module skeleton

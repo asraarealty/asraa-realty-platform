@@ -1,0 +1,307 @@
+/* =============================================================
+   Asraa CRM – Client Portal  (Elementor-compatible stylesheet)
+   ============================================================= */
+
+/* ── Container ─────────────────────────────────────────────── */
+.asraa-portal {
+	max-width: 900px;
+	margin: 0 auto;
+	padding: 1.5rem 1rem;
+	font-family: inherit;
+	box-sizing: border-box;
+}
+
+/* ── Card ───────────────────────────────────────────────────── */
+.asraa-portal__card {
+	background: #ffffff;
+	border-radius: 12px;
+	box-shadow: 0 4px 24px rgba(0, 0, 0, 0.10);
+	padding: 2rem;
+	box-sizing: border-box;
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+.asraa-portal__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 1rem;
+	margin-bottom: 1.5rem;
+}
+
+.asraa-portal__logo {
+	font-size: 2.5rem;
+	margin-bottom: .5rem;
+}
+
+.asraa-portal__title {
+	font-size: 1.5rem;
+	font-weight: 700;
+	margin: 0 0 .25rem;
+	color: #1a1a2e;
+}
+
+.asraa-portal__subtitle {
+	font-size: .95rem;
+	color: #666;
+	margin: 0;
+}
+
+/* ── KPI Strip ──────────────────────────────────────────────── */
+.asraa-portal__kpi-strip {
+	display: flex;
+	gap: 1rem;
+	flex-wrap: wrap;
+	margin-bottom: 1.5rem;
+}
+
+.asraa-portal__kpi {
+	flex: 1 1 140px;
+	background: #f4f6fb;
+	border-radius: 8px;
+	padding: 1rem;
+	text-align: center;
+}
+
+.asraa-portal__kpi-value {
+	display: block;
+	font-size: 1.75rem;
+	font-weight: 700;
+	color: #1a1a2e;
+}
+
+.asraa-portal__kpi-label {
+	font-size: .8rem;
+	color: #888;
+	text-transform: uppercase;
+	letter-spacing: .04em;
+}
+
+/* ── Section ────────────────────────────────────────────────── */
+.asraa-portal__section {
+	background: #ffffff;
+	border-radius: 10px;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+	padding: 1.25rem 1.5rem;
+	margin-bottom: 1.25rem;
+}
+
+.asraa-portal__section-header {
+	font-size: 1rem;
+	font-weight: 600;
+	color: #1a1a2e;
+	margin-bottom: 1rem;
+	padding-bottom: .5rem;
+	border-bottom: 1px solid #eee;
+}
+
+/* ── Unit Grid ──────────────────────────────────────────────── */
+.asraa-portal__unit-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+	gap: 1rem;
+}
+
+.asraa-portal__unit-card {
+	background: #f9fafc;
+	border: 1px solid #e5e7eb;
+	border-radius: 8px;
+	padding: 1rem;
+}
+
+.asraa-portal__unit-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: .5rem;
+	margin-bottom: .5rem;
+}
+
+.asraa-portal__unit-meta,
+.asraa-portal__unit-detail,
+.asraa-portal__unit-stage {
+	font-size: .85rem;
+	color: #555;
+	margin-top: .25rem;
+}
+
+/* ── Badge ──────────────────────────────────────────────────── */
+.asraa-badge {
+	display: inline-block;
+	padding: .2em .55em;
+	border-radius: 4px;
+	font-size: .75rem;
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+.asraa-badge--available  { background: #d1fae5; color: #065f46; }
+.asraa-badge--booked     { background: #fee2e2; color: #991b1b; }
+.asraa-badge--token      { background: #fef3c7; color: #92400e; }
+.asraa-badge--negotiation{ background: #ede9fe; color: #4c1d95; }
+.asraa-badge--registered { background: #dbeafe; color: #1e40af; }
+
+/* ── Tracker ────────────────────────────────────────────────── */
+.asraa-portal__tracker {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .5rem;
+}
+
+.asraa-portal__tracker-step {
+	flex: 1 1 80px;
+	text-align: center;
+	padding: .5rem .75rem;
+	border-radius: 6px;
+	background: #f0f0f0;
+	font-size: .8rem;
+	color: #888;
+	white-space: nowrap;
+}
+
+.asraa-portal__tracker-step--active {
+	background: #1a1a2e;
+	color: #fff;
+	font-weight: 600;
+}
+
+/* ── Table ──────────────────────────────────────────────────── */
+.asraa-portal__table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: .88rem;
+}
+
+.asraa-portal__table th,
+.asraa-portal__table td {
+	padding: .6rem .75rem;
+	text-align: left;
+	border-bottom: 1px solid #eee;
+}
+
+.asraa-portal__table th {
+	background: #f4f6fb;
+	font-weight: 600;
+	color: #444;
+}
+
+/* ── Buttons / CTAs ─────────────────────────────────────────── */
+.asraa-portal__cta-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .75rem;
+}
+
+.asraa-portal__btn {
+	display: inline-flex;
+	align-items: center;
+	gap: .4rem;
+	padding: .6rem 1.25rem;
+	border-radius: 6px;
+	font-size: .9rem;
+	font-weight: 600;
+	text-decoration: none;
+	cursor: pointer;
+	transition: opacity .15s ease;
+	border: 2px solid transparent;
+}
+
+.asraa-portal__btn:hover { opacity: .85; }
+
+.asraa-portal__btn--primary {
+	background: #1a1a2e;
+	color: #fff;
+	border-color: #1a1a2e;
+}
+
+.asraa-portal__btn--outline {
+	background: transparent;
+	color: #1a1a2e;
+	border-color: #1a1a2e;
+}
+
+.asraa-portal__btn--wa {
+	background: #25d366;
+	color: #fff;
+	border-color: #25d366;
+}
+
+/* ── Empty State ────────────────────────────────────────────── */
+.asraa-portal--empty-state {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 60vh;
+}
+
+.asraa-portal__card--centered {
+	max-width: 540px;
+	text-align: center;
+	padding: 2.5rem;
+}
+
+.asraa-portal__cta-row--centered {
+	justify-content: center;
+}
+
+/* ── Empty / Help ───────────────────────────────────────────── */
+.asraa-portal__empty,
+.asraa-portal__help {
+	font-size: .88rem;
+	color: #999;
+	margin: .5rem 0 0;
+}
+
+/* ── Notices ────────────────────────────────────────────────── */
+.asraa-portal__notice {
+	padding: 1rem 1.25rem;
+	border-radius: 8px;
+	font-size: .9rem;
+}
+
+.asraa-portal__notice--error {
+	background: #fee2e2;
+	color: #991b1b;
+	border-left: 4px solid #dc2626;
+}
+
+/* ── Elementor container compatibility ──────────────────────── */
+.elementor-widget-shortcode .asraa-portal,
+.elementor-widget-text-editor .asraa-portal {
+	max-width: 900px;
+}
+
+/* ── Mobile ─────────────────────────────────────────────────── */
+@media ( max-width: 640px ) {
+	.asraa-portal__header {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.asraa-portal__kpi-strip {
+		flex-direction: column;
+	}
+
+	.asraa-portal__unit-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.asraa-portal__table {
+		font-size: .8rem;
+	}
+
+	.asraa-portal__table th,
+	.asraa-portal__table td {
+		padding: .4rem .5rem;
+	}
+
+	.asraa-portal__tracker {
+		flex-direction: column;
+	}
+
+	.asraa-portal__btn {
+		width: 100%;
+		justify-content: center;
+	}
+}

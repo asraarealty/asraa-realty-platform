@@ -1,0 +1,435 @@
+/* ============================
+   FORM – LAYOUT + STYLING
+============================ */
+.asraa-svs-valuation-form {
+    width: 100%;
+    max-width: 100%;
+    padding: 20px 10px;
+}
+.asraa-svs-valuation-form input,
+.asraa-svs-valuation-form select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+    background: #fff;
+    transition: 0.25s ease;
+    margin-top: 5px;
+    box-sizing: border-box;
+}
+.asraa-svs-valuation-form input:focus,
+.asraa-svs-valuation-form select:focus {
+    border-color: #ff385c;
+    box-shadow: 0 0 6px rgba(255,56,92,0.30);
+}
+.asraa-svs-valuation-form label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #222;
+    margin-bottom: 4px;
+    display: block;
+}
+.asraa-svs-field {
+    margin-bottom: 18px;
+}
+.asraa-svs-btn {
+    width: 100%;
+    background: #ff385c;
+    color: #fff;
+    padding: 14px;
+    font-size: 17px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    border: none;
+    margin-top: 10px;
+    transition: 0.25s;
+}
+.asraa-svs-btn:hover {
+    background: #e0274a;
+    transform: translateY(-2px);
+}
+.asraa-svs-btn-loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+.asraa-svs-error {
+    background: #ffe5e5;
+    color: #b40000;
+    padding: 10px 12px;
+    border-radius: 6px;
+    margin-top: 10px;
+    border-left: 4px solid #ff385c;
+    display: none;
+}
+
+/* ============================
+   MODAL OVERLAY
+============================ */
+.asraa-svs-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(4px);
+    z-index: 999999;
+    padding: 20px;
+    animation: fadeInOverlay 0.25s ease;
+}
+@keyframes fadeInOverlay {
+    from { background: rgba(0,0,0,0); }
+    to { background: rgba(0,0,0,0.45); }
+}
+@keyframes fadeOutOverlay {
+    from { background: rgba(0,0,0,0.45); }
+    to { background: rgba(0,0,0,0); }
+}
+.asraa-svs-modal--closing-overlay {
+    animation: fadeOutOverlay 0.25s ease forwards;
+}
+
+/* ============================
+   MODAL CARD
+============================ */
+.asraa-svs-modal-content {
+    max-width: 520px;
+    width: 90%;
+    max-height: 92vh;
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 18px;
+    margin: auto;
+    position: relative;
+    animation: slideUpModal 0.26s ease;
+}
+@keyframes slideUpModal {
+    from { transform: translateY(40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+@keyframes slideDownModal {
+    from { transform: translateY(0); opacity: 1; }
+    to { transform: translateY(40px); opacity: 0; }
+}
+.asraa-svs-modal--closing {
+    animation: slideDownModal 0.25s ease forwards;
+}
+.asraa-svs-close {
+    position: absolute;
+    top: 18px;
+    right: 20px;
+    font-size: 26px;
+    cursor: pointer;
+    color: #fff;
+    z-index: 50;
+}
+
+/* ============================
+   RED HEADER
+============================ */
+.asraa-svs-modal-main {
+    background: #ff385c;
+    color: #fff;
+    padding: 24px 24px 12px;
+    font-size: 30px;
+    font-weight: 700;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+.asraa-svs-modal-sub {
+    background: #ff385c;
+    color: #fff;
+    padding: 0 24px 16px;
+    font-size: 15px;
+    opacity: 0.9;
+    position: sticky;
+    top: 58px;
+    z-index: 10;
+}
+.asraa-svs-range {
+    padding: 12px 24px;
+    border-bottom: 1px solid #e2e2e2;
+    background: #fff;
+}
+
+/* ============================
+   CONFIDENCE BAR
+============================ */
+.asraa-svs-confidence-pill {
+    background: #1a73e8;
+    padding: 14px 20px;
+}
+.asraa-svs-confidence-text {
+    color: #fff;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+/* ============================
+   DETAILS
+============================ */
+.asraa-svs-details {
+    padding: 22px 24px;
+    font-size: 15px;
+}
+.asraa-svs-details ul {
+    list-style: none;
+    margin-top: 10px;
+    padding: 0;
+}
+.asraa-svs-details li {
+    margin-bottom: 6px;
+    padding-left: 16px;
+    position: relative;
+}
+.asraa-svs-details li::before {
+    content: "•";
+    color: #34a853;
+    font-size: 18px;
+    position: absolute;
+    left: 0;
+}
+
+/* ============================
+   AI BODY
+============================ */
+.asraa-svs-ai-body {
+    padding: 0 24px 22px;
+    font-size: 15px;
+    color: #333;
+    line-height: 1.5;
+}
+
+/* ============================
+   WHATSAPP BUTTON
+============================ */
+.asraa-svs-whatsapp {
+    display: block;
+    text-align: center;
+    background: #25d366;
+    padding: 14px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 17px;
+    border-radius: 0 0 18px 18px;
+}
+.asraa-svs-whatsapp:hover {
+    background: #1ebe5b;
+}
+
+/* ============================
+   RESPONSIVE
+============================ */
+@media (max-width: 600px) {
+    .asraa-svs-modal-content { width: 95%; }
+    .asraa-svs-modal-main { font-size: 24px; padding: 18px 18px 10px; }
+    .asraa-svs-modal-sub { font-size: 13px; padding: 0 18px 14px; }
+    .asraa-svs-range { padding: 8px 18px; }
+    .asraa-svs-confidence-pill { padding: 10px 14px; }
+    .asraa-svs-details { padding: 16px 18px; }
+    .asraa-svs-ai-body { padding: 0 18px 16px; }
+}
+
+/* ============================
+   DARK MODE
+============================ */
+@media (prefers-color-scheme: dark) {
+    .asraa-svs-modal { background: rgba(0,0,0,0.65); }
+    .asraa-svs-modal-content { background: #151515; color: #eee; }
+    .asraa-svs-modal-main,
+    .asraa-svs-modal-sub { background: #ff385c; }
+    .asraa-svs-range { border-color: #333; color: #eee; }
+    .asraa-svs-confidence-pill { background: #2b66dd; }
+    .asraa-svs-details,
+    .asraa-svs-ai-body { color: #e5e5e5; }
+    .asraa-svs-whatsapp { background: #22c45a; }
+}
+
+/* ============================
+   ADDRESS AUTOCOMPLETE
+============================ */
+.asraa-svs-ac-wrap {
+    position: relative;
+}
+.asraa-svs-ac-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #dcdcdc;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    z-index: 99999;
+    max-height: 260px;
+    overflow-y: auto;
+}
+.asraa-svs-ac-item {
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 14px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.15s;
+}
+.asraa-svs-ac-item:last-child { border-bottom: none; }
+.asraa-svs-ac-item:hover,
+.asraa-svs-ac-item.active { background: #fff3f3; color: #ff4d4d; }
+.asraa-svs-ac-item small { color: #888; margin-left: 6px; }
+.asraa-svs-address-filled {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #34a853;
+    font-weight: 600;
+    background: #f0fff4;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border-left: 3px solid #34a853;
+}
+
+/* ============================
+   PROPERTY TYPE TOGGLE
+============================ */
+.asraa-svs-type-toggle {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    margin-top: 6px !important;
+}
+.asraa-svs-type-pill {
+    display: inline-flex !important;
+    align-items: center !important;
+    cursor: pointer !important;
+    padding: 7px 18px !important;
+    border: 2px solid #dcdcdc !important;
+    border-radius: 999px !important;
+    background: #f3f4f6 !important;
+    color: #555 !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    transition: background 0.18s, color 0.18s, border-color 0.18s !important;
+    user-select: none !important;
+    box-shadow: none !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    line-height: normal !important;
+}
+.asraa-svs-type-pill input[type="radio"] { display: none !important; }
+.asraa-svs-type-pill:has(input:checked),
+.asraa-svs-type-pill.asraa-active {
+    border-color: #ff385c !important;
+    background: #ff385c !important;
+    color: #fff !important;
+    box-shadow: 0 2px 8px rgba(255,56,92,0.25) !important;
+}
+.asraa-svs-type-pill:hover:not(:has(input:checked)):not(.asraa-active) {
+    border-color: #ff385c !important;
+    color: #ff385c !important;
+    background: #fff !important;
+}
+
+/* ============================
+   TWO-COLUMN FIELD ROW
+============================ */
+.asraa-svs-field--row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+@media (max-width: 480px) {
+    .asraa-svs-field--row { grid-template-columns: 1fr; }
+}
+
+/* ============================
+   COMPARABLE INPUTS
+============================ */
+.asraa-svs-comparables-toggle {
+    background: none;
+    border: 1px dashed #aaa;
+    border-radius: 6px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #555;
+    width: 100%;
+    text-align: left;
+    transition: 0.2s;
+}
+.asraa-svs-comparables-toggle:hover { border-color: #ff4d4d; color: #ff4d4d; }
+.asraa-svs-comp-hint { font-size: 12px; color: #777; margin: 8px 0; }
+.asraa-svs-comp-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+@media (max-width: 480px) { .asraa-svs-comp-row { grid-template-columns: 1fr; } }
+
+/* ============================
+   COMMERCIAL SECTION
+============================ */
+.asraa-svs-commercial-section {
+    background: #f9f9ff;
+    border: 1px solid #e0e0ff;
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 18px;
+}
+
+/* ============================
+   PRICE CARDS (RESULT MODAL)
+============================ */
+.asraa-svs-price-cards {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid #e2e2e2;
+}
+.asraa-svs-pcard {
+    flex: 1;
+    padding: 14px 10px;
+    text-align: center;
+    border-right: 1px solid #e2e2e2;
+}
+.asraa-svs-pcard:last-child { border-right: none; }
+.asraa-svs-pcard-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #888;
+    letter-spacing: 0.5px;
+}
+.asraa-svs-pcard-val {
+    display: block;
+    font-size: 16px;
+    font-weight: 700;
+    margin-top: 4px;
+    color: #222;
+}
+.asraa-svs-pcard--fair .asraa-svs-pcard-val    { color: #ff385c; font-size: 20px; }
+.asraa-svs-pcard--low .asraa-svs-pcard-val     { color: #1a73e8; }
+.asraa-svs-pcard--premium .asraa-svs-pcard-val { color: #34a853; }
+@media (max-width: 400px) {
+    .asraa-svs-price-cards { flex-direction: column; }
+    .asraa-svs-pcard { border-right: none; border-bottom: 1px solid #e2e2e2; }
+    .asraa-svs-pcard:last-child { border-bottom: none; }
+}
+
+/* ============================
+   DARK MODE – new elements
+============================ */
+@media (prefers-color-scheme: dark) {
+    .asraa-svs-ac-dropdown { background: #1e1e1e; border-color: #333; }
+    .asraa-svs-ac-item { border-bottom-color: #2a2a2a; color: #ddd; }
+    .asraa-svs-ac-item:hover,
+    .asraa-svs-ac-item.active { background: #2d1f1f; color: #ff7070; }
+    .asraa-svs-address-filled { background: #1a2e1a; color: #5ecf5e; border-color: #5ecf5e; }
+    .asraa-svs-type-pill { background: #1e1e1e; border-color: #444; color: #ccc; }
+    .asraa-svs-commercial-section { background: #1a1a2e; border-color: #333; }
+    .asraa-svs-price-cards { border-bottom-color: #333; }
+    .asraa-svs-pcard { border-right-color: #333; }
+    .asraa-svs-pcard-val { color: #eee; }
+    .asraa-svs-pcard--fair .asraa-svs-pcard-val { color: #ff7070; }
+}

@@ -1,0 +1,2 @@
+<?php
+// SEO module skeleton

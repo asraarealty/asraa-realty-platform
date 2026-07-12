@@ -1,0 +1,119 @@
+/* ============================================================
+   Groups Module Styles
+   Asraa CRM Plugin
+============================================================ */
+
+/* Group Cards Grid */
+.asraa-groups-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 16px 0;
+}
+
+.asraa-group-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    min-width: 200px;
+    flex: 1 1 200px;
+    max-width: 280px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    position: relative;
+    transition: box-shadow 0.2s;
+}
+
+.asraa-group-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.asraa-group-card-color {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-bottom: 12px;
+    display: inline-block;
+}
+
+.asraa-group-card h3 {
+    margin: 0 0 6px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+.asraa-group-card .asraa-group-desc {
+    color: #666;
+    font-size: 13px;
+    margin-bottom: 10px;
+    min-height: 20px;
+}
+
+.asraa-group-card .asraa-group-count {
+    display: inline-block;
+    background: #f0f6fc;
+    color: #1e40af;
+    font-weight: 600;
+    font-size: 13px;
+    border-radius: 20px;
+    padding: 2px 12px;
+    margin-bottom: 14px;
+}
+
+.asraa-group-card-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* Group Badge (inline in leads table) */
+.asraa-group-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+}
+
+/* Group Filter Bar */
+.asraa-group-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+
+.asraa-group-filter-bar label {
+    font-weight: 600;
+    font-size: 13px;
+}
+
+/* Add/Edit Group Form */
+.asraa-group-form-table .color-preview {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    vertical-align: middle;
+    margin-left: 8px;
+}
+
+/* Empty state */
+.asraa-groups-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+}
+
+.asraa-groups-empty .dashicons {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: #ccc;
+    display: block;
+    margin: 0 auto 12px;
+}

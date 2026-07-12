@@ -1,0 +1,360 @@
+/* ==========================================================================
+   Asraa CRM – Frontend Client Dashboard
+   ========================================================================== */
+
+/* ---- Scoped wrapper ---- */
+.asraa-dashboard {
+    --primary:    #2563eb;
+    --primary-dk: #1d4ed8;
+    --success:    #16a34a;
+    --warning:    #d97706;
+    --danger:     #dc2626;
+    --muted:      #6b7280;
+    --border:     #e5e7eb;
+    --bg:         #f9fafb;
+    --card-bg:    #ffffff;
+    --text:       #111827;
+    --radius:     10px;
+    --shadow:     0 1px 4px rgba(0,0,0,.08);
+
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--bg);
+    padding: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* ---- Header ---- */
+.asraa-dashboard__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.asraa-dashboard__header h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.asraa-dashboard__plan-badge {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--primary);
+    color: #fff;
+}
+
+/* ---- Login panel ---- */
+.asraa-dashboard__login {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    max-width: 420px;
+    margin: 60px auto;
+    padding: 36px 32px;
+    text-align: center;
+}
+
+.asraa-dashboard__login h3 {
+    margin: 0 0 20px;
+    font-size: 20px;
+}
+
+.asraa-dashboard__login p {
+    color: var(--muted);
+    margin-bottom: 20px;
+}
+
+.asraa-dashboard__login a.button {
+    display: inline-block;
+    background: var(--primary);
+    color: #fff;
+    padding: 10px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background .15s;
+}
+
+.asraa-dashboard__login a.button:hover {
+    background: var(--primary-dk);
+}
+
+/* ---- Stats row ---- */
+.asraa-dashboard__stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.asraa-stat-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px 18px;
+}
+
+.asraa-stat-card__label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--muted);
+    margin-bottom: 6px;
+}
+
+.asraa-stat-card__value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+}
+
+.asraa-stat-card__value.accent { color: var(--primary); }
+.asraa-stat-card__value.success { color: var(--success); }
+
+/* ---- Section cards ---- */
+.asraa-dashboard__section {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.asraa-dashboard__section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.asraa-dashboard__section-body {
+    padding: 20px;
+}
+
+/* ---- Property grid ---- */
+.asraa-property-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+}
+
+.asraa-property-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: box-shadow .15s;
+}
+
+.asraa-property-card:hover {
+    box-shadow: 0 4px 14px rgba(0,0,0,.12);
+}
+
+.asraa-property-card__image {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    display: block;
+    background: var(--border);
+}
+
+.asraa-property-card__image.placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    color: var(--muted);
+}
+
+.asraa-property-card__body {
+    padding: 14px;
+}
+
+.asraa-property-card__title {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.asraa-property-card__meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+}
+
+.asraa-property-card__price {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--primary);
+}
+
+.asraa-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    padding: 2px 8px;
+    border-radius: 999px;
+}
+
+.asraa-badge--available { background: #d1fae5; color: var(--success); }
+.asraa-badge--sold      { background: #fee2e2; color: var(--danger); }
+.asraa-badge--hold      { background: #fef3c7; color: var(--warning); }
+
+/* ---- ROI table ---- */
+.asraa-roi-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.asraa-roi-table th,
+.asraa-roi-table td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.asraa-roi-table th {
+    font-weight: 600;
+    color: var(--muted);
+    background: var(--bg);
+}
+
+.asraa-roi-table td.amount { font-weight: 700; color: var(--success); }
+.asraa-roi-table td.neutral { color: var(--muted); }
+
+/* ---- Activity timeline ---- */
+.asraa-timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+.asraa-timeline::before {
+    content: '';
+    position: absolute;
+    left: 14px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+}
+
+.asraa-timeline__item {
+    position: relative;
+    padding: 0 0 20px 40px;
+}
+
+.asraa-timeline__item:last-child { padding-bottom: 0; }
+
+.asraa-timeline__dot {
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 2px solid var(--card-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    color: #fff;
+    z-index: 1;
+}
+
+.asraa-timeline__dot.type-call     { background: var(--success); }
+.asraa-timeline__dot.type-meeting  { background: var(--warning); }
+.asraa-timeline__dot.type-email    { background: #8b5cf6; }
+.asraa-timeline__dot.type-whatsapp { background: #22c55e; }
+.asraa-timeline__dot.type-system   { background: var(--muted); }
+
+.asraa-timeline__subject {
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 2px;
+}
+
+.asraa-timeline__body {
+    color: var(--muted);
+    font-size: 12px;
+    margin-bottom: 2px;
+}
+
+.asraa-timeline__meta {
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+/* ---- Notifications ---- */
+.asraa-notifications { list-style: none; margin: 0; padding: 0; }
+
+.asraa-notifications__item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+}
+
+.asraa-notifications__item:last-child { border-bottom: none; }
+
+.asraa-notifications__icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #eff6ff;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.asraa-notifications__text { flex: 1; }
+.asraa-notifications__time { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+/* ---- Empty states ---- */
+.asraa-empty {
+    text-align: center;
+    padding: 32px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.asraa-empty__icon { font-size: 32px; margin-bottom: 8px; }
+
+/* ---- Responsive ---- */
+@media (max-width: 640px) {
+    .asraa-dashboard { padding: 16px; }
+    .asraa-dashboard__stats { grid-template-columns: 1fr 1fr; }
+    .asraa-property-grid { grid-template-columns: 1fr; }
+    .asraa-roi-table { font-size: 12px; }
+}

@@ -1,0 +1,258 @@
+/* ================================================================
+   Asraa CRM Enhanced – Main CSS
+================================================================ */
+
+/* ---- General ---- */
+.crm-form-section {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.crm-form-section h3 {
+    margin-top: 0;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.form-field label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.form-field-hint {
+    color: #888;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+/* ---- Leads table ---- */
+.leads-table-wrapper {
+    overflow-x: auto;
+}
+
+.leads-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.leads-table th {
+    background: #f6f7f7;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.leads-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+
+.leads-table tbody tr:hover {
+    background: #f9f9f9;
+}
+
+/* ---- Bulk toolbar ---- */
+#asraa-bulk-toolbar {
+    display: flex;
+    background: #f0f6fc;
+    border: 1px solid #c3dafe;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* ---- Dialog / Modal ---- */
+.asraa-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .55);
+    z-index: 99998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.asraa-dialog-box {
+    background: #fff;
+    border-radius: 10px;
+    padding: 28px;
+    width: 560px;
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    z-index: 99999;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, .25);
+}
+
+.asraa-dialog-box h2 {
+    margin-top: 0;
+}
+
+/* ---- WhatsApp button ---- */
+.button.whatsapp-btn,
+.asraa-wa-button {
+    background: #25D366 !important;
+    border-color: #1a9e4f !important;
+    color: #fff !important;
+}
+
+/* ---- Message history ---- */
+.asraa-msg-type-whatsapp {
+    color: #25D366;
+    font-weight: 600;
+}
+
+.asraa-msg-type-email {
+    color: #2271b1;
+    font-weight: 600;
+}
+
+/* ---- Status badges ---- */
+.asraa-status-sent {
+    color: #46b450;
+}
+
+.asraa-status-failed {
+    color: #dc3232;
+}
+
+/* ---- Bulk results list ---- */
+.asraa-bulk-result-item {
+    padding: 6px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 13px;
+}
+
+.asraa-bulk-result-item a {
+    color: #25D366;
+    font-weight: 600;
+}
+
+/* ---- Dashboard cards ---- */
+.asraa-dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.asraa-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 22px;
+    border-left: 6px solid #2271b1;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .06);
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.asraa-card.green  { border-color: #46b450; }
+.asraa-card.orange { border-color: #ffb900; }
+.asraa-card.red    { border-color: #dc3232; }
+
+.asraa-card h2 {
+    margin: 0;
+    font-size: 34px;
+}
+
+.asraa-card p {
+    margin: 6px 0 0;
+    color: #555;
+}
+
+/* ---- Campaign Dashboard ---- */
+.asraa-campaign-wrap .asraa-campaign-subtitle {
+    color: #555;
+    font-size: 14px;
+    margin-top: 4px;
+    margin-bottom: 28px;
+}
+
+.asraa-campaign-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 24px;
+    margin-top: 8px;
+}
+
+.asraa-campaign-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 28px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.asraa-campaign-card:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, .12);
+    transform: translateY(-2px);
+}
+
+.asraa-campaign-card__icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 2px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    flex-shrink: 0;
+}
+
+.asraa-campaign-card__icon .dashicons {
+    font-size: 26px;
+    width: 26px;
+    height: 26px;
+    line-height: 1;
+}
+
+.asraa-campaign-card__title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    color: #1d2327;
+}
+
+.asraa-campaign-card__desc {
+    font-size: 13px;
+    color: #666;
+    margin: 0 0 20px;
+    line-height: 1.6;
+    flex: 1;
+}
+
+.asraa-campaign-card__btn {
+    align-self: stretch;
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+    .asraa-campaign-grid {
+        grid-template-columns: 1fr;
+    }
+}

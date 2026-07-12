@@ -1,0 +1,2 @@
+<?php
+// Schema module skeleton
