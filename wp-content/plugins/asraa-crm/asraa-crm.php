@@ -728,10 +728,24 @@ add_action( 'plugins_loaded', 'asraa_crm_bootstrap_controllers', 20 );
 ============================================================ */
 asraa_crm_safe_require( 'public/class-frontend-dashboard.php' );
 asraa_crm_safe_require( 'public/class-broker-feed-public.php' );
+asraa_crm_safe_require( 'public/class-broker-form-shortcode.php' );
+asraa_crm_safe_require( 'public/class-broker-feed-shortcode.php' );
 if ( class_exists( 'Asraa_Broker_Feed_Public' ) ) {
     global $asraa_broker_feed_public;
     if ( ! isset( $asraa_broker_feed_public ) || ! $asraa_broker_feed_public instanceof Asraa_Broker_Feed_Public ) {
         $asraa_broker_feed_public = new Asraa_Broker_Feed_Public();
+    }
+}
+if ( class_exists( 'Asraa_Broker_Form_Shortcode' ) ) {
+    global $asraa_broker_form_shortcode;
+    if ( ! isset( $asraa_broker_form_shortcode ) || ! $asraa_broker_form_shortcode instanceof Asraa_Broker_Form_Shortcode ) {
+        $asraa_broker_form_shortcode = new Asraa_Broker_Form_Shortcode();
+    }
+}
+if ( class_exists( 'Asraa_Broker_Feed_Shortcode' ) ) {
+    global $asraa_broker_feed_shortcode;
+    if ( ! isset( $asraa_broker_feed_shortcode ) || ! $asraa_broker_feed_shortcode instanceof Asraa_Broker_Feed_Shortcode ) {
+        $asraa_broker_feed_shortcode = new Asraa_Broker_Feed_Shortcode();
     }
 }
 
