@@ -206,7 +206,8 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 			$price_parsed     = $this->parse_shorthand_price_to_number( $price_raw );
 
 			// 7. Handle optional property image upload via WordPress Media Library.
-			$image_url = '';
+			$image_url       = '';
+			$image_upload_msg = '';
 			if ( ! empty( $_FILES['property_image']['name'] ) ) {
 				require_once ABSPATH . 'wp-admin/includes/image.php';
 				require_once ABSPATH . 'wp-admin/includes/file.php';
@@ -220,6 +221,8 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 					}
 				} else {
 					error_log( '[ASRAA CRM MEDIA] AJAX image upload failed: ' . $attachment_id->get_error_message() );
+					// Non-blocking: listing is saved without an image; inform the user.
+					$image_upload_msg = __( 'Note: your listing was saved but the image could not be uploaded.', 'asraa-crm' );
 				}
 			}
 
@@ -248,9 +251,13 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 			$insertion_id = $repository->create( $payload );
 
 			if ( $insertion_id ) {
+				$success_message = __( 'Your listing has been submitted and is awaiting review.', 'asraa-crm' );
+				if ( ! empty( $image_upload_msg ) ) {
+					$success_message .= ' ' . $image_upload_msg;
+				}
 				wp_send_json_success(
 					array(
-						'message' => __( 'Your listing has been submitted and is awaiting review.', 'asraa-crm' ),
+						'message' => $success_message,
 						'id'      => $insertion_id,
 					)
 				);

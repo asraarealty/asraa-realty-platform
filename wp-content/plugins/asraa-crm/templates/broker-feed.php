@@ -24,21 +24,25 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param  float  $price Raw numeric price value.
  * @return string        Formatted string, e.g. "₹1.5 Cr", "₹75 L".
  */
-function asraa_feed_format_price( float $price ): string {
-	if ( $price <= 0 ) {
-		return '';
+if ( ! function_exists( 'asraa_feed_format_price' ) ) {
+	function asraa_feed_format_price( float $price ): string {
+		if ( $price <= 0 ) {
+			return '';
+		}
+		// UTF-8 rupee sign (U+20B9) — safe for esc_html().
+		$rupee = "\u{20B9}";
+		if ( $price >= 10000000 ) {
+			$crores = $price / 10000000;
+			$fmt    = ( fmod( $crores, 1 ) === 0.0 ) ? number_format( $crores, 0 ) : number_format( $crores, 2 );
+			return $rupee . $fmt . ' Cr';
+		}
+		if ( $price >= 100000 ) {
+			$lakhs = $price / 100000;
+			$fmt   = ( fmod( $lakhs, 1 ) === 0.0 ) ? number_format( $lakhs, 0 ) : number_format( $lakhs, 2 );
+			return $rupee . $fmt . ' L';
+		}
+		return $rupee . number_format( $price, 0 );
 	}
-	if ( $price >= 10000000 ) {
-		$crores = $price / 10000000;
-		$fmt    = ( fmod( $crores, 1 ) === 0.0 ) ? number_format( $crores, 0 ) : number_format( $crores, 2 );
-		return '&#8377;' . $fmt . ' Cr';
-	}
-	if ( $price >= 100000 ) {
-		$lakhs = $price / 100000;
-		$fmt   = ( fmod( $lakhs, 1 ) === 0.0 ) ? number_format( $lakhs, 0 ) : number_format( $lakhs, 2 );
-		return '&#8377;' . $fmt . ' L';
-	}
-	return '&#8377;' . number_format( $price, 0 );
 }
 
 /**
@@ -46,13 +50,15 @@ function asraa_feed_format_price( float $price ): string {
  *
  * @return string Data URI string.
  */
-function asraa_feed_placeholder_image(): string {
-	$svg = '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500">'
-		. '<rect width="100%" height="100%" fill="#f1f5f9"/>'
-		. '<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" '
-		. 'font-size="22" fill="#94a3b8" font-family="sans-serif">No Image Available</text>'
-		. '</svg>';
-	return 'data:image/svg+xml;charset=UTF-8,' . rawurlencode( $svg );
+if ( ! function_exists( 'asraa_feed_placeholder_image' ) ) {
+	function asraa_feed_placeholder_image(): string {
+		$svg = '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500">'
+			. '<rect width="100%" height="100%" fill="#f1f5f9"/>'
+			. '<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" '
+			. 'font-size="22" fill="#94a3b8" font-family="sans-serif">No Image Available</text>'
+			. '</svg>';
+		return 'data:image/svg+xml;charset=UTF-8,' . rawurlencode( $svg );
+	}
 }
 ?>
 
@@ -141,7 +147,7 @@ function asraa_feed_placeholder_image(): string {
 					</ul>
 
 					<?php if ( ! empty( $price_fmt ) ) : ?>
-						<p class="asraa-feed-card__price"><?php echo wp_kses( $price_fmt, array() ); ?></p>
+						<p class="asraa-feed-card__price"><?php echo esc_html( $price_fmt ); ?></p>
 					<?php endif; ?>
 
 				</div>

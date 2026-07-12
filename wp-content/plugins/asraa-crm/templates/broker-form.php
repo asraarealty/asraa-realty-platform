@@ -52,7 +52,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		>
 			<?php wp_nonce_field( 'asraa_quick_post', 'asraa_quick_post_nonce' ); ?>
 			<input type="hidden" name="action" value="asraa_quick_post" />
-			<input type="hidden" name="_wp_http_referer" value="<?php echo esc_attr( wp_unslash( $_SERVER['REQUEST_URI'] ?? '' ) ); ?>" />
+			<input type="hidden" name="_wp_http_referer" value="<?php echo esc_attr( esc_url_raw( home_url( add_query_arg( array() ) ) ) ); ?>" />
 
 			<!--
 				Broker hidden fields — displayed for progressive-enhancement / no-JS fallback.
