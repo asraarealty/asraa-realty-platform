@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( 'Asraa_Broker_Feed_Public' ) ) {
 	class Asraa_Broker_Feed_Public {
 		public function __construct() {
-			add_shortcode( 'asraa_broker_feed', array( $this, 'render_listing' ) );
+			// Note: [asraa_broker_feed] shortcode is registered by Asraa_Broker_Feed_Shortcode.
 			add_action( 'init', array( $this, 'register_rewrite_rules' ) );
 			add_filter( 'query_vars', array( $this, 'register_query_vars' ) );
 			add_action( 'template_redirect', array( $this, 'maybe_render_detail' ) );

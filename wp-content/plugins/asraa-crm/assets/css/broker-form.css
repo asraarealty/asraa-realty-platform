@@ -1,0 +1,668 @@
+/**
+ * Asraa Broker Form & Feed — Frontend Styles
+ *
+ * Covers:
+ *   [asraa_broker_post_form]  — property submission form
+ *   [asraa_broker_feed]       — public listing card grid
+ *
+ * Responsive breakpoints:
+ *   Desktop  ≥ 1024 px
+ *   Tablet   768 – 1023 px
+ *   Mobile   < 768 px
+ *
+ * @package Asraa_CRM
+ * @since   5.1.0
+ */
+
+/* ── CSS Custom Properties ──────────────────────────────────────────────── */
+:root {
+	--abf-brand:          #0e4da4;
+	--abf-brand-dark:     #0b3d83;
+	--abf-brand-light:    #e8f0fe;
+	--abf-accent:         #f97316;
+	--abf-success:        #16a34a;
+	--abf-success-bg:     #dcfce7;
+	--abf-error:          #dc2626;
+	--abf-error-bg:       #fee2e2;
+	--abf-text:           #111827;
+	--abf-text-muted:     #6b7280;
+	--abf-border:         #e5e7eb;
+	--abf-radius:         0.75rem;
+	--abf-radius-sm:      0.375rem;
+	--abf-shadow:         0 4px 24px rgba(0, 0, 0, 0.08);
+	--abf-shadow-hover:   0 8px 32px rgba(0, 0, 0, 0.14);
+	--abf-transition:     0.2s ease;
+	--abf-font:           -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ── Shared reset / base ────────────────────────────────────────────────── */
+.asraa-broker-form-wrapper *,
+.asraa-broker-feed * {
+	box-sizing: border-box;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   FORM
+══════════════════════════════════════════════════════════════════════════ */
+
+.asraa-broker-form-wrapper {
+	max-width: 860px;
+	margin: 2rem auto;
+	padding: 0 1rem;
+	font-family: var(--abf-font);
+}
+
+/* Card shell */
+.asraa-broker-form-card {
+	background: #fff;
+	border-radius: var(--abf-radius);
+	box-shadow: var(--abf-shadow);
+	overflow: hidden;
+}
+
+/* Header */
+.asraa-broker-form-header {
+	background: linear-gradient(135deg, var(--abf-brand) 0%, var(--abf-brand-dark) 100%);
+	color: #fff;
+	padding: 2rem 2.5rem 1.75rem;
+}
+
+.asraa-broker-form-title {
+	margin: 0 0 0.4rem;
+	font-size: 1.5rem;
+	font-weight: 700;
+	line-height: 1.25;
+}
+
+.asraa-broker-form-subtitle {
+	margin: 0;
+	font-size: 0.95rem;
+	opacity: 0.85;
+}
+
+/* Login notice */
+.asraa-login-notice {
+	text-align: center;
+	padding: 2rem;
+	color: var(--abf-text-muted);
+}
+
+/* Banners */
+.asraa-banner {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.75rem;
+	padding: 1rem 2.5rem;
+	font-size: 0.95rem;
+	font-weight: 500;
+}
+
+.asraa-banner--success {
+	background: var(--abf-success-bg);
+	color: var(--abf-success);
+	border-left: 4px solid var(--abf-success);
+}
+
+.asraa-banner--error {
+	background: var(--abf-error-bg);
+	color: var(--abf-error);
+	border-left: 4px solid var(--abf-error);
+}
+
+.asraa-banner__icon {
+	font-size: 1.1rem;
+	flex-shrink: 0;
+	margin-top: 0.05rem;
+}
+
+/* Form itself */
+.asraa-broker-form {
+	padding: 0;
+}
+
+/* Sections */
+.asraa-form-section {
+	padding: 1.75rem 2.5rem;
+	border-bottom: 1px solid var(--abf-border);
+}
+
+.asraa-form-section:last-of-type {
+	border-bottom: none;
+}
+
+.asraa-form-section-title {
+	margin: 0 0 1.25rem;
+	font-size: 0.875rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.07em;
+	color: var(--abf-brand);
+}
+
+/* Grid */
+.asraa-form-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 1.25rem;
+}
+
+.asraa-form-field--full {
+	grid-column: 1 / -1;
+}
+
+/* Label */
+.asraa-form-label {
+	display: block;
+	margin-bottom: 0.35rem;
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: var(--abf-text);
+}
+
+.asraa-required {
+	color: var(--abf-error);
+	margin-left: 0.2rem;
+}
+
+/* Input / Select / Textarea */
+.asraa-form-input,
+.asraa-form-select,
+.asraa-form-textarea {
+	display: block;
+	width: 100%;
+	padding: 0.65rem 0.9rem;
+	font-size: 0.9375rem;
+	font-family: var(--abf-font);
+	color: var(--abf-text);
+	background: #fff;
+	border: 1.5px solid var(--abf-border);
+	border-radius: var(--abf-radius-sm);
+	transition: border-color var(--abf-transition), box-shadow var(--abf-transition);
+	outline: none;
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+.asraa-form-input:focus,
+.asraa-form-select:focus,
+.asraa-form-textarea:focus {
+	border-color: var(--abf-brand);
+	box-shadow: 0 0 0 3px rgba(14, 77, 164, 0.15);
+}
+
+.asraa-form-input.asraa-input--invalid,
+.asraa-form-select.asraa-input--invalid {
+	border-color: var(--abf-error);
+	box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
+.asraa-form-select {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' viewBox='0 0 12 8'%3E%3Cpath stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 0.8rem center;
+	padding-right: 2.4rem;
+	cursor: pointer;
+}
+
+.asraa-form-textarea {
+	resize: vertical;
+	min-height: 6rem;
+}
+
+/* Price display */
+.asraa-price-display {
+	display: block;
+	margin-top: 0.3rem;
+	font-size: 0.8125rem;
+	font-weight: 600;
+	color: var(--abf-brand);
+	min-height: 1.2em;
+}
+
+/* Char count */
+.asraa-char-count {
+	display: block;
+	text-align: right;
+	font-size: 0.75rem;
+	color: var(--abf-text-muted);
+	margin-top: 0.25rem;
+}
+
+/* Field-level error */
+.asraa-field-error {
+	display: block;
+	margin-top: 0.3rem;
+	font-size: 0.8125rem;
+	color: var(--abf-error);
+	min-height: 1em;
+}
+
+/* Image upload */
+.asraa-image-upload-wrapper {
+	position: relative;
+}
+
+.asraa-image-upload-label {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 11rem;
+	border: 2px dashed var(--abf-border);
+	border-radius: var(--abf-radius-sm);
+	cursor: pointer;
+	transition: border-color var(--abf-transition), background var(--abf-transition);
+	overflow: hidden;
+	background: #f9fafb;
+}
+
+.asraa-image-upload-label:hover,
+.asraa-image-upload-label:focus {
+	border-color: var(--abf-brand);
+	background: var(--abf-brand-light);
+	outline: none;
+}
+
+.asraa-image-upload-label.asraa-drag-over {
+	border-color: var(--abf-brand);
+	background: var(--abf-brand-light);
+}
+
+.asraa-image-placeholder {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 1.5rem;
+	color: var(--abf-text-muted);
+	text-align: center;
+}
+
+.asraa-image-placeholder svg {
+	color: #9ca3af;
+}
+
+.asraa-image-placeholder span {
+	font-size: 0.9375rem;
+	font-weight: 500;
+}
+
+.asraa-image-placeholder small {
+	font-size: 0.8125rem;
+}
+
+.asraa-file-input {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	opacity: 0;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+}
+
+.asraa-image-preview {
+	display: block;
+	max-width: 100%;
+	max-height: 18rem;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.asraa-image-remove {
+	position: absolute;
+	top: 0.5rem;
+	right: 0.5rem;
+	width: 1.8rem;
+	height: 1.8rem;
+	background: rgba(0, 0, 0, 0.55);
+	color: #fff;
+	border: none;
+	border-radius: 50%;
+	font-size: 0.875rem;
+	cursor: pointer;
+	line-height: 1;
+	transition: background var(--abf-transition);
+}
+
+.asraa-image-remove:hover {
+	background: rgba(0, 0, 0, 0.8);
+}
+
+/* Form footer */
+.asraa-form-footer {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	padding: 1.5rem 2.5rem 2rem;
+	border-top: 1px solid var(--abf-border);
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────── */
+.asraa-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 0.7rem 1.6rem;
+	font-family: var(--abf-font);
+	font-size: 0.9375rem;
+	font-weight: 600;
+	line-height: 1.4;
+	border-radius: var(--abf-radius-sm);
+	border: 2px solid transparent;
+	cursor: pointer;
+	text-decoration: none;
+	transition: background var(--abf-transition), color var(--abf-transition),
+		border-color var(--abf-transition), box-shadow var(--abf-transition),
+		opacity var(--abf-transition);
+}
+
+.asraa-btn--primary {
+	background: var(--abf-brand);
+	color: #fff;
+	border-color: var(--abf-brand);
+}
+
+.asraa-btn--primary:hover,
+.asraa-btn--primary:focus {
+	background: var(--abf-brand-dark);
+	border-color: var(--abf-brand-dark);
+	color: #fff;
+	box-shadow: 0 4px 14px rgba(14, 77, 164, 0.35);
+	outline: none;
+	text-decoration: none;
+}
+
+.asraa-btn--primary:disabled,
+.asraa-btn--primary[aria-disabled="true"] {
+	opacity: 0.6;
+	cursor: not-allowed;
+	box-shadow: none;
+}
+
+.asraa-btn--outline {
+	background: transparent;
+	color: var(--abf-brand);
+	border-color: var(--abf-brand);
+}
+
+.asraa-btn--outline:hover,
+.asraa-btn--outline:focus {
+	background: var(--abf-brand-light);
+	color: var(--abf-brand-dark);
+	outline: none;
+	text-decoration: none;
+}
+
+.asraa-btn--sm {
+	padding: 0.45rem 1rem;
+	font-size: 0.8125rem;
+}
+
+/* Spinner (CSS-only) */
+.asraa-form-spinner {
+	display: inline-block;
+	width: 1rem;
+	height: 1rem;
+	border: 2px solid rgba(255, 255, 255, 0.45);
+	border-top-color: #fff;
+	border-radius: 50%;
+	animation: asraa-spin 0.7s linear infinite;
+}
+
+.asraa-form-spinner[style*="display: none"],
+.asraa-form-spinner[style*="display:none"] {
+	display: none !important;
+}
+
+@keyframes asraa-spin {
+	to { transform: rotate(360deg); }
+}
+
+/* Hidden by default — shown by JS when loading */
+.asraa-btn--loading .asraa-btn__spinner {
+	display: inline-block;
+}
+.asraa-btn:not(.asraa-btn--loading) .asraa-btn__spinner {
+	display: none;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   FEED CARD GRID
+══════════════════════════════════════════════════════════════════════════ */
+
+.asraa-broker-feed {
+	max-width: 1200px;
+	margin: 2rem auto;
+	padding: 0 1rem;
+	font-family: var(--abf-font);
+}
+
+/* Empty state */
+.asraa-feed-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 1rem;
+	padding: 4rem 2rem;
+	text-align: center;
+	color: var(--abf-text-muted);
+}
+
+.asraa-feed-empty svg {
+	color: #d1d5db;
+}
+
+.asraa-feed-empty p {
+	font-size: 1.0625rem;
+	margin: 0;
+}
+
+/* Grid */
+.asraa-feed-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 1.75rem;
+}
+
+/* Card */
+.asraa-feed-card {
+	background: #fff;
+	border-radius: var(--abf-radius);
+	box-shadow: var(--abf-shadow);
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	transition: transform var(--abf-transition), box-shadow var(--abf-transition);
+}
+
+.asraa-feed-card:hover {
+	transform: translateY(-4px);
+	box-shadow: var(--abf-shadow-hover);
+}
+
+/* Card image */
+.asraa-feed-card__image-wrap {
+	position: relative;
+	overflow: hidden;
+	aspect-ratio: 16 / 10;
+	background: #f1f5f9;
+}
+
+.asraa-feed-card__image {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: transform 0.35s ease;
+}
+
+.asraa-feed-card:hover .asraa-feed-card__image {
+	transform: scale(1.04);
+}
+
+/* Badge */
+.asraa-feed-card__badge {
+	position: absolute;
+	top: 0.65rem;
+	left: 0.65rem;
+	padding: 0.2rem 0.6rem;
+	border-radius: 999px;
+	font-size: 0.7375rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	background: rgba(0, 0, 0, 0.55);
+	color: #fff;
+	backdrop-filter: blur(4px);
+}
+
+.asraa-badge--sale    { background: rgba(22, 163, 74, 0.85); }
+.asraa-badge--rent    { background: rgba(249, 115, 22, 0.85); }
+.asraa-badge--resale  { background: rgba(14, 77, 164, 0.85); }
+
+/* Card body */
+.asraa-feed-card__body {
+	flex: 1;
+	padding: 1.1rem 1.25rem 0.75rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.asraa-feed-card__project {
+	margin: 0;
+	font-size: 0.75rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--abf-brand);
+}
+
+.asraa-feed-card__title {
+	margin: 0;
+	font-size: 1rem;
+	font-weight: 700;
+	color: var(--abf-text);
+	line-height: 1.35;
+}
+
+.asraa-feed-card__meta {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.3rem;
+}
+
+.asraa-feed-card__meta-item {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	font-size: 0.8125rem;
+	color: var(--abf-text-muted);
+}
+
+.asraa-feed-card__meta-item svg {
+	flex-shrink: 0;
+	color: #9ca3af;
+}
+
+.asraa-feed-card__price {
+	margin: 0.25rem 0 0;
+	font-size: 1.125rem;
+	font-weight: 800;
+	color: var(--abf-brand);
+}
+
+/* Card footer */
+.asraa-feed-card__footer {
+	display: flex;
+	gap: 0.6rem;
+	padding: 0.75rem 1.25rem 1.1rem;
+	border-top: 1px solid var(--abf-border);
+	flex-wrap: wrap;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE — Tablet (768 – 1023 px)
+══════════════════════════════════════════════════════════════════════════ */
+@media screen and (max-width: 1023px) {
+	.asraa-feed-grid {
+		grid-template-columns: repeat(2, 1fr);
+		gap: 1.25rem;
+	}
+
+	.asraa-broker-form-header {
+		padding: 1.5rem 1.5rem 1.25rem;
+	}
+
+	.asraa-form-section {
+		padding: 1.5rem;
+	}
+
+	.asraa-form-footer {
+		padding: 1.25rem 1.5rem 1.5rem;
+	}
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE — Mobile (< 768 px)
+══════════════════════════════════════════════════════════════════════════ */
+@media screen and (max-width: 767px) {
+	.asraa-broker-form-wrapper {
+		padding: 0 0.5rem;
+		margin: 1rem auto;
+	}
+
+	.asraa-broker-form-header {
+		padding: 1.25rem 1rem 1rem;
+	}
+
+	.asraa-broker-form-title {
+		font-size: 1.25rem;
+	}
+
+	.asraa-form-section {
+		padding: 1.25rem 1rem;
+	}
+
+	.asraa-form-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.asraa-form-footer {
+		padding: 1rem;
+	}
+
+	.asraa-btn--primary {
+		width: 100%;
+	}
+
+	.asraa-banner {
+		padding: 0.85rem 1rem;
+	}
+
+	/* Feed */
+	.asraa-broker-feed {
+		padding: 0 0.5rem;
+		margin: 1rem auto;
+	}
+
+	.asraa-feed-grid {
+		grid-template-columns: 1fr;
+		gap: 1rem;
+	}
+
+	.asraa-feed-card__footer {
+		flex-direction: column;
+	}
+
+	.asraa-feed-card__footer .asraa-btn {
+		width: 100%;
+		justify-content: center;
+	}
+}

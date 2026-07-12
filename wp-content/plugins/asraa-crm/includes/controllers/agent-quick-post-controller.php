@@ -38,6 +38,8 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 		 */
 		public function __construct() {
 			add_action( 'admin_post_asraa_quick_post', array( $this, 'save_property' ) );
+			// AJAX endpoint for the frontend broker form shortcode.
+			add_action( 'wp_ajax_asraa_quick_post', array( $this, 'save_property_ajax' ) );
 		}
 
 		/**
@@ -95,9 +97,11 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 			$configuration    = isset( $_POST['configuration'] ) ? sanitize_text_field( wp_unslash( $_POST['configuration'] ) ) : '';
 			$city             = isset( $_POST['city'] ) ? sanitize_text_field( wp_unslash( $_POST['city'] ) ) : '';
 			$locality         = isset( $_POST['locality'] ) ? sanitize_text_field( wp_unslash( $_POST['locality'] ) ) : '';
+			$location         = isset( $_POST['location'] ) ? sanitize_text_field( wp_unslash( $_POST['location'] ) ) : '';
 			$carpet_area      = isset( $_POST['carpet_area'] ) ? sanitize_text_field( wp_unslash( $_POST['carpet_area'] ) ) : '';
 			$available_units  = isset( $_POST['available_units'] ) ? absint( wp_unslash( $_POST['available_units'] ) ) : 1;
 			$price_raw        = isset( $_POST['price'] ) ? sanitize_text_field( wp_unslash( $_POST['price'] ) ) : '0';
+			$notes            = isset( $_POST['notes'] ) ? sanitize_textarea_field( wp_unslash( $_POST['notes'] ) ) : '';
 			$price_parsed     = $this->parse_shorthand_price_to_number( $price_raw );
 
 			// Compile data vector structure matrix array payload context matching DB structures
@@ -109,9 +113,11 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 				'configuration'      => $configuration,
 				'city'               => $city,
 				'locality'           => $locality,
+				'location'           => $location,
 				'carpet_area'        => $carpet_area,
 				'available_units'    => $available_units,
 				'price'              => $price_parsed,
+				'notes'              => $notes,
 				'source_agent_id'    => $source_agent_id,
 				'source_agent_name'  => $source_agent_name,
 				'source_agent_phone' => $source_agent_phone,
@@ -137,6 +143,130 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 				wp_safe_redirect( add_query_arg( 'asraa_quick_post_error', 'db_failure', $fallback_redirect ) );
 			}
 			exit;
+		}
+
+		/**
+		 * AJAX handler for the frontend [asraa_broker_post_form] shortcode submission.
+		 *
+		 * Fires on: wp_ajax_asraa_quick_post (logged-in users only).
+		 * Reuses the same nonce action, repository, and price parser as save_property().
+		 * Handles optional image upload via the WordPress Media Library engine.
+		 * Returns JSON — never redirects.
+		 *
+		 * @since  5.1.0
+		 * @access public
+		 * @return void Terminates via wp_send_json_success / wp_send_json_error.
+		 */
+		public function save_property_ajax(): void {
+			// 1. Session authentication.
+			if ( ! is_user_logged_in() ) {
+				wp_send_json_error( array( 'message' => __( 'You must be logged in to submit a listing.', 'asraa-crm' ) ), 403 );
+			}
+
+			// 2. Capability check.
+			if ( ! current_user_can( 'read' ) ) {
+				wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'asraa-crm' ) ), 403 );
+			}
+
+			// 3. Nonce verification.
+			$nonce = isset( $_POST['asraa_quick_post_nonce'] ) ? sanitize_key( wp_unslash( $_POST['asraa_quick_post_nonce'] ) ) : '';
+			if ( ! wp_verify_nonce( $nonce, 'asraa_quick_post' ) ) {
+				wp_send_json_error( array( 'message' => __( 'Security check failed. Please reload the page and try again.', 'asraa-crm' ) ), 403 );
+			}
+
+			// 4. Repository availability.
+			if ( ! class_exists( 'Asraa_Broker_Feed_Repository' ) ) {
+				wp_send_json_error( array( 'message' => __( 'System error. Please contact support.', 'asraa-crm' ) ), 500 );
+			}
+
+			$repository = new Asraa_Broker_Feed_Repository();
+
+			// 5. Resolve broker identity from the server session — never from POST.
+			$current_user       = wp_get_current_user();
+			$source_agent_id    = absint( $current_user->ID );
+			$source_agent_name  = sanitize_text_field( $current_user->display_name );
+			$source_agent_phone = sanitize_text_field(
+				get_user_meta( $source_agent_id, 'billing_phone', true )
+					?: get_user_meta( $source_agent_id, 'phone', true )
+			);
+
+			// 6. Sanitize form fields.
+			$title            = isset( $_POST['title'] ) ? sanitize_text_field( wp_unslash( $_POST['title'] ) ) : '';
+			$project_name     = isset( $_POST['project_name'] ) ? sanitize_text_field( wp_unslash( $_POST['project_name'] ) ) : '';
+			$transaction_type = isset( $_POST['transaction_type'] ) ? sanitize_text_field( wp_unslash( $_POST['transaction_type'] ) ) : 'sale';
+			$property_type    = isset( $_POST['property_type'] ) ? sanitize_text_field( wp_unslash( $_POST['property_type'] ) ) : '';
+			$configuration    = isset( $_POST['configuration'] ) ? sanitize_text_field( wp_unslash( $_POST['configuration'] ) ) : '';
+			$city             = isset( $_POST['city'] ) ? sanitize_text_field( wp_unslash( $_POST['city'] ) ) : '';
+			$locality         = isset( $_POST['locality'] ) ? sanitize_text_field( wp_unslash( $_POST['locality'] ) ) : '';
+			$location         = isset( $_POST['location'] ) ? sanitize_text_field( wp_unslash( $_POST['location'] ) ) : '';
+			$carpet_area      = isset( $_POST['carpet_area'] ) ? sanitize_text_field( wp_unslash( $_POST['carpet_area'] ) ) : '';
+			$available_units  = isset( $_POST['available_units'] ) ? absint( wp_unslash( $_POST['available_units'] ) ) : 1;
+			$price_raw        = isset( $_POST['price'] ) ? sanitize_text_field( wp_unslash( $_POST['price'] ) ) : '0';
+			$notes            = isset( $_POST['notes'] ) ? sanitize_textarea_field( wp_unslash( $_POST['notes'] ) ) : '';
+			$price_parsed     = $this->parse_shorthand_price_to_number( $price_raw );
+
+			// 7. Handle optional property image upload via WordPress Media Library.
+			$image_url       = '';
+			$image_upload_msg = '';
+			if ( ! empty( $_FILES['property_image']['name'] ) ) {
+				require_once ABSPATH . 'wp-admin/includes/image.php';
+				require_once ABSPATH . 'wp-admin/includes/file.php';
+				require_once ABSPATH . 'wp-admin/includes/media.php';
+
+				$attachment_id = media_handle_upload( 'property_image', 0 );
+				if ( ! is_wp_error( $attachment_id ) ) {
+					$uploaded_url = wp_get_attachment_url( $attachment_id );
+					if ( $uploaded_url ) {
+						$image_url = esc_url_raw( $uploaded_url );
+					}
+				} else {
+					error_log( '[ASRAA CRM MEDIA] AJAX image upload failed: ' . $attachment_id->get_error_message() );
+					// Non-blocking: listing is saved without an image; inform the user.
+					$image_upload_msg = __( 'Note: your listing was saved but the image could not be uploaded.', 'asraa-crm' );
+				}
+			}
+
+			// 8. Compose and persist the payload.
+			$payload = array(
+				'title'              => $title,
+				'project_name'       => $project_name,
+				'transaction_type'   => $transaction_type,
+				'property_type'      => $property_type,
+				'configuration'      => $configuration,
+				'city'               => $city,
+				'locality'           => $locality,
+				'location'           => $location,
+				'carpet_area'        => $carpet_area,
+				'available_units'    => $available_units,
+				'price'              => $price_parsed,
+				'notes'              => $notes,
+				'image_url'          => $image_url,
+				'source_agent_id'    => $source_agent_id,
+				'source_agent_name'  => $source_agent_name,
+				'source_agent_phone' => $source_agent_phone,
+				'approval_status'    => 'pending',
+				'is_public'          => 0,
+			);
+
+			$insertion_id = $repository->create( $payload );
+
+			if ( $insertion_id ) {
+				$success_message = __( 'Your listing has been submitted and is awaiting review.', 'asraa-crm' );
+				if ( ! empty( $image_upload_msg ) ) {
+					$success_message .= ' ' . $image_upload_msg;
+				}
+				wp_send_json_success(
+					array(
+						'message' => $success_message,
+						'id'      => $insertion_id,
+					)
+				);
+			} else {
+				wp_send_json_error(
+					array( 'message' => __( 'Failed to save your listing. Please try again.', 'asraa-crm' ) ),
+					500
+				);
+			}
 		}
 
 		/**
