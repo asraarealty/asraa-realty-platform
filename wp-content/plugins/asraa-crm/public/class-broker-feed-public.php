@@ -51,35 +51,17 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Public' ) ) {
 		}
 
 		public function maybe_render_detail() {
-			if ( ! class_exists( 'Asraa_Broker_Feed_Repository' ) ) {
-				status_header( 404 );
-				nocache_headers();
-				return;
-			}
-
 			$slug = get_query_var( 'asraa_broker_feed_slug' );
 			if ( empty( $slug ) ) {
 				return;
 			}
 
-			$repository = new Asraa_Broker_Feed_Repository();
-			$record = $repository->get_by_slug( $slug );
-			if ( ! $record ) {
-				status_header( 404 );
-				nocache_headers();
-				return;
+			global $wp_query;
+			if ( $wp_query instanceof WP_Query ) {
+				$wp_query->set_404();
 			}
-
-			status_header( 200 );
-			add_filter( 'template_include', function( $template ) {
-				return locate_template( array( 'page.php', 'single.php', 'index.php' ) ) ?: $template;
-			}, 99 );
-			add_filter( 'the_title', function( $title ) use ( $record ) {
-				return $record['title'] ?? $title;
-			}, 20 );
-			add_filter( 'the_content', function( $content ) use ( $record ) {
-				return $this->render_detail( $record );
-			}, 20 );
+			status_header( 404 );
+			nocache_headers();
 		}
 
 		public function render_detail( $record ) {
@@ -100,24 +82,9 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Public' ) ) {
 		}
 
 		public function render_meta_tags() {
-			if ( ! class_exists( 'Asraa_Broker_Feed_Repository' ) ) {
-				return;
-			}
-
 			$slug = get_query_var( 'asraa_broker_feed_slug' );
 			if ( empty( $slug ) ) {
 				return;
-			}
-			$repository = new Asraa_Broker_Feed_Repository();
-			$record = $repository->get_by_slug( $slug );
-			if ( ! $record ) {
-				return;
-			}
-			if ( ! empty( $record['meta_title'] ) ) {
-				echo '<meta property="og:title" content="' . esc_attr( $record['meta_title'] ) . '" />' . PHP_EOL;
-			}
-			if ( ! empty( $record['meta_description'] ) ) {
-				echo '<meta name="description" content="' . esc_attr( $record['meta_description'] ) . '" />' . PHP_EOL;
 			}
 		}
 
