@@ -143,7 +143,20 @@ if ( ! class_exists( 'Asraa_Broker_Form_Shortcode' ) ) {
 			ob_start();
 			?>
 			<div class="asraa-broker-form-wrapper" id="asraa-broker-auth-wrapper">
-				<div class="asraa-broker-form-card">
+				<div class="asraa-broker-layout">
+					<aside class="asraa-broker-sidecard" aria-label="<?php esc_attr_e( 'Broker portal information', 'asraa-crm' ); ?>">
+						<span class="asraa-broker-sidecard__kicker"><?php esc_html_e( 'Asraa Realty', 'asraa-crm' ); ?></span>
+						<h2 class="asraa-broker-sidecard__title"><?php esc_html_e( 'Broker Partner Access', 'asraa-crm' ); ?></h2>
+						<p class="asraa-broker-sidecard__text">
+							<?php esc_html_e( 'Sign in to continue submissions, or create a broker account to start posting listings instantly.', 'asraa-crm' ); ?>
+						</p>
+						<ul class="asraa-broker-sidecard__list">
+							<li><?php esc_html_e( 'Submit listings securely in minutes', 'asraa-crm' ); ?></li>
+							<li><?php esc_html_e( 'Track approvals through Asraa CRM review', 'asraa-crm' ); ?></li>
+							<li><?php esc_html_e( 'Keep your listing data and media in one place', 'asraa-crm' ); ?></li>
+						</ul>
+					</aside>
+					<div class="asraa-broker-form-card">
 
 					<div class="asraa-broker-form-header">
 						<h2 class="asraa-broker-form-title">
@@ -297,7 +310,8 @@ if ( ! class_exists( 'Asraa_Broker_Form_Shortcode' ) ) {
 						</form>
 					</div><!-- /#asraa-auth-panel-register -->
 
-				</div><!-- /.asraa-broker-form-card -->
+					</div><!-- /.asraa-broker-form-card -->
+				</div><!-- /.asraa-broker-layout -->
 			</div><!-- /#asraa-broker-auth-wrapper -->
 			<?php
 			return (string) ob_get_clean();
