@@ -583,7 +583,7 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Repository' ) ) {
 			if ( $use_limit ) {
 				$limit = max( 1, min( self::PUBLIC_FEED_MAX_LIMIT, $limit ) );
 			}
-			$cache_key = self::PUBLIC_FEED_CACHE_PREFIX . $limit;
+			$cache_key = $use_limit ? self::PUBLIC_FEED_CACHE_PREFIX . $limit : '';
 
 			if ( $use_limit && ARRAY_A === $output_type ) {
 				$cached_results = get_transient( $cache_key );

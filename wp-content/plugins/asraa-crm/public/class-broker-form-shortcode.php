@@ -137,8 +137,8 @@ if ( ! class_exists( 'Asraa_Broker_Form_Shortcode' ) ) {
 		 * @return string HTML output.
 		 */
 		private function render_auth_panel(): string {
-			$current_permalink = get_permalink();
-			$redirect_to       = $current_permalink ? esc_url_raw( $current_permalink ) : esc_url_raw( home_url( '/' ) );
+			$permalink   = get_permalink();
+			$redirect_to = $permalink ? esc_url_raw( $permalink ) : esc_url_raw( home_url( '/' ) );
 
 			ob_start();
 			?>
