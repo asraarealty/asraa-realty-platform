@@ -20,6 +20,10 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+$display_name = isset( $broker_name ) && '' !== trim( (string) $broker_name )
+	? trim( (string) $broker_name )
+	: __( 'Broker Account', 'asraa-crm' );
 ?>
 <div class="asraa-broker-form-wrapper" id="asraa-broker-form-wrapper">
 	<div class="asraa-broker-layout">
@@ -36,7 +40,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</ul>
 			<div class="asraa-broker-sidecard__broker">
 				<span class="asraa-broker-sidecard__label"><?php esc_html_e( 'Logged in as', 'asraa-crm' ); ?></span>
-				<strong class="asraa-broker-sidecard__name"><?php echo esc_html( $broker_name ); ?></strong>
+				<strong class="asraa-broker-sidecard__name"><?php echo esc_html( $display_name ); ?></strong>
 				<?php if ( ! empty( $broker_email ) ) : ?>
 					<span class="asraa-broker-sidecard__meta"><?php echo esc_html( $broker_email ); ?></span>
 				<?php endif; ?>
