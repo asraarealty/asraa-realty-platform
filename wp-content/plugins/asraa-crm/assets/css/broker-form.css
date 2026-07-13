@@ -769,13 +769,13 @@
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   FEED CARD GRID
+   BROKER FEED — Premium Property Carousel
 ══════════════════════════════════════════════════════════════════════════ */
 
 .asraa-broker-feed {
-	max-width: 1240px;
-	margin: 2rem auto;
-	padding: 0 1rem;
+	max-width: 1280px;
+	margin: 3rem auto;
+	padding: 0 1.5rem;
 	font-family: var(--abf-font);
 }
 
@@ -800,28 +800,57 @@
 	margin: 0;
 }
 
-/* Grid */
+/* Grid (legacy — replaced by carousel) */
 .asraa-feed-grid {
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	gap: 1.75rem;
+	display: none; /* safety fallback if old markup is cached */
 }
 
-/* Card */
-.asraa-feed-card {
-	background: #fff;
+/* ── Carousel ──────────────────────────────────────────────────────────── */
+
+.asraa-feed-carousel {
+	position: relative;
+	outline: none;
+	-webkit-user-select: none;
+	        user-select: none;
+}
+
+.asraa-feed-carousel:focus-visible {
+	outline: 2px solid var(--abf-brand);
+	outline-offset: 6px;
 	border-radius: var(--abf-radius);
-	border: 1px solid rgba(18, 58, 122, 0.08);
-	box-shadow: var(--abf-shadow);
+}
+
+/* Clipping wrapper — clips overflowing slides */
+.asraa-feed-track-wrap {
+	overflow: hidden;
+	border-radius: var(--abf-radius);
+}
+
+/* Sliding track */
+.asraa-feed-track {
+	display: flex;
+	align-items: stretch;
+	gap: 1.75rem;
+	will-change: transform;
+}
+
+/* ── Card ──────────────────────────────────────────────────────────────── */
+
+.asraa-feed-card {
+	background: #ffffff;
+	border-radius: var(--abf-radius);
+	border: 1px solid rgba(18, 58, 122, 0.07);
+	box-shadow: 0 8px 24px rgba(15, 47, 97, 0.09), 0 2px 6px rgba(15, 47, 97, 0.05);
 	overflow: hidden;
 	display: flex;
 	flex-direction: column;
-	transition: transform var(--abf-transition), box-shadow var(--abf-transition);
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+	flex-shrink: 0; /* width controlled by JS */
 }
 
 .asraa-feed-card:hover {
-	transform: translateY(-4px);
-	box-shadow: var(--abf-shadow-hover);
+	transform: translateY(-6px);
+	box-shadow: 0 20px 48px rgba(15, 47, 97, 0.16), 0 6px 16px rgba(15, 47, 97, 0.09);
 }
 
 /* Card image */
@@ -837,54 +866,55 @@
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
-	transition: transform 0.35s ease;
+	transition: transform 0.45s ease;
 }
 
 .asraa-feed-card:hover .asraa-feed-card__image {
-	transform: scale(1.04);
+	transform: scale(1.06);
 }
 
 /* Badge */
 .asraa-feed-card__badge {
 	position: absolute;
-	top: 0.65rem;
-	left: 0.65rem;
-	padding: 0.2rem 0.6rem;
+	top: 0.75rem;
+	left: 0.75rem;
+	padding: 0.25rem 0.7rem;
 	border-radius: 999px;
-	font-size: 0.7375rem;
+	font-size: 0.75rem;
 	font-weight: 700;
-	letter-spacing: 0.04em;
+	letter-spacing: 0.05em;
 	text-transform: uppercase;
-	background: rgba(0, 0, 0, 0.55);
+	background: rgba(0, 0, 0, 0.52);
 	color: #fff;
-	backdrop-filter: blur(4px);
+	backdrop-filter: blur(6px);
+	-webkit-backdrop-filter: blur(6px);
 }
 
-.asraa-badge--sale    { background: rgba(22, 163, 74, 0.85); }
-.asraa-badge--rent    { background: rgba(249, 115, 22, 0.85); }
-.asraa-badge--resale  { background: rgba(14, 77, 164, 0.85); }
+.asraa-badge--sale    { background: rgba(22, 163, 74, 0.88); }
+.asraa-badge--rent    { background: rgba(249, 115, 22, 0.88); }
+.asraa-badge--resale  { background: rgba(14, 77, 164, 0.88); }
 
 /* Card body */
 .asraa-feed-card__body {
 	flex: 1;
-	padding: 1.1rem 1.25rem 0.75rem;
+	padding: 1.375rem 1.5rem 1rem;
 	display: flex;
 	flex-direction: column;
-	gap: 0.5rem;
+	gap: 0.6rem;
 }
 
 .asraa-feed-card__project {
 	margin: 0;
-	font-size: 0.75rem;
+	font-size: 0.8rem;
 	font-weight: 700;
 	text-transform: uppercase;
-	letter-spacing: 0.06em;
+	letter-spacing: 0.07em;
 	color: var(--abf-brand);
 }
 
 .asraa-feed-card__title {
 	margin: 0;
-	font-size: 1rem;
+	font-size: 1.125rem;
 	font-weight: 700;
 	color: var(--abf-text);
 	line-height: 1.35;
@@ -896,14 +926,14 @@
 	padding: 0;
 	display: flex;
 	flex-direction: column;
-	gap: 0.3rem;
+	gap: 0.4rem;
 }
 
 .asraa-feed-card__meta-item {
 	display: flex;
 	align-items: center;
-	gap: 0.4rem;
-	font-size: 0.8125rem;
+	gap: 0.5rem;
+	font-size: 0.875rem;
 	color: var(--abf-text-muted);
 }
 
@@ -913,17 +943,18 @@
 }
 
 .asraa-feed-card__price {
-	margin: 0.25rem 0 0;
-	font-size: 1.125rem;
+	margin: 0.375rem 0 0;
+	font-size: 1.375rem;
 	font-weight: 800;
 	color: var(--abf-brand);
+	letter-spacing: -0.01em;
 }
 
 /* Card footer */
 .asraa-feed-card__footer {
 	display: flex;
-	gap: 0.6rem;
-	padding: 0.75rem 1.25rem 1.1rem;
+	gap: 0.75rem;
+	padding: 1rem 1.5rem 1.375rem;
 	border-top: 1px solid var(--abf-border);
 	flex-wrap: wrap;
 }
@@ -931,6 +962,83 @@
 .asraa-feed-card__footer .asraa-btn {
 	flex: 1 1 0;
 }
+
+/* ── Carousel navigation arrows ───────────────────────────────────────── */
+
+.asraa-feed-nav {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	z-index: 10;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 3rem;
+	height: 3rem;
+	background: #ffffff;
+	border: 1px solid rgba(18, 58, 122, 0.12);
+	border-radius: 50%;
+	box-shadow: 0 4px 16px rgba(15, 47, 97, 0.14);
+	cursor: pointer;
+	color: var(--abf-brand);
+	transition: background var(--abf-transition), box-shadow var(--abf-transition), transform 0.3s ease, color var(--abf-transition);
+	padding: 0;
+}
+
+.asraa-feed-nav:hover,
+.asraa-feed-nav:focus-visible {
+	background: var(--abf-brand);
+	color: #ffffff;
+	box-shadow: 0 6px 24px rgba(15, 47, 97, 0.28);
+	outline: none;
+}
+
+.asraa-feed-nav:focus-visible {
+	outline: 2px solid var(--abf-brand);
+	outline-offset: 3px;
+}
+
+.asraa-feed-prev {
+	left: -1.375rem;
+}
+
+.asraa-feed-next {
+	right: -1.375rem;
+}
+
+/* ── Dot indicators ───────────────────────────────────────────────────── */
+
+.asraa-feed-dots {
+	display: flex;
+	justify-content: center;
+	gap: 0.5rem;
+	margin-top: 1.75rem;
+	flex-wrap: wrap;
+}
+
+.asraa-feed-dot {
+	width: 0.625rem;
+	height: 0.625rem;
+	border-radius: 50%;
+	border: none;
+	background: #d1d5db;
+	cursor: pointer;
+	padding: 0;
+	transition: background var(--abf-transition), transform var(--abf-transition), width 0.25s ease;
+	flex-shrink: 0;
+}
+
+.asraa-feed-dot--active {
+	background: var(--abf-brand);
+	width: 1.5rem;
+	border-radius: 999px;
+}
+
+.asraa-feed-dot:focus-visible {
+	outline: 2px solid var(--abf-brand);
+	outline-offset: 2px;
+}
+
 
 /* ══════════════════════════════════════════════════════════════════════════
    RESPONSIVE — Tablet (768 – 1023 px)
@@ -948,6 +1056,10 @@
 		grid-template-columns: repeat(2, 1fr);
 		gap: 1.25rem;
 	}
+
+	/* Carousel: nav arrows pulled in slightly on smaller screens */
+	.asraa-feed-prev { left: -1rem; }
+	.asraa-feed-next { right: -1rem; }
 
 	.asraa-broker-form-header {
 		padding: 1.5rem 1.5rem 1.25rem;
@@ -1041,15 +1153,19 @@
 		width: 100%;
 	}
 
-	/* Feed */
+	/* Feed — mobile */
 	.asraa-broker-feed {
-		padding: 0 0.5rem;
-		margin: 1rem auto;
+		padding: 0 0.75rem;
+		margin: 1.5rem auto;
 	}
 
-	.asraa-feed-grid {
-		grid-template-columns: 1fr;
-		gap: 1rem;
+	/* Nav arrows inside the carousel bounds on mobile */
+	.asraa-feed-prev { left: 0.25rem; }
+	.asraa-feed-next { right: 0.25rem; }
+
+	.asraa-feed-nav {
+		width: 2.5rem;
+		height: 2.5rem;
 	}
 
 	.asraa-feed-card__footer {

@@ -50,6 +50,13 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Shortcode' ) ) {
 				array(),
 				ASRAA_CRM_VERSION
 			);
+			wp_enqueue_script(
+				'asraa-broker-feed-carousel',
+				ASRAA_CRM_URL . 'assets/js/broker-feed-carousel.js',
+				array(),
+				ASRAA_CRM_VERSION,
+				true
+			);
 		}
 
 		/**
