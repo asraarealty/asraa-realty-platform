@@ -7,6 +7,7 @@
  * Available variables (resolved server-side from the current WP session):
  *   $broker_id    (int)     Current user ID.
  *   $broker_name  (string)  Current user display name.
+ *   $broker_email (string)  Current user email address.
  *   $broker_phone (string)  Current user phone number.
  *   $current_user (WP_User) Full user object.
  *
@@ -60,6 +61,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			-->
 			<input type="hidden" name="broker_id"       value="<?php echo esc_attr( (string) $broker_id ); ?>" />
 			<input type="hidden" name="broker_name"     value="<?php echo esc_attr( $broker_name ); ?>" />
+			<input type="hidden" name="broker_email"    value="<?php echo esc_attr( $broker_email ); ?>" />
 			<input type="hidden" name="broker_phone"    value="<?php echo esc_attr( $broker_phone ); ?>" />
 			<input type="hidden" name="current_user_id" value="<?php echo esc_attr( (string) $broker_id ); ?>" />
 

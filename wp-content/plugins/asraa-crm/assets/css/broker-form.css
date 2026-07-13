@@ -400,6 +400,23 @@
 	font-size: 0.8125rem;
 }
 
+/* WhatsApp button */
+.asraa-btn--whatsapp {
+	background: #25d366;
+	color: #fff;
+	border-color: #25d366;
+}
+
+.asraa-btn--whatsapp:hover,
+.asraa-btn--whatsapp:focus {
+	background: #1da855;
+	border-color: #1da855;
+	color: #fff;
+	box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
+	outline: none;
+	text-decoration: none;
+}
+
 /* Spinner (CSS-only) */
 .asraa-form-spinner {
 	display: inline-block;
@@ -426,6 +443,140 @@
 }
 .asraa-btn:not(.asraa-btn--loading) .asraa-btn__spinner {
 	display: none;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   AUTH PANEL (Login / Register)
+══════════════════════════════════════════════════════════════════════════ */
+
+/* Tab bar */
+.asraa-auth-tabs {
+	display: flex;
+	border-bottom: 2px solid var(--abf-border);
+	padding: 0 2.5rem;
+	gap: 0;
+}
+
+.asraa-auth-tab {
+	flex: 0 0 auto;
+	padding: 0.85rem 1.5rem;
+	font-family: var(--abf-font);
+	font-size: 0.9375rem;
+	font-weight: 600;
+	color: var(--abf-text-muted);
+	background: transparent;
+	border: none;
+	border-bottom: 2px solid transparent;
+	margin-bottom: -2px;
+	cursor: pointer;
+	transition: color var(--abf-transition), border-color var(--abf-transition);
+	outline: none;
+}
+
+.asraa-auth-tab:hover,
+.asraa-auth-tab:focus {
+	color: var(--abf-brand);
+}
+
+.asraa-auth-tab--active {
+	color: var(--abf-brand);
+	border-bottom-color: var(--abf-brand);
+}
+
+/* Auth panels */
+.asraa-auth-panel {
+	padding: 2rem 2.5rem;
+}
+
+/* WordPress login form overrides */
+#asraa-login-form p {
+	margin: 0 0 1.1rem;
+}
+
+#asraa-login-form label {
+	display: block;
+	margin-bottom: 0.35rem;
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: var(--abf-text);
+	font-family: var(--abf-font);
+}
+
+#asraa-login-form .input {
+	display: block;
+	width: 100%;
+	padding: 0.65rem 0.9rem;
+	font-size: 0.9375rem;
+	font-family: var(--abf-font);
+	color: var(--abf-text);
+	background: #fff;
+	border: 1.5px solid var(--abf-border);
+	border-radius: var(--abf-radius-sm);
+	transition: border-color var(--abf-transition), box-shadow var(--abf-transition);
+	outline: none;
+	-webkit-appearance: none;
+	appearance: none;
+	box-sizing: border-box;
+}
+
+#asraa-login-form .input:focus {
+	border-color: var(--abf-brand);
+	box-shadow: 0 0 0 3px rgba(14, 77, 164, 0.15);
+}
+
+#asraa-login-form .login-remember label {
+	font-weight: 400;
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	cursor: pointer;
+}
+
+#asraa-login-form .login-submit .button-primary {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.7rem 1.6rem;
+	font-family: var(--abf-font);
+	font-size: 0.9375rem;
+	font-weight: 600;
+	color: #fff;
+	background: var(--abf-brand);
+	border: 2px solid var(--abf-brand);
+	border-radius: var(--abf-radius-sm);
+	cursor: pointer;
+	text-decoration: none;
+	transition: background var(--abf-transition), border-color var(--abf-transition), box-shadow var(--abf-transition);
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+#asraa-login-form .login-submit .button-primary:hover,
+#asraa-login-form .login-submit .button-primary:focus {
+	background: var(--abf-brand-dark);
+	border-color: var(--abf-brand-dark);
+	box-shadow: 0 4px 14px rgba(14, 77, 164, 0.35);
+	outline: none;
+}
+
+/* Forgot password / meta links */
+.asraa-auth-meta {
+	margin: 1rem 0 0;
+	font-size: 0.875rem;
+}
+
+.asraa-auth-meta a {
+	color: var(--abf-brand);
+	text-decoration: none;
+}
+
+.asraa-auth-meta a:hover {
+	text-decoration: underline;
+}
+
+/* Custom register form footer */
+.asraa-auth-form-footer {
+	padding-top: 1.25rem;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -607,6 +758,14 @@
 	.asraa-form-footer {
 		padding: 1.25rem 1.5rem 1.5rem;
 	}
+
+	.asraa-auth-tabs {
+		padding: 0 1.5rem;
+	}
+
+	.asraa-auth-panel {
+		padding: 1.5rem;
+	}
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -644,6 +803,28 @@
 
 	.asraa-banner {
 		padding: 0.85rem 1rem;
+	}
+
+	/* Auth panel mobile */
+	.asraa-auth-tabs {
+		padding: 0 1rem;
+	}
+
+	.asraa-auth-tab {
+		padding: 0.75rem 1rem;
+		font-size: 0.875rem;
+	}
+
+	.asraa-auth-panel {
+		padding: 1.25rem 1rem;
+	}
+
+	#asraa-login-form .login-submit .button-primary {
+		width: 100%;
+	}
+
+	.asraa-auth-form-footer .asraa-btn {
+		width: 100%;
 	}
 
 	/* Feed */
