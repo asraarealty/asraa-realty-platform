@@ -824,6 +824,7 @@
 /* Sliding track */
 .asraa-feed-track {
 	display: flex;
+	flex-wrap: nowrap;
 	align-items: stretch;
 	gap: 1.75rem;
 	will-change: transform;
@@ -852,7 +853,7 @@
 .asraa-feed-card__image-wrap {
 	position: relative;
 	overflow: hidden;
-	aspect-ratio: 16 / 10;
+	height: 220px;
 	background: #f1f5f9;
 }
 

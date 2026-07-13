@@ -127,9 +127,10 @@
 		function sizeCards() {
 			var cw = getCardWidth();
 			Array.prototype.slice.call( track.children ).forEach( function ( c ) {
-				c.style.width    = cw + 'px';
-				c.style.minWidth = cw + 'px';
-				c.style.maxWidth = cw + 'px';
+				c.style.flexBasis = cw + 'px';
+				c.style.width     = '';
+				c.style.minWidth  = '';
+				c.style.maxWidth  = '';
 			} );
 		}
 
