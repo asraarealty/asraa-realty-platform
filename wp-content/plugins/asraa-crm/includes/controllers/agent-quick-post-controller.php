@@ -51,10 +51,6 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 		 * @return void Finishes execution by redirecting headers out of scope.
 		 */
 		public function save_property(): void {
-			// Temporary Debug Logs at Start
-			error_log('===== ASRAA QUICK POST START =====');
-			error_log(print_r($_POST, true));
-
 			// 1. Enforce strict user session authentication verification.
 			if ( ! is_user_logged_in() ) {
 				error_log( '[ASRAA CRM CONTROLLER SECURITY] Unauthenticated form post attempt intercepted.' );
@@ -68,7 +64,7 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 			}
 
 			// 3. Perform a rigorous anti-CSRF token verification handshake.
-			if ( ! isset( $_POST['asraa_quick_post_nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['asraa_quick_post_nonce'] ), 'asraa_quick_post' ) ) {
+			if ( ! isset( $_POST['asraa_quick_post_nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['asraa_quick_post_nonce'] ) ), 'asraa_quick_post' ) ) {
 				error_log( '[ASRAA CRM CONTROLLER SECURITY] Nonce verification handshake failure intercepted.' );
 				wp_die( esc_html__( 'Error: Security verification failed. Please reload the interface and retry.', 'asraa-crm' ), 403 );
 			}
@@ -81,13 +77,12 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 
 			// 5. Initialize the decoupled repository layer to isolate data writing tasks.
 			$repository = new Asraa_Broker_Feed_Repository();
-			error_log('Repository Loaded');
 
 			// 6. Automatically look up authenticated session parameters to prevent profile spoofing.
-			$current_user       = wp_get_current_user();
-			$source_agent_id    = absint( $current_user->ID );
-			$source_agent_name  = sanitize_text_field( $current_user->display_name );
-			$source_agent_phone = sanitize_text_field( get_user_meta( $source_agent_id, 'billing_phone', true ) ?: get_user_meta( $source_agent_id, 'phone', true ) );
+			$broker_profile     = $this->get_broker_profile();
+			$source_agent_id    = $broker_profile['id'];
+			$source_agent_name  = $broker_profile['name'];
+			$source_agent_phone = $broker_profile['phone'];
 
 			// 7. Sanitize incoming form parameters.
 			$title            = isset( $_POST['title'] ) ? sanitize_text_field( wp_unslash( $_POST['title'] ) ) : '';
@@ -103,6 +98,10 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 			$price_raw        = isset( $_POST['price'] ) ? sanitize_text_field( wp_unslash( $_POST['price'] ) ) : '0';
 			$notes            = isset( $_POST['notes'] ) ? sanitize_textarea_field( wp_unslash( $_POST['notes'] ) ) : '';
 			$price_parsed     = $this->parse_shorthand_price_to_number( $price_raw );
+			$validation_error = $this->validate_listing_input( $title, $project_name, $transaction_type, $property_type, $city, $price_parsed );
+			if ( $validation_error ) {
+				wp_die( esc_html( $validation_error ), 400 );
+			}
 
 			// Compile data vector structure matrix array payload context matching DB structures
 			$payload = array(
@@ -125,11 +124,12 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 				'is_public'          => 0,
 			);
 
-			$insertion_id = $repository->create( $payload );
+			$existing = $repository->find_duplicate_submission( $payload );
+			if ( ! empty( $existing ) ) {
+				wp_die( esc_html__( 'A similar listing already exists. Please update the existing entry instead.', 'asraa-crm' ), 409 );
+			}
 
-			global $wpdb;
-			error_log('Insert Result: ' . print_r($insertion_id, true));
-			error_log('DB Error: ' . $wpdb->last_error);
+			$insertion_id = $repository->create( $payload );
 
 			// Redirect cleanly back to prevent the blank admin-post rendering execution profile loop
 			$fallback_redirect = admin_url( 'admin.php?page=asraa-broker-feed' );
@@ -182,13 +182,10 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 			$repository = new Asraa_Broker_Feed_Repository();
 
 			// 5. Resolve broker identity from the server session — never from POST.
-			$current_user       = wp_get_current_user();
-			$source_agent_id    = absint( $current_user->ID );
-			$source_agent_name  = sanitize_text_field( $current_user->display_name );
-			$source_agent_phone = sanitize_text_field(
-				get_user_meta( $source_agent_id, 'billing_phone', true )
-					?: get_user_meta( $source_agent_id, 'phone', true )
-			);
+			$broker_profile     = $this->get_broker_profile();
+			$source_agent_id    = $broker_profile['id'];
+			$source_agent_name  = $broker_profile['name'];
+			$source_agent_phone = $broker_profile['phone'];
 
 			// 6. Sanitize form fields.
 			$title            = isset( $_POST['title'] ) ? sanitize_text_field( wp_unslash( $_POST['title'] ) ) : '';
@@ -204,6 +201,10 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 			$price_raw        = isset( $_POST['price'] ) ? sanitize_text_field( wp_unslash( $_POST['price'] ) ) : '0';
 			$notes            = isset( $_POST['notes'] ) ? sanitize_textarea_field( wp_unslash( $_POST['notes'] ) ) : '';
 			$price_parsed     = $this->parse_shorthand_price_to_number( $price_raw );
+			$validation_error = $this->validate_listing_input( $title, $project_name, $transaction_type, $property_type, $city, $price_parsed );
+			if ( $validation_error ) {
+				wp_send_json_error( array( 'message' => $validation_error ), 400 );
+			}
 
 			// 7. Handle optional property image upload via WordPress Media Library.
 			$image_url       = '';
@@ -248,6 +249,14 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 				'is_public'          => 0,
 			);
 
+			$existing = $repository->find_duplicate_submission( $payload );
+			if ( ! empty( $existing ) ) {
+				wp_send_json_error(
+					array( 'message' => __( 'A similar listing already exists. Please contact support to update it.', 'asraa-crm' ) ),
+					409
+				);
+			}
+
 			$insertion_id = $repository->create( $payload );
 
 			if ( $insertion_id ) {
@@ -278,14 +287,80 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 				return 0.00;
 			}
 			$multiplied_valuation = 1.00;
-			if ( str_contains( $clean_string, 'l' ) ) {
-				$multiplied_valuation = 100000.00;
-				$clean_string         = str_replace( array( 'lakhs', 'lakh', 'lac', 'l' ), '', $clean_string );
-			} elseif ( str_contains( $clean_string, 'cr' ) || str_contains( $clean_string, 'crore' ) ) {
+			$crore_removed = (string) preg_replace( '/(?:crores?|cr)\b/', '', $clean_string );
+			$lakh_removed  = (string) preg_replace( '/(?:lakhs?|lacs?)\b/', '', $clean_string );
+			$l_suffix_removed = (string) preg_replace( '/l\b/', '', $clean_string );
+
+			if ( $crore_removed !== $clean_string ) {
 				$multiplied_valuation = 10000000.00;
-				$clean_string         = str_replace( array( 'crores', 'crore', 'cr' ), '', $clean_string );
+				$clean_string         = $crore_removed;
+			} elseif ( $lakh_removed !== $clean_string ) {
+				$multiplied_valuation = 100000.00;
+				$clean_string         = $lakh_removed;
+			} elseif ( preg_match( '/\d+l\b/', $clean_string ) && $l_suffix_removed !== $clean_string ) {
+				$multiplied_valuation = 100000.00;
+				$clean_string         = $l_suffix_removed;
 			}
 			return floatval( $clean_string ) * $multiplied_valuation;
+		}
+
+		/**
+		 * Resolve broker identity from the authenticated WordPress session.
+		 *
+		 * @return array{id:int,name:string,phone:string}
+		 */
+		private function get_broker_profile(): array {
+			$current_user    = wp_get_current_user();
+			$source_agent_id = absint( $current_user->ID );
+			$display_name    = sanitize_text_field( $current_user->display_name );
+			$first_name      = sanitize_text_field( (string) get_user_meta( $source_agent_id, 'first_name', true ) );
+			$last_name       = sanitize_text_field( (string) get_user_meta( $source_agent_id, 'last_name', true ) );
+			$fallback_name   = trim( implode( ' ', array_filter( array( trim( $first_name ), trim( $last_name ) ) ) ) );
+			$source_name     = $display_name ? $display_name : ( $fallback_name ? $fallback_name : sanitize_text_field( $current_user->user_login ) );
+			$source_phone    = sanitize_text_field(
+				(string) ( get_user_meta( $source_agent_id, 'billing_phone', true ) ?: get_user_meta( $source_agent_id, 'phone', true ) )
+			);
+
+			return array(
+				'id'    => $source_agent_id,
+				'name'  => $source_name,
+				'phone' => $source_phone,
+			);
+		}
+
+		/**
+		 * Validate core listing fields.
+		 *
+		 * @param string $title Listing title.
+		 * @param string $project_name Project name.
+		 * @param string $transaction_type Transaction type.
+		 * @param string $property_type Property type.
+		 * @param string $city City.
+		 * @param float  $price Price.
+		 * @return string Empty string when valid, translated message when invalid.
+		 */
+		private function validate_listing_input(
+			string $title,
+			string $project_name,
+			string $transaction_type,
+			string $property_type,
+			string $city,
+			float $price
+		): string {
+			if ( '' === $title || '' === $project_name || '' === $property_type || '' === $city ) {
+				return __( 'Please complete all required fields.', 'asraa-crm' );
+			}
+
+			if ( $price <= 0 ) {
+				return __( 'Please enter a valid price.', 'asraa-crm' );
+			}
+
+			$allowed_transaction_types = array( 'sale', 'rent', 'resale' );
+			if ( ! in_array( $transaction_type, $allowed_transaction_types, true ) ) {
+				return __( 'Invalid transaction type selected.', 'asraa-crm' );
+			}
+
+			return '';
 		}
 	}
 }

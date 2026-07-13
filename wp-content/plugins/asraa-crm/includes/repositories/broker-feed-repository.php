@@ -33,6 +33,12 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Repository' ) ) {
 		 * @var string
 		 */
 		private string $table;
+		private const PUBLIC_FEED_CACHE_PREFIX = 'asraa_broker_public_feed_';
+		private const PUBLIC_FEED_CACHE_LIMITS = array( 24, 60, 120 );
+		private const PUBLIC_FEED_MAX_LIMIT = 120;
+		private const PUBLIC_FEED_CACHE_TTL = 5 * MINUTE_IN_SECONDS;
+		private const VISIBILITY_PUBLIC = 1;
+		private const VISIBILITY_PRIVATE = 0;
 
 		/**
 		 * Constructor initializes internal parameters via global database instance interface.
@@ -40,6 +46,17 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Repository' ) ) {
 		public function __construct() {
 			global $wpdb;
 			$this->table = $wpdb->prefix . 'asraa_broker_feed';
+		}
+
+		/**
+		 * Clear cached public feed query results.
+		 *
+		 * @return void
+		 */
+		private function invalidate_public_feed_cache(): void {
+			foreach ( self::PUBLIC_FEED_CACHE_LIMITS as $limit ) {
+				delete_transient( self::PUBLIC_FEED_CACHE_PREFIX . $limit );
+			}
 		}
 
 		/**
@@ -137,6 +154,7 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Repository' ) ) {
 				return false;
 			}
 
+			$this->invalidate_public_feed_cache();
 			return (int) $wpdb->insert_id;
 		}
 
@@ -235,6 +253,9 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Repository' ) ) {
 
 			$sanitized_data['updated_at'] = current_time( 'mysql' );
 			$result = $wpdb->update( $this->table, $sanitized_data, array( 'id' => $id ) );
+			if ( false !== $result ) {
+				$this->invalidate_public_feed_cache();
+			}
 			return false !== $result;
 		}
 
@@ -256,12 +277,15 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Repository' ) ) {
 				$this->table,
 				array(
 					'approval_status' => 'approved',
-					'is_public'       => 1,
+					'is_public'       => self::VISIBILITY_PUBLIC,
 				),
 				array( 'id' => $id ),
 				array( '%s', '%d' ),
 				array( '%d' )
 			);
+			if ( false !== $result ) {
+				$this->invalidate_public_feed_cache();
+			}
 			return false !== $result;
 		}
 
@@ -279,7 +303,20 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Repository' ) ) {
 			if ( 0 === $id ) {
 				return false;
 			}
-			$result = $wpdb->update( $this->table, array( 'approval_status' => 'rejected' ), array( 'id' => $id ), array( '%s' ), array( '%d' ) );
+			$result = $wpdb->update(
+				$this->table,
+				array(
+					// Rejected listings must not remain publicly visible.
+					'approval_status' => 'rejected',
+					'is_public'       => self::VISIBILITY_PRIVATE,
+				),
+				array( 'id' => $id ),
+				array( '%s', '%d' ),
+				array( '%d' )
+			);
+			if ( false !== $result ) {
+				$this->invalidate_public_feed_cache();
+			}
 			return false !== $result;
 		}
 
@@ -298,6 +335,9 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Repository' ) ) {
 				return false;
 			}
 			$result = $wpdb->delete( $this->table, array( 'id' => $id ), array( '%d' ) );
+			if ( false !== $result ) {
+				$this->invalidate_public_feed_cache();
+			}
 			return false !== $result;
 		}
 
@@ -318,6 +358,9 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Repository' ) ) {
 			$placeholder_string = implode( ',', array_fill( 0, count( $sanitized_ids ), '%d' ) );
 			$query              = $wpdb->prepare( "DELETE FROM {$this->table} WHERE id IN ($placeholder_string)", $sanitized_ids );
 			$execution_state    = $wpdb->query( $query ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			if ( false !== $execution_state ) {
+				$this->invalidate_public_feed_cache();
+			}
 			return false !== $execution_state;
 		}
 
@@ -342,15 +385,19 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Repository' ) ) {
 			if ( 'approved' === $target_status ) {
 				$query = $wpdb->prepare(
 					"UPDATE {$this->table} SET approval_status = %s, is_public = %d WHERE id IN ($placeholder_string)",
-					array_merge( array( $target_status, 1 ), $sanitized_ids )
+					array_merge( array( $target_status, self::VISIBILITY_PUBLIC ), $sanitized_ids )
 				);
 			} else {
 				$query = $wpdb->prepare(
-					"UPDATE {$this->table} SET approval_status = %s WHERE id IN ($placeholder_string)",
-					array_merge( array( $target_status ), $sanitized_ids )
+					"UPDATE {$this->table} SET approval_status = %s, is_public = %d WHERE id IN ($placeholder_string)",
+					array_merge( array( $target_status, self::VISIBILITY_PRIVATE ), $sanitized_ids )
 				);
 			}
-			return false !== $wpdb->query( $query ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			$result = $wpdb->query( $query ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			if ( false !== $result ) {
+				$this->invalidate_public_feed_cache();
+			}
+			return false !== $result;
 		}
 
 		public function get_filtered( array $args = array(), string $output_type = OBJECT ): array {
@@ -410,7 +457,9 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Repository' ) ) {
 				$values[] = $offset;
 			}
 
-			$query = $wpdb->prepare( $query, $values );
+			if ( ! empty( $values ) ) {
+				$query = $wpdb->prepare( $query, $values );
+			}
 			$results = $wpdb->get_results( $query, $output_type );
 			return is_array( $results ) ? $results : array();
 		}
@@ -463,7 +512,9 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Repository' ) ) {
 				$query .= ' WHERE ' . implode( ' AND ', $where );
 			}
 
-			$query = $wpdb->prepare( $query, $values );
+			if ( ! empty( $values ) ) {
+				$query = $wpdb->prepare( $query, $values );
+			}
 			$results = $wpdb->get_var( $query );
 			return (int) $results;
 		}
@@ -524,12 +575,44 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Repository' ) ) {
 		 * @param  string $output_type Return format structure configuration context default rule (OBJECT).
 		 * @return array Multi-row entity database lookup results matrix array.
 		 */
-		public function get_public_feed( string $output_type = OBJECT ): array {
+		public function get_public_feed( string $output_type = OBJECT, int $limit = 0 ): array {
 			global $wpdb;
-			$results = $wpdb->get_results(
-				"SELECT * FROM {$this->table} WHERE approval_status = 'approved' AND is_public = 1 ORDER BY id DESC",
-				$output_type
-			);
+			if ( ! $this->table_exists() ) {
+				return array();
+			}
+
+			$limit = absint( $limit );
+			$use_limit = $limit > 0;
+			if ( $use_limit ) {
+				$limit = max( 1, min( self::PUBLIC_FEED_MAX_LIMIT, $limit ) );
+			}
+			$cache_key = $use_limit ? self::PUBLIC_FEED_CACHE_PREFIX . $limit : '';
+
+			if ( $use_limit && ARRAY_A === $output_type ) {
+				$cached_results = get_transient( $cache_key );
+				if ( is_array( $cached_results ) ) {
+					return $cached_results;
+				}
+			}
+
+			if ( $use_limit ) {
+				$query = $wpdb->prepare(
+					"SELECT * FROM {$this->table} WHERE approval_status = %s AND is_public = %d ORDER BY id DESC LIMIT %d",
+					'approved',
+					1,
+					$limit
+				);
+			} else {
+				$query = $wpdb->prepare(
+					"SELECT * FROM {$this->table} WHERE approval_status = %s AND is_public = %d ORDER BY id DESC",
+					'approved',
+					1
+				);
+			}
+			$results = $wpdb->get_results( $query, $output_type );
+			if ( $use_limit && ARRAY_A === $output_type && is_array( $results ) ) {
+				set_transient( $cache_key, $results, self::PUBLIC_FEED_CACHE_TTL );
+			}
 			return is_array( $results ) ? $results : array();
 		}
 	}
