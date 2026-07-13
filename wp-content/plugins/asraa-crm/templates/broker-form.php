@@ -21,8 +21,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$display_name = isset( $broker_name ) && '' !== trim( (string) $broker_name )
-	? trim( (string) $broker_name )
+$broker_name_value = isset( $broker_name ) ? trim( (string) $broker_name ) : '';
+$display_name      = '' !== $broker_name_value
+	? $broker_name_value
 	: __( 'Broker Account', 'asraa-crm' );
 ?>
 <div class="asraa-broker-form-wrapper" id="asraa-broker-form-wrapper">
