@@ -34,6 +34,8 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Repository' ) ) {
 		 */
 		private string $table;
 		private const PUBLIC_FEED_CACHE_PREFIX = 'asraa_broker_public_feed_';
+		private const PUBLIC_FEED_CACHE_LIMITS = array( 24, 60, 120 );
+		private const PUBLIC_FEED_CACHE_TTL = 5 * MINUTE_IN_SECONDS;
 
 		/**
 		 * Constructor initializes internal parameters via global database instance interface.
@@ -49,7 +51,7 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Repository' ) ) {
 		 * @return void
 		 */
 		private function invalidate_public_feed_cache(): void {
-			foreach ( array( 24, 60, 120 ) as $limit ) {
+			foreach ( self::PUBLIC_FEED_CACHE_LIMITS as $limit ) {
 				delete_transient( self::PUBLIC_FEED_CACHE_PREFIX . $limit );
 			}
 		}
@@ -593,7 +595,7 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Repository' ) ) {
 			);
 			$results = $wpdb->get_results( $query, $output_type );
 			if ( ARRAY_A === $output_type && is_array( $results ) ) {
-				set_transient( $cache_key, $results, 5 * MINUTE_IN_SECONDS );
+				set_transient( $cache_key, $results, self::PUBLIC_FEED_CACHE_TTL );
 			}
 			return is_array( $results ) ? $results : array();
 		}

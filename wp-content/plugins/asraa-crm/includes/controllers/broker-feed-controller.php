@@ -173,7 +173,7 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Controller' ) ) {
 
 			// Enforce explicit cryptographic anti-CSRF token check.
 			// View submits nonce field name `update_nonce` with action `asraa_broker_feed_update_nonce`.
-			$update_nonce = isset( $_POST['update_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['update_nonce'] ) ) : '';
+			$update_nonce = isset( $_POST['update_nonce'] ) ? sanitize_key( wp_unslash( $_POST['update_nonce'] ) ) : '';
 			if ( ! wp_verify_nonce( $update_nonce, 'asraa_broker_feed_update_nonce' ) ) {
 				wp_die( esc_html__( 'Error: Security verification failed. Nonce has expired.', 'asraa-crm' ), 403 );
 			}

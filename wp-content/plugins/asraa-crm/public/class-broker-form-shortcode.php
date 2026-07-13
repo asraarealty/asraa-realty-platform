@@ -320,6 +320,11 @@ if ( ! class_exists( 'Asraa_Broker_Form_Shortcode' ) ) {
 			}
 
 			// 2. Allow broker portal registration by default (overridable via filter).
+			/**
+			 * Filter whether broker registration is enabled from the broker portal UI.
+			 *
+			 * @param bool $enabled True to allow registration, false to block it.
+			 */
 			$registration_enabled = apply_filters( 'asraa_crm_broker_registration_enabled', true );
 			if ( ! $registration_enabled ) {
 				wp_send_json_error( array( 'message' => __( 'Broker registration is temporarily disabled. Please contact the site administrator.', 'asraa-crm' ) ) );

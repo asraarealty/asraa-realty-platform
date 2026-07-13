@@ -64,7 +64,7 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 			}
 
 			// 3. Perform a rigorous anti-CSRF token verification handshake.
-			if ( ! isset( $_POST['asraa_quick_post_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['asraa_quick_post_nonce'] ) ), 'asraa_quick_post' ) ) {
+			if ( ! isset( $_POST['asraa_quick_post_nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['asraa_quick_post_nonce'] ) ), 'asraa_quick_post' ) ) {
 				error_log( '[ASRAA CRM CONTROLLER SECURITY] Nonce verification handshake failure intercepted.' );
 				wp_die( esc_html__( 'Error: Security verification failed. Please reload the interface and retry.', 'asraa-crm' ), 403 );
 			}
@@ -169,7 +169,7 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 			}
 
 			// 3. Nonce verification.
-			$nonce = isset( $_POST['asraa_quick_post_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['asraa_quick_post_nonce'] ) ) : '';
+			$nonce = isset( $_POST['asraa_quick_post_nonce'] ) ? sanitize_key( wp_unslash( $_POST['asraa_quick_post_nonce'] ) ) : '';
 			if ( ! wp_verify_nonce( $nonce, 'asraa_quick_post' ) ) {
 				wp_send_json_error( array( 'message' => __( 'Security check failed. Please reload the page and try again.', 'asraa-crm' ) ), 403 );
 			}
