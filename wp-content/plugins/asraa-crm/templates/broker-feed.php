@@ -165,6 +165,20 @@ if ( ! function_exists( 'asraa_feed_placeholder_image' ) ) {
 					>
 						<?php esc_html_e( 'Contact Asraa Realty', 'asraa-crm' ); ?>
 					</a>
+					<?php
+					$_asraa_wa_phone = get_option( 'asraa_crm_brand_phone', '' );
+					if ( ! empty( $_asraa_wa_phone ) ) :
+						$_asraa_wa_number = preg_replace( '/[^0-9]/', '', $_asraa_wa_phone );
+					?>
+					<a
+						href="<?php echo esc_url( 'https://wa.me/' . $_asraa_wa_number ); ?>"
+						class="asraa-btn asraa-btn--whatsapp asraa-btn--sm"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						<?php esc_html_e( 'WhatsApp', 'asraa-crm' ); ?>
+					</a>
+					<?php endif; ?>
 				</div>
 
 			</article>

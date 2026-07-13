@@ -2,6 +2,7 @@
  * Asraa Broker Post Form — Frontend JavaScript
  *
  * Features:
+ *   - Auth panel: tab switching (Login / Register) and AJAX broker registration
  *   - Live validation (required fields, price format)
  *   - Price shorthand parsing and formatted display (₹)
  *   - Image file validation and instant preview
@@ -24,6 +25,138 @@
 	// Config injected via wp_localize_script.
 	var cfg  = window.asraaBrokerFormConfig || {};
 	var i18n = cfg.i18n || {};
+
+	// ── Auth panel (shown when not logged in) ────────────────────────────────
+
+	var $authWrapper = $( '#asraa-broker-auth-wrapper' );
+
+	if ( $authWrapper.length ) {
+
+		var $authError    = $( '#asraa-auth-error' );
+		var $regForm      = $( '#asraa-broker-register-form' );
+		var $regSubmit    = $( '#asraa-register-submit' );
+
+		// Tab switching.
+		$authWrapper.on( 'click', '.asraa-auth-tab', function () {
+			var tab = $( this ).data( 'tab' );
+
+			$authWrapper.find( '.asraa-auth-tab' )
+				.removeClass( 'asraa-auth-tab--active' )
+				.attr( 'aria-selected', 'false' );
+
+			$( this )
+				.addClass( 'asraa-auth-tab--active' )
+				.attr( 'aria-selected', 'true' );
+
+			$authWrapper.find( '.asraa-auth-panel' ).hide();
+			$( '#asraa-auth-panel-' + tab ).show();
+			$authError.hide();
+		} );
+
+		// Inline field validation for required register fields on blur.
+		$regForm.on( 'blur', '.asraa-auth-required', function () {
+			var $el  = $( this );
+			var id   = $el.attr( 'id' );
+			var $err = $( '#' + id + '-error' );
+			if ( ! $el.val().trim() ) {
+				$el.addClass( 'asraa-input--invalid' ).attr( 'aria-invalid', 'true' );
+				$err.text( i18n.required || 'This field is required.' );
+			} else {
+				$el.removeClass( 'asraa-input--invalid' ).removeAttr( 'aria-invalid' );
+				$err.text( '' );
+			}
+		} );
+
+		// AJAX registration.
+		$regForm.on( 'submit', function ( e ) {
+			e.preventDefault();
+
+			$authError.hide();
+
+			// Client-side validation.
+			var valid = true;
+			$regForm.find( '.asraa-auth-required' ).each( function () {
+				var $el  = $( this );
+				var id   = $el.attr( 'id' );
+				var $err = $( '#' + id + '-error' );
+				if ( ! $el.val().trim() ) {
+					$el.addClass( 'asraa-input--invalid' ).attr( 'aria-invalid', 'true' );
+					$err.text( i18n.required || 'This field is required.' );
+					if ( valid ) { $el.trigger( 'focus' ); }
+					valid = false;
+				} else {
+					$el.removeClass( 'asraa-input--invalid' ).removeAttr( 'aria-invalid' );
+					$err.text( '' );
+				}
+			} );
+
+			var $pw1 = $( '#abr-password' );
+			var $pw2 = $( '#abr-password2' );
+
+			if ( $pw1.val().length < 8 ) {
+				$pw1.addClass( 'asraa-input--invalid' ).attr( 'aria-invalid', 'true' );
+				$( '#abr-password-error' ).text( i18n.pwTooShort || 'Password must be at least 8 characters.' );
+				if ( valid ) { $pw1.trigger( 'focus' ); }
+				valid = false;
+			}
+
+			if ( $pw1.val() !== $pw2.val() ) {
+				$pw2.addClass( 'asraa-input--invalid' ).attr( 'aria-invalid', 'true' );
+				$( '#abr-password2-error' ).text( i18n.pwMismatch || 'Passwords do not match.' );
+				if ( valid ) { $pw2.trigger( 'focus' ); }
+				valid = false;
+			}
+
+			if ( ! valid ) { return; }
+
+			// Lock button.
+			$regSubmit
+				.prop( 'disabled', true )
+				.attr( 'aria-disabled', 'true' )
+				.addClass( 'asraa-btn--loading' );
+			$regSubmit.find( '.asraa-btn__text' ).text( i18n.regSubmitting || 'Creating account\u2026' );
+
+			var formData = new FormData( $regForm[0] );
+			formData.set( 'action', 'asraa_broker_register' );
+			formData.set( 'nonce', cfg.regNonce || '' );
+
+			$.ajax( {
+				url:         cfg.ajaxUrl,
+				type:        'POST',
+				data:        formData,
+				processData: false,
+				contentType: false,
+				success: function ( response ) {
+					if ( response && response.success && response.data && response.data.redirect ) {
+						// Redirect back to the form page — user is now logged in.
+						window.location.href = response.data.redirect;
+					} else {
+						var msg = ( response && response.data && response.data.message )
+							? response.data.message
+							: ( i18n.regError || 'Registration failed. Please try again.' );
+						$authError.find( '.asraa-banner__message' ).text( msg );
+						$authError.show();
+						$regSubmit
+							.prop( 'disabled', false )
+							.attr( 'aria-disabled', 'false' )
+							.removeClass( 'asraa-btn--loading' );
+						$regSubmit.find( '.asraa-btn__text' ).text( 'Create Account' );
+					}
+				},
+				error: function () {
+					$authError.find( '.asraa-banner__message' ).text( i18n.regError || 'Registration failed. Please try again.' );
+					$authError.show();
+					$regSubmit
+						.prop( 'disabled', false )
+						.attr( 'aria-disabled', 'false' )
+						.removeClass( 'asraa-btn--loading' );
+					$regSubmit.find( '.asraa-btn__text' ).text( 'Create Account' );
+				}
+			} );
+		} );
+
+		return; // Auth screen active — no broker form code needed.
+	}
 
 	// ── Selectors ────────────────────────────────────────────────────────────
 	var $form       = $( '#asraa-broker-post-form' );
