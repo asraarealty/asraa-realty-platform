@@ -60,11 +60,11 @@ if ( empty( $rendered_broker_telephone ) ) {
 	<?php endif; ?>
 
 	<style>
-		.asraa-crm-container { margin-top: 24px; max-width: 1100px; display: grid; grid-template-columns: 1fr; gap: 24px; }
+		.asraa-crm-container { margin-top: 24px; max-width: 1100px; width: 100%; display: grid; grid-template-columns: 1fr; gap: 24px; }
 		.asraa-crm-panel { background: #fff; border: 1px solid #ccd0d4; box-shadow: 0 1px 3px rgba(0,0,0,0.04); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
 		.asraa-crm-panel-title { font-size: 14px; font-weight: 600; padding: 14px 20px; margin: 0; background: #f6f7f7; border-bottom: 1px solid #ccd0d4; color: #1d2327; text-transform: uppercase; letter-spacing: 0.5px; }
 		.asraa-crm-panel-body { padding: 24px; }
-		.asraa-crm-row { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 18px; }
+		.asraa-crm-row { display: flex; flex-wrap: wrap; align-items: stretch; gap: 20px; margin-bottom: 18px; }
 		.asraa-crm-group { flex: 1; min-width: 240px; display: flex; flex-direction: column; }
 		.asraa-crm-group-full { width: 100%; display: flex; flex-direction: column; margin-bottom: 18px; }
 		.asraa-crm-label { font-weight: 600; font-size: 13px; color: #1d2327; margin-bottom: 6px; display: inline-block; }
@@ -76,8 +76,19 @@ if ( empty( $rendered_broker_telephone ) ) {
 		.asraa-preview-box { margin-top: 12px; padding: 12px; border: 1px dashed #c3c4c7; border-radius: 4px; background: #fafafa; display: inline-flex; align-items: center; justify-content: center; min-width: 120px; min-height: 120px; max-width: 240px; position: relative; }
 		.asraa-preview-box img { max-width: 100%; height: auto; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: none; }
 		.asraa-preview-placeholder { font-size: 12px; color: #8c8f94; text-align: center; }
-		.asraa-submit-zone { background: #f6f7f7; border-top: 1px solid #ccd0d4; padding: 18px 24px; display: flex; justify-content: flex-end; align-items: center; gap: 16px; border-radius: 0 0 4px 4px; }
-		@media (max-width: 600px) { .asraa-crm-row { flex-direction: column; gap: 16px; } .asraa-crm-group { width: 100%; } }
+		.asraa-submit-zone { background: #f6f7f7; border-top: 1px solid #ccd0d4; padding: 18px 24px; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 16px; border-radius: 0 0 4px 4px; }
+		@media (max-width: 960px) {
+			.asraa-crm-panel-body { padding: 16px; }
+			.asraa-crm-group { min-width: 0; }
+			.asraa-submit-zone { padding: 16px; }
+		}
+		@media (max-width: 600px) {
+			.asraa-crm-row { flex-direction: column; gap: 16px; }
+			.asraa-crm-group { width: 100%; }
+			.asraa-submit-zone { flex-direction: column-reverse; align-items: stretch; }
+			.asraa-submit-zone .button { width: 100%; text-align: center; }
+			.asraa-crm-panel-title { font-size: 13px; padding: 12px 14px; }
+		}
 	</style>
 
 	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" enctype="multipart/form-data" class="asraa-crm-container" id="asraaQuickPostForm" novalidate="novalidate">
@@ -86,7 +97,6 @@ if ( empty( $rendered_broker_telephone ) ) {
 		<?php wp_nonce_field( 'asraa_quick_post', 'asraa_quick_post_nonce' ); ?>
 
 		<input type="hidden" name="location" id="legacy_location" value="">
-		<input type="hidden" name="area" id="legacy_area" value="">
 
 		<div class="asraa-crm-panel">
 			<h2 class="asraa-crm-panel-title"><?php echo esc_html__( '1. Broker Information Scope Profile', 'asraa-crm' ); ?></h2>
@@ -133,10 +143,7 @@ if ( empty( $rendered_broker_telephone ) ) {
 						<select name="transaction_type" id="transaction_type" class="asraa-crm-select" required="required">
 							<option value="sale"><?php echo esc_html__( 'Sale', 'asraa-crm' ); ?></option>
 							<option value="rent"><?php echo esc_html__( 'Rent', 'asraa-crm' ); ?></option>
-							<option value="lease"><?php echo esc_html__( 'Lease', 'asraa-crm' ); ?></option>
 							<option value="resale"><?php echo esc_html__( 'Resale', 'asraa-crm' ); ?></option>
-							<option value="new_launch"><?php echo esc_html__( 'New Launch', 'asraa-crm' ); ?></option>
-							<option value="pre_launch"><?php echo esc_html__( 'Pre Launch', 'asraa-crm' ); ?></option>
 						</select>
 						<p class="asraa-crm-desc"><?php echo esc_html__( 'Operational listing deployment strategy category classification.', 'asraa-crm' ); ?></p>
 					</div>
@@ -194,14 +201,14 @@ if ( empty( $rendered_broker_telephone ) ) {
 						<label for="city" class="asraa-crm-label">
 							<?php echo esc_html__( 'City Target Location', 'asraa-crm' ); ?><span class="required-star">*</span>
 						</label>
-						<input type="text" id="city" class="asraa-crm-input-text" required="required" placeholder="<?php echo esc_attr__( 'e.g., Mumbai', 'asraa-crm' ); ?>">
+						<input type="text" name="city" id="city" class="asraa-crm-input-text" required="required" placeholder="<?php echo esc_attr__( 'e.g., Mumbai', 'asraa-crm' ); ?>">
 						<p class="asraa-crm-desc"><?php echo esc_html__( 'Primary city territory indexing reference context.', 'asraa-crm' ); ?></p>
 					</div>
 					<div class="asraa-crm-group">
 						<label for="locality" class="asraa-crm-label">
 							<?php echo esc_html__( 'Locality Zone Neighborhood', 'asraa-crm' ); ?><span class="required-star">*</span>
 						</label>
-						<input type="text" id="locality" class="asraa-crm-input-text" required="required" placeholder="<?php echo esc_attr__( 'e.g., Mira Road East', 'asraa-crm' ); ?>">
+						<input type="text" name="locality" id="locality" class="asraa-crm-input-text" required="required" placeholder="<?php echo esc_attr__( 'e.g., Mira Road East', 'asraa-crm' ); ?>">
 						<p class="asraa-crm-desc"><?php echo esc_html__( 'Specific sub-market zone neighborhood deployment region.', 'asraa-crm' ); ?></p>
 					</div>
 				</div>
@@ -216,7 +223,7 @@ if ( empty( $rendered_broker_telephone ) ) {
 						<label for="carpet_area" class="asraa-crm-label">
 							<?php echo esc_html__( 'Carpet Area Metrics', 'asraa-crm' ); ?><span class="required-star">*</span>
 						</label>
-						<input type="text" id="carpet_area" class="asraa-crm-input-text" required="required" placeholder="<?php echo esc_attr__( 'e.g., 685 Sq.Ft.', 'asraa-crm' ); ?>">
+						<input type="text" name="carpet_area" id="carpet_area" class="asraa-crm-input-text" required="required" placeholder="<?php echo esc_attr__( 'e.g., 685 Sq.Ft.', 'asraa-crm' ); ?>">
 						<p class="asraa-crm-desc"><?php echo esc_html__( 'Exact physical usable area dimensions calculation string syntax formatting.', 'asraa-crm' ); ?></p>
 					</div>
 					<div class="asraa-crm-group">
@@ -299,7 +306,6 @@ document.addEventListener('DOMContentLoaded', function () {
 	const localityInput         = document.getElementById('locality');
 	const carpetAreaInput       = document.getElementById('carpet_area');
 	const legacyLocationInput   = document.getElementById('legacy_location');
-	const legacyAreaInput       = document.getElementById('legacy_area');
 
 	// Real-time media browser load stream change listener callback handling.
 	fileInputSelector?.addEventListener('change', function () {
@@ -353,9 +359,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		// BRIDGE TO IMMUTABLE LEGACY CONTROLLER: Format and inject payload parameters dynamically
 		if (legacyLocationInput && cityInput && localityInput) {
 			legacyLocationInput.value = localityInput.value.trim() + ', ' + cityInput.value.trim();
-		}
-		if (legacyAreaInput && carpetAreaInput) {
-			legacyAreaInput.value = carpetAreaInput.value.trim();
 		}
 	});
 });
