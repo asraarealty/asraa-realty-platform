@@ -571,6 +571,204 @@
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
+   PREMIUM BROKER SUBMISSION LAYOUT
+══════════════════════════════════════════════════════════════════════════ */
+
+.asraa-broker-form-wrapper {
+	max-width: 1240px;
+	margin: 2.5rem auto;
+	padding: 0 1rem;
+}
+
+.asraa-broker-layout {
+	display: grid;
+	grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.15fr);
+	gap: 1.5rem;
+	align-items: stretch;
+}
+
+.asraa-broker-sidecard {
+	position: sticky;
+	top: 2rem;
+	align-self: start;
+	background: linear-gradient(148deg, #123a7a 0%, #0f2f61 58%, #1f4d95 100%);
+	color: #fff;
+	border-radius: 1rem;
+	padding: 2rem 2rem 1.8rem;
+	box-shadow: 0 20px 45px rgba(9, 34, 73, 0.35);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.asraa-broker-sidecard__kicker {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0.3rem 0.7rem;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.16);
+	font-size: 0.76rem;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.asraa-broker-sidecard__title {
+	margin: 1rem 0 0.6rem;
+	font-size: 1.9rem;
+	line-height: 1.2;
+	font-weight: 700;
+}
+
+.asraa-broker-sidecard__text {
+	margin: 0;
+	font-size: 0.97rem;
+	line-height: 1.65;
+	color: rgba(255, 255, 255, 0.9);
+}
+
+.asraa-broker-sidecard__list {
+	margin: 1.3rem 0 0;
+	padding: 0;
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: 0.7rem;
+}
+
+.asraa-broker-sidecard__list li {
+	position: relative;
+	padding-left: 1.4rem;
+	font-size: 0.9rem;
+	line-height: 1.45;
+	color: rgba(255, 255, 255, 0.92);
+}
+
+.asraa-broker-sidecard__list li::before {
+	content: "";
+	position: absolute;
+	left: 0.05rem;
+	top: 0.45rem;
+	width: 0.5rem;
+	height: 0.5rem;
+	border-radius: 50%;
+	background: #f97316;
+	box-shadow: 0 0 0 0.2rem rgba(249, 115, 22, 0.22);
+}
+
+.asraa-broker-sidecard__broker {
+	margin-top: 1.6rem;
+	padding: 0.95rem 1rem;
+	border-radius: 0.8rem;
+	background: rgba(255, 255, 255, 0.12);
+	backdrop-filter: blur(3px);
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+}
+
+.asraa-broker-sidecard__label {
+	font-size: 0.75rem;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: rgba(255, 255, 255, 0.76);
+}
+
+.asraa-broker-sidecard__name {
+	font-size: 1rem;
+	font-weight: 600;
+}
+
+.asraa-broker-sidecard__meta {
+	font-size: 0.86rem;
+	color: rgba(255, 255, 255, 0.86);
+	word-break: break-word;
+}
+
+.asraa-broker-form-card {
+	border-radius: 1rem;
+	border: 1px solid rgba(17, 24, 39, 0.06);
+	box-shadow: 0 18px 40px rgba(15, 47, 97, 0.12);
+}
+
+.asraa-broker-form-header {
+	padding: 2rem 2rem 1.55rem;
+}
+
+.asraa-broker-form-title {
+	font-size: 1.55rem;
+}
+
+.asraa-broker-form-subtitle {
+	font-size: 0.95rem;
+	max-width: 42ch;
+}
+
+.asraa-banner {
+	padding: 0.9rem 2rem;
+}
+
+.asraa-form-section {
+	padding: 1.5rem 2rem;
+}
+
+.asraa-form-section-title {
+	margin-bottom: 1rem;
+	font-size: 0.8rem;
+	letter-spacing: 0.08em;
+}
+
+.asraa-form-grid {
+	gap: 1rem 1.1rem;
+}
+
+.asraa-form-input,
+.asraa-form-select,
+.asraa-form-textarea {
+	min-height: 2.85rem;
+	border-radius: 0.55rem;
+	border-width: 1px;
+}
+
+.asraa-form-textarea {
+	min-height: 7.5rem;
+}
+
+.asraa-form-footer {
+	padding: 1.35rem 2rem 1.7rem;
+}
+
+.asraa-btn--primary {
+	min-height: 2.95rem;
+	padding: 0.75rem 1.8rem;
+	background: linear-gradient(135deg, #123a7a 0%, #1f4d95 100%);
+	border: none;
+}
+
+.asraa-btn--primary:hover,
+.asraa-btn--primary:focus {
+	background: linear-gradient(135deg, #0f2f61 0%, #123a7a 100%);
+}
+
+.asraa-auth-tabs {
+	padding: 0 2rem;
+}
+
+.asraa-auth-panel {
+	padding: 1.5rem 2rem 1.85rem;
+}
+
+#asraa-login-form .login-submit .button-primary {
+	min-height: 2.8rem;
+	border: none;
+	background: linear-gradient(135deg, #123a7a 0%, #1f4d95 100%);
+}
+
+#asraa-login-form .login-submit .button-primary:hover,
+#asraa-login-form .login-submit .button-primary:focus {
+	background: linear-gradient(135deg, #0f2f61 0%, #123a7a 100%);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
    FEED CARD GRID
 ══════════════════════════════════════════════════════════════════════════ */
 
@@ -738,6 +936,14 @@
    RESPONSIVE — Tablet (768 – 1023 px)
 ══════════════════════════════════════════════════════════════════════════ */
 @media screen and (max-width: 1023px) {
+	.asraa-broker-layout {
+		grid-template-columns: 1fr;
+	}
+
+	.asraa-broker-sidecard {
+		position: static;
+	}
+
 	.asraa-feed-grid {
 		grid-template-columns: repeat(2, 1fr);
 		gap: 1.25rem;
@@ -771,6 +977,18 @@
 	.asraa-broker-form-wrapper {
 		padding: 0 0.5rem;
 		margin: 1rem auto;
+	}
+
+	.asraa-broker-layout {
+		gap: 1rem;
+	}
+
+	.asraa-broker-sidecard {
+		padding: 1.4rem 1.1rem 1.25rem;
+	}
+
+	.asraa-broker-sidecard__title {
+		font-size: 1.35rem;
 	}
 
 	.asraa-broker-form-header {

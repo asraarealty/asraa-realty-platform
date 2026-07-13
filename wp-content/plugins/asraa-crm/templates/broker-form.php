@@ -20,9 +20,34 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+$broker_name_value = isset( $broker_name ) ? trim( (string) $broker_name ) : '';
+$display_name      = '' !== $broker_name_value
+	? $broker_name_value
+	: __( 'Broker Account', 'asraa-crm' );
 ?>
 <div class="asraa-broker-form-wrapper" id="asraa-broker-form-wrapper">
-	<div class="asraa-broker-form-card">
+	<div class="asraa-broker-layout">
+		<aside class="asraa-broker-sidecard" aria-label="<?php esc_attr_e( 'Broker submission information', 'asraa-crm' ); ?>">
+			<span class="asraa-broker-sidecard__kicker"><?php esc_html_e( 'Asraa Realty', 'asraa-crm' ); ?></span>
+			<h2 class="asraa-broker-sidecard__title"><?php esc_html_e( 'Broker Submission Portal', 'asraa-crm' ); ?></h2>
+			<p class="asraa-broker-sidecard__text">
+				<?php esc_html_e( 'Share complete and accurate property details to speed up quality checks and listing approval.', 'asraa-crm' ); ?>
+			</p>
+			<ul class="asraa-broker-sidecard__list">
+				<li><?php esc_html_e( 'Balanced form layout for faster entries', 'asraa-crm' ); ?></li>
+				<li><?php esc_html_e( 'Instant preview and validation before submission', 'asraa-crm' ); ?></li>
+				<li><?php esc_html_e( 'Secure review workflow managed by Asraa CRM', 'asraa-crm' ); ?></li>
+			</ul>
+			<div class="asraa-broker-sidecard__broker">
+				<span class="asraa-broker-sidecard__label"><?php esc_html_e( 'Logged in as', 'asraa-crm' ); ?></span>
+				<strong class="asraa-broker-sidecard__name"><?php echo esc_html( $display_name ); ?></strong>
+				<?php if ( ! empty( $broker_email ) ) : ?>
+					<span class="asraa-broker-sidecard__meta"><?php echo esc_html( $broker_email ); ?></span>
+				<?php endif; ?>
+			</div>
+		</aside>
+		<div class="asraa-broker-form-card">
 
 		<div class="asraa-broker-form-header">
 			<h2 class="asraa-broker-form-title">
@@ -354,5 +379,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</div>
 
 		</form>
+		</div>
 	</div>
 </div>
