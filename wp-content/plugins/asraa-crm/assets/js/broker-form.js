@@ -140,7 +140,7 @@
 							.prop( 'disabled', false )
 							.attr( 'aria-disabled', 'false' )
 							.removeClass( 'asraa-btn--loading' );
-						$regSubmit.find( '.asraa-btn__text' ).text( 'Create Account' );
+						$regSubmit.find( '.asraa-btn__text' ).text( i18n.createAccount || 'Create Account' );
 					}
 				},
 				error: function () {
@@ -150,7 +150,7 @@
 						.prop( 'disabled', false )
 						.attr( 'aria-disabled', 'false' )
 						.removeClass( 'asraa-btn--loading' );
-					$regSubmit.find( '.asraa-btn__text' ).text( 'Create Account' );
+					$regSubmit.find( '.asraa-btn__text' ).text( i18n.createAccount || 'Create Account' );
 				}
 			} );
 		} );

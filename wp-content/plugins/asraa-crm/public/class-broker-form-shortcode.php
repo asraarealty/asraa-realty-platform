@@ -82,6 +82,7 @@ if ( ! class_exists( 'Asraa_Broker_Form_Shortcode' ) ) {
 						'imageType'     => __( 'Please upload a JPG, PNG, or WebP image.', 'asraa-crm' ),
 						'regError'      => __( 'Registration failed. Please try again.', 'asraa-crm' ),
 						'regSubmitting' => __( 'Creating account\u2026', 'asraa-crm' ),
+						'createAccount' => __( 'Create Account', 'asraa-crm' ),
 						'pwMismatch'    => __( 'Passwords do not match.', 'asraa-crm' ),
 						'pwTooShort'    => __( 'Password must be at least 8 characters.', 'asraa-crm' ),
 					),
@@ -340,9 +341,13 @@ if ( ! class_exists( 'Asraa_Broker_Form_Shortcode' ) ) {
 			}
 
 			// 5. Derive a unique username from the email local-part.
-			$base_username = sanitize_user( current( explode( '@', $email ) ), true );
-			$username      = $base_username;
-			$suffix        = 1;
+			$parts         = explode( '@', $email );
+			$base_username = sanitize_user( $parts[0] ?? '', true );
+			if ( empty( $base_username ) ) {
+				$base_username = 'broker';
+			}
+			$username = $base_username;
+			$suffix   = 1;
 			while ( username_exists( $username ) ) {
 				$username = $base_username . $suffix;
 				++$suffix;
@@ -373,7 +378,7 @@ if ( ! class_exists( 'Asraa_Broker_Form_Shortcode' ) ) {
 
 			// 9. Resolve safe redirect URL (fall back to home).
 			$redirect_raw = isset( $_POST['redirect_to'] ) ? wp_unslash( $_POST['redirect_to'] ) : '';
-			$redirect_url = $redirect_raw ? wp_validate_redirect( sanitize_url( $redirect_raw ), get_home_url() ) : get_home_url();
+			$redirect_url = $redirect_raw ? wp_validate_redirect( esc_url_raw( $redirect_raw ), get_home_url() ) : get_home_url();
 
 			wp_send_json_success( array( 'redirect' => esc_url_raw( $redirect_url ) ) );
 		}
