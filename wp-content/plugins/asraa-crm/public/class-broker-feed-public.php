@@ -27,9 +27,7 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Public' ) ) {
 			}
 
 			global $wp_query;
-			if ( $wp_query instanceof WP_Query ) {
-				$wp_query->set_404();
-			}
+			$wp_query->set_404();
 			status_header( 404 );
 			nocache_headers();
 		}

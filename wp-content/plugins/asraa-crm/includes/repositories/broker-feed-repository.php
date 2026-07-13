@@ -339,12 +339,17 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Repository' ) ) {
 			$sanitized_ids      = array_map( 'absint', $ids );
 			$placeholder_string = implode( ',', array_fill( 0, count( $sanitized_ids ), '%d' ) );
 			$target_status      = sanitize_key( $status );
-			$update_sql         = "UPDATE {$this->table} SET approval_status = %s";
 			if ( 'approved' === $target_status ) {
-				$update_sql .= ', is_public = 1';
+				$query = $wpdb->prepare(
+					"UPDATE {$this->table} SET approval_status = %s, is_public = %d WHERE id IN ($placeholder_string)",
+					array_merge( array( $target_status, 1 ), $sanitized_ids )
+				);
+			} else {
+				$query = $wpdb->prepare(
+					"UPDATE {$this->table} SET approval_status = %s WHERE id IN ($placeholder_string)",
+					array_merge( array( $target_status ), $sanitized_ids )
+				);
 			}
-			$update_sql .= " WHERE id IN ($placeholder_string)";
-			$query = $wpdb->prepare( $update_sql, array_merge( array( $target_status ), $sanitized_ids ) );
 			return false !== $wpdb->query( $query ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		}
 
