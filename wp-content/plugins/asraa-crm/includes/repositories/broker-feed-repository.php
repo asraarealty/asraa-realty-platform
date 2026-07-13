@@ -572,30 +572,42 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Repository' ) ) {
 		 * @param  string $output_type Return format structure configuration context default rule (OBJECT).
 		 * @return array Multi-row entity database lookup results matrix array.
 		 */
-		public function get_public_feed( string $output_type = OBJECT, int $limit = 60 ): array {
+		public function get_public_feed( string $output_type = OBJECT, int $limit = 0 ): array {
 			global $wpdb;
 			if ( ! $this->table_exists() ) {
 				return array();
 			}
 
-			$limit = max( 1, min( self::PUBLIC_FEED_MAX_LIMIT, absint( $limit ) ) );
+			$limit = absint( $limit );
+			$use_limit = $limit > 0;
+			if ( $use_limit ) {
+				$limit = max( 1, min( self::PUBLIC_FEED_MAX_LIMIT, $limit ) );
+			}
 			$cache_key = self::PUBLIC_FEED_CACHE_PREFIX . $limit;
 
-			if ( ARRAY_A === $output_type ) {
+			if ( $use_limit && ARRAY_A === $output_type ) {
 				$cached_results = get_transient( $cache_key );
 				if ( is_array( $cached_results ) ) {
 					return $cached_results;
 				}
 			}
 
-			$query = $wpdb->prepare(
-				"SELECT * FROM {$this->table} WHERE approval_status = %s AND is_public = %d ORDER BY id DESC LIMIT %d",
-				'approved',
-				1,
-				$limit
-			);
+			if ( $use_limit ) {
+				$query = $wpdb->prepare(
+					"SELECT * FROM {$this->table} WHERE approval_status = %s AND is_public = %d ORDER BY id DESC LIMIT %d",
+					'approved',
+					1,
+					$limit
+				);
+			} else {
+				$query = $wpdb->prepare(
+					"SELECT * FROM {$this->table} WHERE approval_status = %s AND is_public = %d ORDER BY id DESC",
+					'approved',
+					1
+				);
+			}
 			$results = $wpdb->get_results( $query, $output_type );
-			if ( ARRAY_A === $output_type && is_array( $results ) ) {
+			if ( $use_limit && ARRAY_A === $output_type && is_array( $results ) ) {
 				set_transient( $cache_key, $results, self::PUBLIC_FEED_CACHE_TTL );
 			}
 			return is_array( $results ) ? $results : array();

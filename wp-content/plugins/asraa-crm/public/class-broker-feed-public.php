@@ -8,13 +8,5 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Public' ) ) {
 		public function __construct() {
 			// View-details route has been retired intentionally.
 		}
-
-		public function register_query_vars( $vars ) {
-			return $vars;
-		}
-
-		public function maybe_render_detail() {
-			return;
-		}
 	}
 }

@@ -189,7 +189,11 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Controller' ) ) {
 				$approval_status = 'pending';
 			}
 			$is_public = isset( $_POST['is_public'] ) ? absint( wp_unslash( $_POST['is_public'] ) ) : 0;
-			$is_public = ( 'approved' === $approval_status ) ? ( $is_public ? 1 : 0 ) : 0;
+			if ( 'approved' === $approval_status ) {
+				$is_public = $is_public ? 1 : 0;
+			} else {
+				$is_public = 0;
+			}
 
 			$payload = array(
 				'title'            => isset( $_POST['title'] ) ? sanitize_text_field( wp_unslash( $_POST['title'] ) ) : '',
