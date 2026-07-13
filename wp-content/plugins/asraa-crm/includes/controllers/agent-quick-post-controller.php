@@ -287,15 +287,19 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 				return 0.00;
 			}
 			$multiplied_valuation = 1.00;
-			if ( preg_match( '/(?:crores?|cr)\b/', $clean_string ) ) {
+			$crore_removed = (string) preg_replace( '/(?:crores?|cr)\b/', '', $clean_string );
+			$lakh_removed  = (string) preg_replace( '/(?:lakhs?|lacs?)\b/', '', $clean_string );
+			$l_suffix_removed = (string) preg_replace( '/l\b/', '', $clean_string );
+
+			if ( $crore_removed !== $clean_string ) {
 				$multiplied_valuation = 10000000.00;
-				$clean_string         = (string) preg_replace( '/(?:crores?|cr)\b/', '', $clean_string );
-			} elseif ( preg_match( '/(?:lakhs?|lacs?)\b/', $clean_string ) ) {
+				$clean_string         = $crore_removed;
+			} elseif ( $lakh_removed !== $clean_string ) {
 				$multiplied_valuation = 100000.00;
-				$clean_string         = (string) preg_replace( '/(?:lakhs?|lacs?)\b/', '', $clean_string );
-			} elseif ( preg_match( '/\d+l\b/', $clean_string ) ) {
+				$clean_string         = $lakh_removed;
+			} elseif ( preg_match( '/\d+l\b/', $clean_string ) && $l_suffix_removed !== $clean_string ) {
 				$multiplied_valuation = 100000.00;
-				$clean_string         = (string) preg_replace( '/l\b/', '', $clean_string );
+				$clean_string         = $l_suffix_removed;
 			}
 			return floatval( $clean_string ) * $multiplied_valuation;
 		}

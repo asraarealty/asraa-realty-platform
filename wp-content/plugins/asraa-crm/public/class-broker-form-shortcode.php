@@ -373,12 +373,15 @@ if ( ! class_exists( 'Asraa_Broker_Form_Shortcode' ) ) {
 			}
 
 			if ( get_role( 'asraa_agent' ) ) {
-				wp_update_user(
+				$role_update_result = wp_update_user(
 					array(
 						'ID'   => $user_id,
 						'role' => 'asraa_agent',
 					)
 				);
+				if ( is_wp_error( $role_update_result ) ) {
+					error_log( '[ASRAA CRM] Broker role assignment failed for user ' . $user_id . ': ' . $role_update_result->get_error_message() );
+				}
 			}
 
 			// 7. Populate display name if first/last name provided.
