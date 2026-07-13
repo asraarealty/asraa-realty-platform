@@ -84,10 +84,9 @@ if ( ! function_exists( 'asraa_feed_placeholder_image' ) ) {
 				$city         = sanitize_text_field( $listing['city'] ?? '' );
 				$locality     = sanitize_text_field( $listing['locality'] ?? '' );
 				$carpet_area  = sanitize_text_field( $listing['carpet_area'] ?? '' );
+				$area         = sanitize_text_field( $listing['area'] ?? '' );
 				$price_raw    = floatval( $listing['price'] ?? 0 );
 				$price_fmt    = asraa_feed_format_price( $price_raw );
-				$slug         = sanitize_title( $listing['slug'] ?? $title );
-				$detail_url   = home_url( '/broker-feed/' . rawurlencode( $slug ) . '/' );
 				$trans_type   = sanitize_text_field( $listing['transaction_type'] ?? '' );
 			?>
 			<article class="asraa-feed-card" aria-label="<?php echo esc_attr( $title ); ?>">
@@ -144,6 +143,13 @@ if ( ! function_exists( 'asraa_feed_placeholder_image' ) ) {
 							</li>
 						<?php endif; ?>
 
+						<?php if ( ! empty( $area ) ) : ?>
+							<li class="asraa-feed-card__meta-item">
+								<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h10v10H7z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h3M17 4h3M4 20h3M17 20h3M4 7V4M20 7V4M4 20v-3M20 20v-3"/></svg>
+								<span><?php echo esc_html( $area ); ?></span>
+							</li>
+						<?php endif; ?>
+
 					</ul>
 
 					<?php if ( ! empty( $price_fmt ) ) : ?>
@@ -153,12 +159,6 @@ if ( ! function_exists( 'asraa_feed_placeholder_image' ) ) {
 				</div>
 
 				<div class="asraa-feed-card__footer">
-					<a
-						href="<?php echo esc_url( $detail_url ); ?>"
-						class="asraa-btn asraa-btn--outline asraa-btn--sm"
-					>
-						<?php esc_html_e( 'View Details', 'asraa-crm' ); ?>
-					</a>
 					<a
 						href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"
 						class="asraa-btn asraa-btn--primary asraa-btn--sm"

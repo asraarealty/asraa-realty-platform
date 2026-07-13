@@ -252,7 +252,16 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Repository' ) ) {
 			if ( 0 === $id ) {
 				return false;
 			}
-			$result = $wpdb->update( $this->table, array( 'approval_status' => 'approved' ), array( 'id' => $id ), array( '%s' ), array( '%d' ) );
+			$result = $wpdb->update(
+				$this->table,
+				array(
+					'approval_status' => 'approved',
+					'is_public'       => 1,
+				),
+				array( 'id' => $id ),
+				array( '%s', '%d' ),
+				array( '%d' )
+			);
 			return false !== $result;
 		}
 
@@ -330,10 +339,17 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Repository' ) ) {
 			$sanitized_ids      = array_map( 'absint', $ids );
 			$placeholder_string = implode( ',', array_fill( 0, count( $sanitized_ids ), '%d' ) );
 			$target_status      = sanitize_key( $status );
-			$query = $wpdb->prepare(
-				"UPDATE {$this->table} SET approval_status = %s WHERE id IN ($placeholder_string)",
-				array_merge( array( $target_status ), $sanitized_ids )
-			);
+			if ( 'approved' === $target_status ) {
+				$query = $wpdb->prepare(
+					"UPDATE {$this->table} SET approval_status = %s, is_public = %d WHERE id IN ($placeholder_string)",
+					array_merge( array( $target_status, 1 ), $sanitized_ids )
+				);
+			} else {
+				$query = $wpdb->prepare(
+					"UPDATE {$this->table} SET approval_status = %s WHERE id IN ($placeholder_string)",
+					array_merge( array( $target_status ), $sanitized_ids )
+				);
+			}
 			return false !== $wpdb->query( $query ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		}
 
