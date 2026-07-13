@@ -72,7 +72,7 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Shortcode' ) ) {
 			}
 
 			$repository = new Asraa_Broker_Feed_Repository();
-			$listings   = $repository->get_public_feed( ARRAY_A );
+			$listings   = $repository->get_public_feed( ARRAY_A, 60 );
 
 			ob_start();
 			include $template;
@@ -97,7 +97,7 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Shortcode' ) ) {
 			}
 			// Elementor compatibility: inspect stored page-builder JSON meta.
 			$elementor_data = get_post_meta( $post->ID, '_elementor_data', true );
-			if ( ! empty( $elementor_data ) && str_contains( (string) $elementor_data, $tag ) ) {
+			if ( ! empty( $elementor_data ) && false !== strpos( (string) $elementor_data, $tag ) ) {
 				return true;
 			}
 			return false;

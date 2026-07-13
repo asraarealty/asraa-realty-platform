@@ -32,7 +32,7 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Controller' ) ) {
 		 *
 		 * @var Asraa_Broker_Feed_Repository
 		 */
-		private Asraa_Broker_Feed_Repository $repository;
+		private ?Asraa_Broker_Feed_Repository $repository = null;
 
 		/**
 		 * Constructor initializes operational dependencies and binds targeted admin-post actions.
@@ -61,6 +61,9 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Controller' ) ) {
 		 */
 		public function handle_single_action(): void {
 			$this->validate_security_and_privileges();
+			if ( ! $this->repository ) {
+				wp_die( esc_html__( 'Error: Broker feed repository is unavailable.', 'asraa-crm' ), 500 );
+			}
 
 			$feed_action = isset( $_GET['feed_action'] ) ? sanitize_key( wp_unslash( $_GET['feed_action'] ) ) : '';
 			$record_id   = isset( $_GET['id'] ) ? absint( wp_unslash( $_GET['id'] ) ) : 0;
@@ -110,6 +113,9 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Controller' ) ) {
 		 */
 		public function handle_bulk_action(): void {
 			$this->validate_security_and_privileges();
+			if ( ! $this->repository ) {
+				wp_die( esc_html__( 'Error: Broker feed repository is unavailable.', 'asraa-crm' ), 500 );
+			}
 
 			// Verify bulk-action nonce (view submits it as `bulk_nonce` with action `asraa_broker_feed_bulk_nonce`).
 			$bulk_nonce = isset( $_POST['bulk_nonce'] ) ? sanitize_key( wp_unslash( $_POST['bulk_nonce'] ) ) : '';
@@ -161,10 +167,13 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Controller' ) ) {
 		 */
 		public function handle_update_record(): void {
 			$this->validate_security_and_privileges();
+			if ( ! $this->repository ) {
+				wp_die( esc_html__( 'Error: Broker feed repository is unavailable.', 'asraa-crm' ), 500 );
+			}
 
 			// Enforce explicit cryptographic anti-CSRF token check.
 			// View submits nonce field name `update_nonce` with action `asraa_broker_feed_update_nonce`.
-			$update_nonce = isset( $_POST['update_nonce'] ) ? sanitize_key( wp_unslash( $_POST['update_nonce'] ) ) : '';
+			$update_nonce = isset( $_POST['update_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['update_nonce'] ) ) : '';
 			if ( ! wp_verify_nonce( $update_nonce, 'asraa_broker_feed_update_nonce' ) ) {
 				wp_die( esc_html__( 'Error: Security verification failed. Nonce has expired.', 'asraa-crm' ), 403 );
 			}
@@ -175,6 +184,13 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Controller' ) ) {
 			}
 
 			// Clean and organize incoming fields.
+			$approval_status = isset( $_POST['approval_status'] ) ? sanitize_key( wp_unslash( $_POST['approval_status'] ) ) : 'pending';
+			if ( ! in_array( $approval_status, array( 'pending', 'approved', 'rejected' ), true ) ) {
+				$approval_status = 'pending';
+			}
+			$is_public = isset( $_POST['is_public'] ) ? absint( wp_unslash( $_POST['is_public'] ) ) : 0;
+			$is_public = ( 'approved' === $approval_status ) ? ( $is_public ? 1 : 0 ) : 0;
+
 			$payload = array(
 				'title'            => isset( $_POST['title'] ) ? sanitize_text_field( wp_unslash( $_POST['title'] ) ) : '',
 				'project_name'     => isset( $_POST['project_name'] ) ? sanitize_text_field( wp_unslash( $_POST['project_name'] ) ) : '',
@@ -192,8 +208,8 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Controller' ) ) {
 				'source_group'     => isset( $_POST['source_group'] ) ? sanitize_text_field( wp_unslash( $_POST['source_group'] ) ) : '',
 				'raw_message'      => isset( $_POST['raw_message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['raw_message'] ) ) : '',
 				'notes'            => isset( $_POST['notes'] ) ? sanitize_textarea_field( wp_unslash( $_POST['notes'] ) ) : '',
-				'approval_status'  => isset( $_POST['approval_status'] ) ? sanitize_text_field( wp_unslash( $_POST['approval_status'] ) ) : 'pending',
-				'is_public'        => isset( $_POST['is_public'] ) ? absint( wp_unslash( $_POST['is_public'] ) ) : 0,
+				'approval_status'  => $approval_status,
+				'is_public'        => $is_public,
 			);
 
 			// Check for physical image multi-part files uploaded via the file input element.
@@ -236,7 +252,7 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Controller' ) ) {
 			if ( ! is_user_logged_in() ) {
 				wp_die( esc_html__( 'Error: Direct access denied. Please re-authenticate your account session.', 'asraa-crm' ), 403 );
 			}
-			if ( ! current_user_can( 'read' ) ) {
+			if ( ! current_user_can( 'manage_options' ) ) {
 				wp_die( esc_html__( 'Error: Insufficient administrative roles or operational capability settings.', 'asraa-crm' ), 403 );
 			}
 		}

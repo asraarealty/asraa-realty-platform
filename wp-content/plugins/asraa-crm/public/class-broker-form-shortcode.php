@@ -137,7 +137,8 @@ if ( ! class_exists( 'Asraa_Broker_Form_Shortcode' ) ) {
 		 * @return string HTML output.
 		 */
 		private function render_auth_panel(): string {
-			$redirect_to = esc_url_raw( get_permalink() );
+			$current_permalink = get_permalink();
+			$redirect_to       = $current_permalink ? esc_url_raw( $current_permalink ) : esc_url_raw( home_url( '/' ) );
 
 			ob_start();
 			?>
@@ -318,9 +319,10 @@ if ( ! class_exists( 'Asraa_Broker_Form_Shortcode' ) ) {
 				wp_send_json_error( array( 'message' => __( 'Security check failed. Please reload and try again.', 'asraa-crm' ) ), 403 );
 			}
 
-			// 2. Check registration is enabled on this site.
-			if ( ! get_option( 'users_can_register' ) ) {
-				wp_send_json_error( array( 'message' => __( 'User registration is currently disabled. Please contact the site administrator.', 'asraa-crm' ) ) );
+			// 2. Allow broker portal registration by default (overridable via filter).
+			$registration_enabled = apply_filters( 'asraa_crm_broker_registration_enabled', true );
+			if ( ! $registration_enabled ) {
+				wp_send_json_error( array( 'message' => __( 'Broker registration is temporarily disabled. Please contact the site administrator.', 'asraa-crm' ) ) );
 			}
 
 			// 3. Sanitize inputs.
@@ -363,6 +365,15 @@ if ( ! class_exists( 'Asraa_Broker_Form_Shortcode' ) ) {
 			$user_id = wp_create_user( $username, $password, $email );
 			if ( is_wp_error( $user_id ) ) {
 				wp_send_json_error( array( 'message' => $user_id->get_error_message() ) );
+			}
+
+			if ( get_role( 'asraa_agent' ) ) {
+				wp_update_user(
+					array(
+						'ID'   => $user_id,
+						'role' => 'asraa_agent',
+					)
+				);
 			}
 
 			// 7. Populate display name if first/last name provided.
@@ -410,7 +421,7 @@ if ( ! class_exists( 'Asraa_Broker_Form_Shortcode' ) ) {
 			}
 			// Elementor compatibility: inspect stored page-builder JSON meta.
 			$elementor_data = get_post_meta( $post->ID, '_elementor_data', true );
-			if ( ! empty( $elementor_data ) && str_contains( (string) $elementor_data, $tag ) ) {
+			if ( ! empty( $elementor_data ) && false !== strpos( (string) $elementor_data, $tag ) ) {
 				return true;
 			}
 			return false;
