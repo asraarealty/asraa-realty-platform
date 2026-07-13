@@ -35,6 +35,7 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Repository' ) ) {
 		private string $table;
 		private const PUBLIC_FEED_CACHE_PREFIX = 'asraa_broker_public_feed_';
 		private const PUBLIC_FEED_CACHE_LIMITS = array( 24, 60, 120 );
+		private const PUBLIC_FEED_MAX_LIMIT = 120;
 		private const PUBLIC_FEED_CACHE_TTL = 5 * MINUTE_IN_SECONDS;
 
 		/**
@@ -577,7 +578,7 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Repository' ) ) {
 				return array();
 			}
 
-			$limit = max( 1, min( 120, absint( $limit ) ) );
+			$limit = max( 1, min( self::PUBLIC_FEED_MAX_LIMIT, absint( $limit ) ) );
 			$cache_key = self::PUBLIC_FEED_CACHE_PREFIX . $limit;
 
 			if ( ARRAY_A === $output_type ) {

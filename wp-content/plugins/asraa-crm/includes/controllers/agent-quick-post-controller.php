@@ -287,12 +287,12 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 				return 0.00;
 			}
 			$multiplied_valuation = 1.00;
-			if ( false !== strpos( $clean_string, 'l' ) ) {
-				$multiplied_valuation = 100000.00;
-				$clean_string         = str_replace( array( 'lakhs', 'lakh', 'lac', 'l' ), '', $clean_string );
-			} elseif ( false !== strpos( $clean_string, 'cr' ) || false !== strpos( $clean_string, 'crore' ) ) {
+			if ( preg_match( '/(?:crores?|cr)\b/', $clean_string ) ) {
 				$multiplied_valuation = 10000000.00;
 				$clean_string         = str_replace( array( 'crores', 'crore', 'cr' ), '', $clean_string );
+			} elseif ( preg_match( '/(?:lakhs?|lac|l)\b/', $clean_string ) ) {
+				$multiplied_valuation = 100000.00;
+				$clean_string         = str_replace( array( 'lakhs', 'lakh', 'lac', 'l' ), '', $clean_string );
 			}
 			return floatval( $clean_string ) * $multiplied_valuation;
 		}
@@ -308,7 +308,7 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 			$display_name    = sanitize_text_field( $current_user->display_name );
 			$first_name      = sanitize_text_field( (string) get_user_meta( $source_agent_id, 'first_name', true ) );
 			$last_name       = sanitize_text_field( (string) get_user_meta( $source_agent_id, 'last_name', true ) );
-			$fallback_name   = trim( $first_name . ' ' . $last_name );
+			$fallback_name   = trim( implode( ' ', array_filter( array( trim( $first_name ), trim( $last_name ) ) ) ) );
 			$source_name     = $display_name ? $display_name : ( $fallback_name ? $fallback_name : sanitize_text_field( $current_user->user_login ) );
 			$source_phone    = sanitize_text_field(
 				(string) ( get_user_meta( $source_agent_id, 'billing_phone', true ) ?: get_user_meta( $source_agent_id, 'phone', true ) )
