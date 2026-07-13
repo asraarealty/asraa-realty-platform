@@ -26,7 +26,6 @@
 	var AUTOPLAY_MS   = 3000;
 	var TRANSITION_MS = 500;
 	var SWIPE_THRESH  = 40;    // px minimum horizontal swipe distance
-	var GAP_PX        = 28;    // matches CSS 1.75 rem gap
 
 	document.addEventListener( 'DOMContentLoaded', function () {
 		var wrap = document.getElementById( 'asraa-feed-carousel' );
@@ -58,13 +57,18 @@
 
 		/* ─── Card size calculation ─────────────────────────────────── */
 
+		function getGap() {
+			var g = parseFloat( window.getComputedStyle( track ).columnGap );
+			return isNaN( g ) ? 28 : g;
+		}
+
 		function getCardWidth() {
 			var wrapWidth = track.parentElement.offsetWidth;
-			return ( wrapWidth - ( spv - 1 ) * GAP_PX ) / spv;
+			return ( wrapWidth - ( spv - 1 ) * getGap() ) / spv;
 		}
 
 		function getSlideStep() {
-			return getCardWidth() + GAP_PX;
+			return getCardWidth() + getGap();
 		}
 
 		/* ─── Clone management ──────────────────────────────────────── */
@@ -276,6 +280,9 @@
 		/* ─── Keyboard ──────────────────────────────────────────────── */
 
 		wrap.addEventListener( 'keydown', function ( e ) {
+			// Only handle arrow keys when the carousel wrapper itself has focus,
+			// not when focus is on an interactive element inside a card.
+			if ( e.target !== wrap ) { return; }
 			if ( e.key === 'ArrowLeft'  ) { stopAutoplay(); prev(); startAutoplay(); e.preventDefault(); }
 			if ( e.key === 'ArrowRight' ) { stopAutoplay(); next(); startAutoplay(); e.preventDefault(); }
 		} );

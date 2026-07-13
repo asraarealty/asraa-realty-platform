@@ -800,18 +800,13 @@
 	margin: 0;
 }
 
-/* Grid (legacy — replaced by carousel) */
-.asraa-feed-grid {
-	display: none; /* safety fallback if old markup is cached */
-}
+/* Grid (legacy — no longer rendered by the template) */
 
 /* ── Carousel ──────────────────────────────────────────────────────────── */
 
 .asraa-feed-carousel {
 	position: relative;
 	outline: none;
-	-webkit-user-select: none;
-	        user-select: none;
 }
 
 .asraa-feed-carousel:focus-visible {
