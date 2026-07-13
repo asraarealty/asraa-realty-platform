@@ -341,8 +341,14 @@ if ( ! class_exists( 'Asraa_Broker_Form_Shortcode' ) ) {
 			}
 
 			// 5. Derive a unique username from the email local-part.
-			$parts         = explode( '@', $email );
-			$base_username = sanitize_user( $parts[0] ?? '', true );
+			// Email has already been validated as a valid address above, so the
+			// explode() will always yield at least two parts. The count check is
+			// an extra defensive guard.
+			$parts = explode( '@', $email );
+			if ( count( $parts ) < 2 ) {
+				wp_send_json_error( array( 'message' => __( 'Please enter a valid email address.', 'asraa-crm' ) ) );
+			}
+			$base_username = sanitize_user( $parts[0], true );
 			if ( empty( $base_username ) ) {
 				$base_username = 'broker';
 			}
@@ -372,7 +378,10 @@ if ( ! class_exists( 'Asraa_Broker_Form_Shortcode' ) ) {
 				);
 			}
 
-			// 8. Auto-login the newly created user.
+			// 8. Auto-login the newly registered user.
+			// false = session cookie (expires on browser close) for security on first login;
+			// the user can choose a persistent session on subsequent logins via the "Keep me
+			// signed in" option on the Login tab.
 			wp_set_current_user( $user_id );
 			wp_set_auth_cookie( $user_id, false );
 

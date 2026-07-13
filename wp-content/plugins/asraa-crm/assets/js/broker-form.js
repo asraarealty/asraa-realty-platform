@@ -54,11 +54,14 @@
 		} );
 
 		// Inline field validation for required register fields on blur.
+		// Use raw .val() for password fields (passwords may legitimately contain whitespace).
 		$regForm.on( 'blur', '.asraa-auth-required', function () {
-			var $el  = $( this );
-			var id   = $el.attr( 'id' );
-			var $err = $( '#' + id + '-error' );
-			if ( ! $el.val().trim() ) {
+			var $el       = $( this );
+			var id        = $el.attr( 'id' );
+			var $err      = $( '#' + id + '-error' );
+			var isPassword = $el.attr( 'type' ) === 'password';
+			var isEmpty   = isPassword ? ( $el.val().length === 0 ) : ( ! $el.val().trim() );
+			if ( isEmpty ) {
 				$el.addClass( 'asraa-input--invalid' ).attr( 'aria-invalid', 'true' );
 				$err.text( i18n.required || 'This field is required.' );
 			} else {
@@ -73,13 +76,22 @@
 
 			$authError.hide();
 
+			// Guard: ensure nonce is present before submitting.
+			if ( ! cfg.regNonce ) {
+				$authError.find( '.asraa-banner__message' ).text( i18n.regError || 'Registration failed. Please try again.' );
+				$authError.show();
+				return;
+			}
+
 			// Client-side validation.
 			var valid = true;
 			$regForm.find( '.asraa-auth-required' ).each( function () {
-				var $el  = $( this );
-				var id   = $el.attr( 'id' );
-				var $err = $( '#' + id + '-error' );
-				if ( ! $el.val().trim() ) {
+				var $el       = $( this );
+				var id        = $el.attr( 'id' );
+				var $err      = $( '#' + id + '-error' );
+				var isPassword = $el.attr( 'type' ) === 'password';
+				var val       = isPassword ? $el.val() : $el.val().trim();
+				if ( ! val ) {
 					$el.addClass( 'asraa-input--invalid' ).attr( 'aria-invalid', 'true' );
 					$err.text( i18n.required || 'This field is required.' );
 					if ( valid ) { $el.trigger( 'focus' ); }
