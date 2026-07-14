@@ -23,10 +23,38 @@ class Asraa_SVS_Public {
 
         wp_enqueue_style( 'asraa-svs-public', $plugin_url . 'assets/css/public.css', array(), $ver );
 
+        /* Central Google Maps (Places) loader.
+         * autocomplete.js polls for window.google.maps.places, so this must
+         * be enqueued (as a dependency of autocomplete.js) rather than left
+         * for another plugin to provide it. */
+        $maps_key = get_option( 'asraa_svs_google_places_key', '' );
+        if ( '' === $maps_key ) {
+            $maps_key = get_option( 'asraa_svs_google_maps_api_key', '' );
+        }
+
+        $script_deps = array( 'jquery' );
+
+        if ( '' !== $maps_key ) {
+            wp_enqueue_script(
+                'asraa-svs-google-maps',
+                add_query_arg(
+                    array(
+                        'key'       => $maps_key,
+                        'libraries' => 'places',
+                    ),
+                    'https://maps.googleapis.com/maps/api/js'
+                ),
+                array(),
+                null,
+                true
+            );
+            $script_deps[] = 'asraa-svs-google-maps';
+        }
+
         wp_enqueue_script(
             'asraa-svs-autocomplete',
             $plugin_url . 'assets/js/autocomplete.js',
-            array( 'jquery' ),
+            $script_deps,
             $ver,
             true
         );
@@ -45,15 +73,10 @@ class Asraa_SVS_Public {
             true
         );
 
-        $places_key = get_option( 'asraa_svs_google_places_key', '' );
-        if ( '' === $places_key ) {
-            $places_key = get_option( 'asraa_svs_google_maps_api_key', '' );
-        }
-
         wp_localize_script( 'asraa-svs-public-v4', 'ASRAA_SVS', array(
             'ajax_url'           => admin_url( 'admin-ajax.php' ),
             'nonce'              => wp_create_nonce( 'asraa_svs_valuation' ),
-            'google_places_key'  => $places_key,
+            'google_places_key'  => $maps_key,
             'unit'               => get_option( 'asraa_svs_unit_system', 'sqft' ),
             'action_autocomplete' => 'asraa_svs_autocomplete',
             'action_calculate'   => 'asraa_svs_calculate',
