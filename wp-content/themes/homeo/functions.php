@@ -218,6 +218,57 @@ function homeo_enqueue_styles() {
 }
 add_action( 'wp_enqueue_scripts', 'homeo_enqueue_styles', 100 );
 
+/**
+ * Defer non-critical stylesheets so they no longer block initial render.
+ *
+ * These handles still load in full and apply exactly as before — this only
+ * changes *when* the browser is allowed to paint the page relative to them.
+ * Core layout styles (bootstrap, template, homeo-style) are left untouched
+ * since they affect above-the-fold layout.
+ *
+ * @since Homeo 1.0 (perf patch)
+ */
+function homeo_defer_noncritical_styles( $html, $handle ) {
+
+	$deferred_handles = array(
+		'all-awesome',
+		'flaticon',
+		'themify-icons',
+		'animate',
+		'slick',
+		'magnific-popup',
+		'perfect-scrollbar',
+		'jquery-mmenu',
+	);
+
+	if ( ! in_array( $handle, $deferred_handles, true ) ) {
+		return $html;
+	}
+
+	// Already rewritten (defensive, avoids double-processing).
+	if ( strpos( $html, 'data-homeo-deferred' ) !== false ) {
+		return $html;
+	}
+
+	// Turn: <link rel='stylesheet' id='handle-css' href='...' media='all' />
+	// Into: <link rel="preload" as="style" ... onload="this.onload=null;this.rel='stylesheet'">
+	//       plus a <noscript> fallback so it still loads with JS disabled.
+	$preload_html = preg_replace(
+		"/rel=(['\"])stylesheet\\1/",
+		'rel="preload" as="style" data-homeo-deferred="1" onload="this.onload=null;this.rel=\'stylesheet\'"',
+		$html,
+		1
+	);
+
+	if ( null === $preload_html || $preload_html === $html ) {
+		// Regex didn't match for some reason — fail safe, return original tag.
+		return $html;
+	}
+
+	return $preload_html . '<noscript>' . $html . '</noscript>';
+}
+add_filter( 'style_loader_tag', 'homeo_defer_noncritical_styles', 10, 2 );
+
 function homeo_admin_enqueue_styles() {
 	//load font awesome
 	wp_enqueue_style( 'all-awesome', get_template_directory_uri() . '/css/all-awesome.css', array(), '5.11.2' );
