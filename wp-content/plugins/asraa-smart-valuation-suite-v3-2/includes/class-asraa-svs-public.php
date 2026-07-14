@@ -41,12 +41,16 @@ class Asraa_SVS_Public {
                     array(
                         'key'       => $maps_key,
                         'libraries' => 'places',
+                        'loading'   => 'async',
                     ),
                     'https://maps.googleapis.com/maps/api/js'
                 ),
                 array(),
                 null,
-                true
+                array(
+                    'strategy'  => 'async',
+                    'in_footer' => true,
+                )
             );
             $script_deps[] = 'asraa-svs-google-maps';
         }
