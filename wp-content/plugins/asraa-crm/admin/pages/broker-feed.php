@@ -81,7 +81,7 @@ if ( isset( $_GET['asraa_msg'] ) ) {
 		<div class="asraa-responsive-table">
 			<table class="wp-list-table widefat fixed striped">
 				<thead>
-					<tr><td class="check-column"><input type="checkbox" id="cb-select-all-1"></td><th>Cover</th><th>Property</th><th>Project</th><th>Type</th><th>Intent</th><th>City</th><th>Broker</th><th>Status</th><th>Actions</th></tr>
+					<tr><td class="check-column"><input type="checkbox" id="cb-select-all-1"></td><th>Cover</th><th>Property</th><th>Project</th><th>Type</th><th>Intent</th><th>City</th><th>Broker</th><th>Phone</th><th>Status</th><th>Actions</th></tr>
 				</thead>
 				<tbody>
 					<?php if ( ! empty( $records ) ) : ?>
@@ -96,6 +96,16 @@ if ( isset( $_GET['asraa_msg'] ) ) {
 								<td><?php echo esc_html( ucfirst( $record['transaction_type'] ?? 'sale' ) ); ?></td>
 								<td><?php echo esc_html( $record['city'] ?? '' ); ?></td>
 								<td><?php echo esc_html( $record['source_agent_name'] ?? '' ); ?></td>
+								<td>
+									<?php
+									$row_phone = trim( (string) ( $record['source_agent_phone'] ?? '' ) );
+									if ( '' !== $row_phone ) :
+										?>
+										<a href="<?php echo esc_url( 'tel:+91' . $row_phone ); ?>"><?php echo esc_html( $row_phone ); ?></a>
+									<?php else : ?>
+										<span aria-hidden="true">&#8212;</span>
+									<?php endif; ?>
+								</td>
 								<td><span class="asraa-badge <?php echo esc_attr( $badge ); ?>"><?php echo esc_html( $status ); ?></span></td>
 								<td>
 									<div class="asraa-actions-flex">
@@ -108,7 +118,7 @@ if ( isset( $_GET['asraa_msg'] ) ) {
 							</tr>
 						<?php endforeach; ?>
 					<?php else : ?>
-						<tr><td colspan="10" style="text-align:center;padding:24px;">No broker feed entries found.</td></tr>
+						<tr><td colspan="11" style="text-align:center;padding:24px;">No broker feed entries found.</td></tr>
 					<?php endif; ?>
 				</tbody>
 			</table>

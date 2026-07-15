@@ -8,11 +8,15 @@
  *   $broker_id    (int)     Current user ID.
  *   $broker_name  (string)  Current user display name.
  *   $broker_email (string)  Current user email address.
- *   $broker_phone (string)  Current user phone number.
+ *   $broker_phone (string)  Current user phone number, used to pre-fill the
+ *                           visible/editable Mobile Number field below.
  *   $current_user (WP_User) Full user object.
  *
- * NOTE: Hidden broker fields are for progressive-enhancement only.
- * The controller always re-fetches these values from the authenticated session.
+ * NOTE: broker_id/broker_name/broker_email are hidden fields for
+ * progressive-enhancement only — the controller always re-fetches these
+ * values from the authenticated session. broker_phone is different: it is a
+ * visible, required, editable field; the controller sanitizes, normalizes,
+ * and re-validates it server-side before accepting it.
  *
  * @package Asraa_CRM
  */
@@ -82,13 +86,47 @@ $display_name      = '' !== $broker_name_value
 
 			<!--
 				Broker hidden fields — displayed for progressive-enhancement / no-JS fallback.
-				The server controller ALWAYS overwrites these from the authenticated session.
+				The server controller ALWAYS overwrites broker_id/broker_name/broker_email from the
+				authenticated session (never trusts these POST values for identity).
+				broker_phone is the one exception: it is a visible, editable, required field below —
+				the controller re-validates its format server-side but does accept the submitted value.
 			-->
 			<input type="hidden" name="broker_id"       value="<?php echo esc_attr( (string) $broker_id ); ?>" />
 			<input type="hidden" name="broker_name"     value="<?php echo esc_attr( $broker_name ); ?>" />
 			<input type="hidden" name="broker_email"    value="<?php echo esc_attr( $broker_email ); ?>" />
-			<input type="hidden" name="broker_phone"    value="<?php echo esc_attr( $broker_phone ); ?>" />
 			<input type="hidden" name="current_user_id" value="<?php echo esc_attr( (string) $broker_id ); ?>" />
+
+			<!-- ── Section 0 : Broker Contact ───────────────────────────── -->
+			<div class="asraa-form-section asraa-form-section--contact">
+				<h3 class="asraa-form-section-title">
+					<?php esc_html_e( 'Broker Contact', 'asraa-crm' ); ?>
+				</h3>
+				<div class="asraa-form-grid">
+
+					<div class="asraa-form-field">
+						<label for="abf-broker-phone" class="asraa-form-label">
+							<?php esc_html_e( 'Mobile Number', 'asraa-crm' ); ?>
+							<span class="asraa-required" aria-hidden="true">*</span>
+						</label>
+						<input
+							type="tel"
+							id="abf-broker-phone"
+							name="broker_phone"
+							class="asraa-form-input asraa-required-field asraa-phone-field"
+							inputmode="tel"
+							autocomplete="tel"
+							placeholder="<?php esc_attr_e( 'e.g. 98765 43210 or +91 98765 43210', 'asraa-crm' ); ?>"
+							maxlength="17"
+							value="<?php echo esc_attr( $broker_phone ); ?>"
+						/>
+						<span class="asraa-field-hint">
+							<?php esc_html_e( '10-digit Indian mobile number. +91 prefix is optional.', 'asraa-crm' ); ?>
+						</span>
+						<span class="asraa-field-error" id="abf-broker-phone-error" role="alert"></span>
+					</div>
+
+				</div>
+			</div><!-- /.asraa-form-section -->
 
 			<!-- ── Section 1 : Project & Property ──────────────────────── -->
 			<div class="asraa-form-section">

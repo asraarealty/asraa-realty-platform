@@ -82,7 +82,6 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 			$broker_profile     = $this->get_broker_profile();
 			$source_agent_id    = $broker_profile['id'];
 			$source_agent_name  = $broker_profile['name'];
-			$source_agent_phone = $broker_profile['phone'];
 
 			// 7. Sanitize incoming form parameters.
 			$title            = isset( $_POST['title'] ) ? sanitize_text_field( wp_unslash( $_POST['title'] ) ) : '';
@@ -97,11 +96,16 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 			$available_units  = isset( $_POST['available_units'] ) ? absint( wp_unslash( $_POST['available_units'] ) ) : 1;
 			$price_raw        = isset( $_POST['price'] ) ? sanitize_text_field( wp_unslash( $_POST['price'] ) ) : '0';
 			$notes            = isset( $_POST['notes'] ) ? sanitize_textarea_field( wp_unslash( $_POST['notes'] ) ) : '';
+			$broker_phone_raw = isset( $_POST['broker_phone'] ) ? sanitize_text_field( wp_unslash( $_POST['broker_phone'] ) ) : '';
+			$broker_phone     = $this->normalize_indian_mobile( $broker_phone_raw );
 			$price_parsed     = $this->parse_shorthand_price_to_number( $price_raw );
-			$validation_error = $this->validate_listing_input( $title, $project_name, $transaction_type, $property_type, $city, $price_parsed );
+			$validation_error = $this->validate_listing_input( $title, $project_name, $transaction_type, $property_type, $city, $price_parsed, $broker_phone );
 			if ( $validation_error ) {
 				wp_die( esc_html( $validation_error ), 400 );
 			}
+
+			// 7a. Backfill the broker's profile if it has no phone number on file yet.
+			$this->maybe_backfill_broker_phone( $source_agent_id, $broker_phone );
 
 			// Compile data vector structure matrix array payload context matching DB structures
 			$payload = array(
@@ -119,7 +123,7 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 				'notes'              => $notes,
 				'source_agent_id'    => $source_agent_id,
 				'source_agent_name'  => $source_agent_name,
-				'source_agent_phone' => $source_agent_phone,
+				'source_agent_phone' => $broker_phone,
 				'approval_status'    => 'pending',
 				'is_public'          => 0,
 			);
@@ -185,7 +189,6 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 			$broker_profile     = $this->get_broker_profile();
 			$source_agent_id    = $broker_profile['id'];
 			$source_agent_name  = $broker_profile['name'];
-			$source_agent_phone = $broker_profile['phone'];
 
 			// 6. Sanitize form fields.
 			$title            = isset( $_POST['title'] ) ? sanitize_text_field( wp_unslash( $_POST['title'] ) ) : '';
@@ -200,11 +203,16 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 			$available_units  = isset( $_POST['available_units'] ) ? absint( wp_unslash( $_POST['available_units'] ) ) : 1;
 			$price_raw        = isset( $_POST['price'] ) ? sanitize_text_field( wp_unslash( $_POST['price'] ) ) : '0';
 			$notes            = isset( $_POST['notes'] ) ? sanitize_textarea_field( wp_unslash( $_POST['notes'] ) ) : '';
+			$broker_phone_raw = isset( $_POST['broker_phone'] ) ? sanitize_text_field( wp_unslash( $_POST['broker_phone'] ) ) : '';
+			$broker_phone     = $this->normalize_indian_mobile( $broker_phone_raw );
 			$price_parsed     = $this->parse_shorthand_price_to_number( $price_raw );
-			$validation_error = $this->validate_listing_input( $title, $project_name, $transaction_type, $property_type, $city, $price_parsed );
+			$validation_error = $this->validate_listing_input( $title, $project_name, $transaction_type, $property_type, $city, $price_parsed, $broker_phone );
 			if ( $validation_error ) {
 				wp_send_json_error( array( 'message' => $validation_error ), 400 );
 			}
+
+			// 6a. Backfill the broker's profile if it has no phone number on file yet.
+			$this->maybe_backfill_broker_phone( $source_agent_id, $broker_phone );
 
 			// 7. Handle optional property image upload via WordPress Media Library.
 			$image_url       = '';
@@ -244,7 +252,7 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 				'image_url'          => $image_url,
 				'source_agent_id'    => $source_agent_id,
 				'source_agent_name'  => $source_agent_name,
-				'source_agent_phone' => $source_agent_phone,
+				'source_agent_phone' => $broker_phone,
 				'approval_status'    => 'pending',
 				'is_public'          => 0,
 			);
@@ -305,6 +313,68 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 		}
 
 		/**
+		 * Normalize a user-entered Indian mobile number to a plain 10-digit string.
+		 *
+		 * Strips whitespace/hyphens/parentheses and an optional leading country
+		 * code (+91 / 91) or trunk prefix (0), leaving a canonical 10-digit form
+		 * for storage. Does not validate — call is_valid_indian_mobile() after.
+		 *
+		 * @since 5.2.0
+		 * @param string $raw Raw user input.
+		 * @return string Normalized digits (may still be invalid length/prefix).
+		 */
+		private function normalize_indian_mobile( string $raw ): string {
+			$digits = preg_replace( '/\D/', '', $raw );
+			$digits = is_string( $digits ) ? $digits : '';
+
+			if ( '' === $digits ) {
+				return '';
+			}
+
+			if ( 12 === strlen( $digits ) && '91' === substr( $digits, 0, 2 ) ) {
+				$digits = substr( $digits, 2 );
+			} elseif ( 11 === strlen( $digits ) && '0' === substr( $digits, 0, 1 ) ) {
+				$digits = substr( $digits, 1 );
+			}
+
+			return $digits;
+		}
+
+		/**
+		 * Validate a normalized Indian mobile number: exactly 10 digits, starting 6-9.
+		 *
+		 * @since 5.2.0
+		 * @param string $normalized Output of normalize_indian_mobile().
+		 * @return bool
+		 */
+		private function is_valid_indian_mobile( string $normalized ): bool {
+			return 1 === preg_match( '/^[6-9]\d{9}$/', $normalized );
+		}
+
+		/**
+		 * Backfill the broker's user profile with their mobile number when the
+		 * profile does not already have one on file. Never overwrites an
+		 * existing phone number — this is additive/backfill only.
+		 *
+		 * @since 5.2.0
+		 * @param int    $user_id           Broker user ID.
+		 * @param string $normalized_phone  Validated 10-digit mobile number.
+		 * @return void
+		 */
+		private function maybe_backfill_broker_phone( int $user_id, string $normalized_phone ): void {
+			if ( $user_id <= 0 || '' === $normalized_phone ) {
+				return;
+			}
+
+			$existing = (string) ( get_user_meta( $user_id, 'billing_phone', true ) ?: get_user_meta( $user_id, 'phone', true ) );
+			if ( '' !== trim( $existing ) ) {
+				return; // Profile already has a number on file — do not overwrite.
+			}
+
+			update_user_meta( $user_id, 'phone', $normalized_phone );
+		}
+
+		/**
 		 * Resolve broker identity from the authenticated WordPress session.
 		 *
 		 * @return array{id:int,name:string,phone:string}
@@ -337,6 +407,7 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 		 * @param string $property_type Property type.
 		 * @param string $city City.
 		 * @param float  $price Price.
+		 * @param string $normalized_phone Normalized 10-digit broker mobile number.
 		 * @return string Empty string when valid, translated message when invalid.
 		 */
 		private function validate_listing_input(
@@ -345,10 +416,19 @@ if ( ! class_exists( 'Asraa_Agent_Quick_Post_Controller' ) ) {
 			string $transaction_type,
 			string $property_type,
 			string $city,
-			float $price
+			float $price,
+			string $normalized_phone
 		): string {
 			if ( '' === $title || '' === $project_name || '' === $property_type || '' === $city ) {
 				return __( 'Please complete all required fields.', 'asraa-crm' );
+			}
+
+			if ( '' === $normalized_phone ) {
+				return __( 'Please enter your mobile number.', 'asraa-crm' );
+			}
+
+			if ( ! $this->is_valid_indian_mobile( $normalized_phone ) ) {
+				return __( 'Please enter a valid 10-digit Indian mobile number.', 'asraa-crm' );
 			}
 
 			if ( $price <= 0 ) {

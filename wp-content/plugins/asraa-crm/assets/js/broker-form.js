@@ -177,6 +177,7 @@
 	var $error      = $( '#asraa-broker-form-error' );
 	var $priceInput = $( '#abf-price' );
 	var $priceDisp  = $( '#abf-price-display' );
+	var $phoneInput = $( '#abf-broker-phone' );
 	var $fileInput  = $( '#abf-property-image' );
 	var $preview    = $( '#abf-image-preview' );
 	var $placeholder = $( '#abf-image-placeholder' );
@@ -341,6 +342,47 @@
 		$notesCount.text( len + ' / 2000' );
 	} );
 
+	// ── Broker phone (Indian mobile) validation ──────────────────────────────
+
+	// 10 digits starting 6-9, with an optional +91 (or 0091 / 91) prefix and
+	// optional space/hyphen separators. Matches server-side normalization.
+	var INDIA_MOBILE_RE = /^(?:\+?91[\s-]?|0)?[6-9]\d{9}$/;
+
+	/**
+	 * Validate an Indian mobile number, ignoring incidental spaces/hyphens.
+	 *
+	 * @param  {string} raw Raw input string.
+	 * @return {boolean}    True if it matches a valid Indian mobile format.
+	 */
+	function isValidIndianMobile( raw ) {
+		if ( ! raw ) {
+			return false;
+		}
+		var cleaned = raw.replace( /[\s-]/g, '' );
+		return INDIA_MOBILE_RE.test( cleaned );
+	}
+
+	$phoneInput.on( 'input', function () {
+		clearFieldError( $( this ) );
+	} );
+
+	$phoneInput.on( 'blur', function () {
+		var $el  = $( this );
+		var val  = $el.val().trim();
+		var $err = $( '#abf-broker-phone-error' );
+
+		if ( ! val ) {
+			showFieldError( $el, '#abf-broker-phone-error', i18n.required || 'This field is required.' );
+			return;
+		}
+		if ( ! isValidIndianMobile( val ) ) {
+			showFieldError( $el, '#abf-broker-phone-error', i18n.invalidPhone || 'Enter a valid 10-digit Indian mobile number.' );
+			return;
+		}
+		$el.removeClass( 'asraa-input--invalid' ).removeAttr( 'aria-invalid' );
+		$err.text( '' );
+	} );
+
 	// ── Validation helpers ───────────────────────────────────────────────────
 
 	function showFieldError( $input, errorSelector, message ) {
@@ -392,11 +434,22 @@
 			valid = false;
 		}
 
+		// Phone-specific validation (only checked for format here — the
+		// required-field loop above already caught an empty value).
+		var phoneVal = $phoneInput.val().trim();
+		if ( phoneVal && ! isValidIndianMobile( phoneVal ) ) {
+			showFieldError( $phoneInput, '#abf-broker-phone-error', i18n.invalidPhone || 'Enter a valid 10-digit Indian mobile number.' );
+			if ( valid ) { $phoneInput.trigger( 'focus' ); }
+			valid = false;
+		}
+
 		return valid;
 	}
 
-	// Validate on blur for each required field.
-	$form.on( 'blur', '.asraa-required-field', function () {
+	// Validate on blur for each required field (phone has its own dedicated
+	// handler above, which also checks format — skip it here to avoid the
+	// two handlers fighting over the same error message).
+	$form.on( 'blur', '.asraa-required-field:not(.asraa-phone-field)', function () {
 		var $el  = $( this );
 		var val  = $el.val().trim();
 		var id   = $el.attr( 'id' );

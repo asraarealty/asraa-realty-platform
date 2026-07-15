@@ -229,6 +229,14 @@
 	margin-top: 0.25rem;
 }
 
+/* Field-level hint (helper text below an input, before any error) */
+.asraa-field-hint {
+	display: block;
+	margin-top: 0.3rem;
+	font-size: 0.8125rem;
+	color: var(--abf-text-muted);
+}
+
 /* Field-level error */
 .asraa-field-error {
 	display: block;

@@ -78,6 +78,7 @@ if ( ! class_exists( 'Asraa_Broker_Form_Shortcode' ) ) {
 						'success'       => __( 'Your listing has been submitted and is awaiting review.', 'asraa-crm' ),
 						'error'         => __( 'Submission failed. Please try again.', 'asraa-crm' ),
 						'invalidPrice'  => __( 'Please enter a valid price (e.g. 50L, 1.5Cr, 2500000).', 'asraa-crm' ),
+						'invalidPhone'  => __( 'Enter a valid 10-digit Indian mobile number.', 'asraa-crm' ),
 						'imageTooBig'   => __( 'Image must be under 5\u00a0MB.', 'asraa-crm' ),
 						'imageType'     => __( 'Please upload a JPG, PNG, or WebP image.', 'asraa-crm' ),
 						'regError'      => __( 'Registration failed. Please try again.', 'asraa-crm' ),
