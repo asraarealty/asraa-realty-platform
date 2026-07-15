@@ -218,6 +218,31 @@ function homeo_enqueue_styles() {
 }
 add_action( 'wp_enqueue_scripts', 'homeo_enqueue_styles', 100 );
 
+/**
+ * Fix "Google Maps JavaScript API has been loaded directly without
+ * loading=async" console warning.
+ *
+ * The WP RealEstate plugin registers the 'google-maps' script handle
+ * (includes/class-scripts.php) without Google's recommended loading=async
+ * URL parameter. Patched here via script_loader_src instead of editing the
+ * vendor plugin file directly, so this survives plugin updates.
+ *
+ * @since Homeo 1.0 (perf patch)
+ * @param string $src    Script source URL.
+ * @param string $handle Registered script handle.
+ * @return string
+ */
+function homeo_google_maps_async_loading( $src, $handle ) {
+	if ( 'google-maps' !== $handle || empty( $src ) ) {
+		return $src;
+	}
+	if ( false !== strpos( $src, 'loading=async' ) ) {
+		return $src; // Already patched — avoid duplicating the param.
+	}
+	return add_query_arg( 'loading', 'async', $src );
+}
+add_filter( 'script_loader_src', 'homeo_google_maps_async_loading', 10, 2 );
+
 function homeo_admin_enqueue_styles() {
 	//load font awesome
 	wp_enqueue_style( 'all-awesome', get_template_directory_uri() . '/css/all-awesome.css', array(), '5.11.2' );
