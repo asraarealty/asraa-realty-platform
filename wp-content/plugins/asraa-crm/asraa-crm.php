@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Asraa CRM
  * Description: SaaS-ready CRM for real estate – lead pipeline, property management, deals, campaigns, automation, and client portal management.
- * Version: 5.0.1
+ * Version: 5.2.0
  * Author: Asraa Realty
  * Text Domain: asraa-crm
  * Requires at least: 6.0
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! defined( 'ASRAA_CRM_PATH' ) )    define( 'ASRAA_CRM_PATH', plugin_dir_path( __FILE__ ) );
 if ( ! defined( 'ASRAA_CRM_URL' ) )     define( 'ASRAA_CRM_URL', plugin_dir_url( __FILE__ ) );
 if ( ! defined( 'ASRAA_CRM_FILE' ) )    define( 'ASRAA_CRM_FILE', __FILE__ );
-if ( ! defined( 'ASRAA_CRM_VERSION' ) ) define( 'ASRAA_CRM_VERSION', '5.0.1' );
+if ( ! defined( 'ASRAA_CRM_VERSION' ) ) define( 'ASRAA_CRM_VERSION', '5.2.0' );
 if ( ! defined( 'ASRAA_CRM_LOG_DIR' ) ) define( 'ASRAA_CRM_LOG_DIR', ASRAA_CRM_PATH . 'logs' );
 
 /* ============================================================
@@ -571,6 +571,7 @@ function asraa_crm_run_broker_feed_table_migration() {
         'meta_description' => "ALTER TABLE {$broker_feed_table} ADD COLUMN meta_description TEXT NULL DEFAULT NULL",
         'notes' => "ALTER TABLE {$broker_feed_table} ADD COLUMN notes TEXT NULL DEFAULT NULL",
         'updated_at' => "ALTER TABLE {$broker_feed_table} ADD COLUMN updated_at DATETIME NULL DEFAULT NULL",
+        'source_agent_phone' => "ALTER TABLE {$broker_feed_table} ADD COLUMN source_agent_phone VARCHAR(30) NOT NULL DEFAULT ''",
     );
     foreach ( $columns as $column => $sql ) {
         $exists = $wpdb->get_results( $wpdb->prepare( "SHOW COLUMNS FROM {$broker_feed_table} LIKE %s", $column ) );
