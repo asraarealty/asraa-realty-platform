@@ -678,6 +678,10 @@ function asraa_crm_bootstrap_controllers() {
         'Asraa_CRM_Site_Visit_Controller'        => 'asraa_crm_site_visit_controller',
         'Asraa_CRM_Inventory_Controller'         => 'asraa_crm_inventory_controller',
         'Asraa_CRM_Client_Portal_Controller'     => 'asraa_crm_client_portal_controller',
+        // Bug fix (audit 2026-07-15): this service registers its own hooks in __construct()
+        // (asraa_crm_site_visit_completed / booking_confirmed / booking_cancelled) but was
+        // never instantiated anywhere in the plugin, so those automations silently never fired.
+        'Asraa_CRM_Inventory_Automation_Service' => 'asraa_crm_inventory_automation_service',
     );
     foreach ( $controllers as $class => $global_var ) {
         if ( class_exists( $class ) ) {

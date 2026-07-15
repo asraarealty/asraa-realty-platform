@@ -6,10 +6,18 @@
  *
  * Available variables:
  *   $listings (array) — Rows from Asraa_Broker_Feed_Repository::get_public_feed( ARRAY_A ).
- *                       Only approved + public records are present.
+ *                       Only approved + public records are present (enforced in the
+ *                       repository query — approval_status = 'approved' AND is_public = 1).
+ *                       This template does NOT re-filter or alter that business logic.
  *
  * Security: Broker phone and broker email are NEVER displayed here.
  * All output is escaped with the appropriate wp_kses / esc_* functions.
+ *
+ * SEO layer (2026-07 audit): every card automatically derives an SEO-friendly title,
+ * descriptive alt text, a short description, and Schema.org/JSON-LD structured data
+ * purely from existing fields (project, configuration, property_type, city, locality,
+ * transaction_type, price). Brokers are never required to type a description, and no
+ * dedicated per-property page/URL is created — everything renders inline in this feed.
  *
  * @package Asraa_CRM
  */
@@ -60,9 +68,207 @@ if ( ! function_exists( 'asraa_feed_placeholder_image' ) ) {
 		return 'data:image/svg+xml;charset=UTF-8,' . rawurlencode( $svg );
 	}
 }
+
+/**
+ * Normalize a listing row into a flat set of clean, human-readable fragments
+ * used to build SEO copy. Every fragment gracefully degrades to '' when the
+ * source field is empty — nothing here invents data that wasn't provided.
+ *
+ * @param  array $listing Raw listing row (ARRAY_A).
+ * @return array{config:string,ptype:string,trans:string,project:string,locality:string,city:string,price:string,raw_title:string}
+ */
+if ( ! function_exists( 'asraa_feed_seo_fragments' ) ) {
+	function asraa_feed_seo_fragments( array $listing ): array {
+		$trans_map = [
+			'sale'   => 'Sale',
+			'rent'   => 'Rent',
+			'resale' => 'Resale',
+			'lease'  => 'Lease',
+		];
+		$trans_raw = strtolower( sanitize_text_field( $listing['transaction_type'] ?? '' ) );
+
+		return [
+			'config'    => sanitize_text_field( $listing['configuration'] ?? '' ),
+			'ptype'     => sanitize_text_field( $listing['property_type'] ?? '' ),
+			'trans'     => $trans_map[ $trans_raw ] ?? ucfirst( $trans_raw ),
+			'project'   => sanitize_text_field( $listing['project_name'] ?? '' ),
+			'locality'  => sanitize_text_field( $listing['locality'] ?? '' ),
+			'city'      => sanitize_text_field( $listing['city'] ?? '' ),
+			'price_fmt' => asraa_feed_format_price( floatval( $listing['price'] ?? 0 ) ),
+			'raw_title' => sanitize_text_field( $listing['title'] ?? '' ),
+		];
+	}
+}
+
+/**
+ * Build an SEO-friendly title such as:
+ * "3 BHK Apartment for Sale in Bandra, Mumbai – Prestige Heights"
+ *
+ * Falls back through progressively shorter combinations, then to the
+ * broker-entered meta_title / title fields, so a card with sparse data
+ * never renders an empty or malformed string.
+ *
+ * @param  array $listing Raw listing row.
+ * @return string
+ */
+if ( ! function_exists( 'asraa_feed_build_seo_title' ) ) {
+	function asraa_feed_build_seo_title( array $listing ): string {
+		$f = asraa_feed_seo_fragments( $listing );
+
+		$head = trim( $f['config'] . ' ' . $f['ptype'] );
+		if ( '' === $head ) {
+			$head = ! empty( $listing['meta_title'] ) ? sanitize_text_field( $listing['meta_title'] ) : $f['raw_title'];
+		}
+
+		$location = trim( implode( ', ', array_filter( [ $f['locality'], $f['city'] ] ) ) );
+
+		$title = $head;
+		if ( '' !== $f['trans'] ) {
+			$title .= ' for ' . $f['trans'];
+		}
+		if ( '' !== $location ) {
+			$title .= ' in ' . $location;
+		}
+		if ( '' !== $f['project'] ) {
+			$title .= ' – ' . $f['project'];
+		}
+
+		$title = trim( $title, " \t\n\r\0\x0B–" );
+
+		if ( '' === $title ) {
+			$title = ! empty( $listing['meta_title'] ) ? sanitize_text_field( $listing['meta_title'] ) : $f['raw_title'];
+		}
+
+		/**
+		 * Filter the auto-generated SEO title for a broker feed card.
+		 *
+		 * @param string $title   The generated title.
+		 * @param array  $listing The raw listing row.
+		 */
+		return (string) apply_filters( 'asraa_feed_seo_title', $title, $listing );
+	}
+}
+
+/**
+ * Build descriptive, unique alt text for the card image (never just "image"
+ * or a bare repeated title — each alt describes what's actually in view:
+ * configuration + type + locality/city).
+ *
+ * @param  array  $listing Raw listing row.
+ * @param  string $seo_title Pre-built SEO title (avoids recomputation).
+ * @return string
+ */
+if ( ! function_exists( 'asraa_feed_build_alt_text' ) ) {
+	function asraa_feed_build_alt_text( array $listing, string $seo_title ): string {
+		$alt = $seo_title . ' – property photo';
+		return (string) apply_filters( 'asraa_feed_seo_alt', $alt, $listing );
+	}
+}
+
+/**
+ * Build a short (1–2 sentence) auto-generated description purely from
+ * existing structured fields. Brokers are never required to type this.
+ * Respects a broker/admin-entered meta_description when one already exists.
+ *
+ * @param  array $listing Raw listing row.
+ * @return string
+ */
+if ( ! function_exists( 'asraa_feed_build_description' ) ) {
+	function asraa_feed_build_description( array $listing ): string {
+		if ( ! empty( $listing['meta_description'] ) ) {
+			return sanitize_text_field( $listing['meta_description'] );
+		}
+
+		$f        = asraa_feed_seo_fragments( $listing );
+		$location = trim( implode( ', ', array_filter( [ $f['locality'], $f['city'] ] ) ) );
+
+		$parts = [];
+
+		$what = trim( $f['config'] . ' ' . $f['ptype'] );
+		if ( '' === $what ) {
+			$what = 'Property';
+		}
+		$sentence = $what;
+		if ( '' !== $f['project'] ) {
+			$sentence .= ' at ' . $f['project'];
+		}
+		if ( '' !== $location ) {
+			$sentence .= ' in ' . $location;
+		}
+		if ( '' !== $f['trans'] ) {
+			$sentence .= ', available for ' . strtolower( $f['trans'] );
+		}
+		$parts[] = $sentence . '.';
+
+		if ( '' !== $f['price_fmt'] ) {
+			$parts[] = 'Priced at ' . $f['price_fmt'] . '.';
+		}
+
+		$brand = get_option( 'asraa_crm_brand_name', 'Asraa Realty' );
+		$parts[] = 'Listed via ' . sanitize_text_field( $brand ) . '\'s verified broker network.';
+
+		$description = implode( ' ', $parts );
+
+		return (string) apply_filters( 'asraa_feed_seo_description', $description, $listing );
+	}
+}
+
+/**
+ * Build one Schema.org RealEstateListing node (used inside the feed-level
+ * ItemList JSON-LD block). No dedicated property page exists, so `url`
+ * points back to this feed with a same-page fragment identifier.
+ *
+ * @param  array  $listing   Raw listing row.
+ * @param  int    $position  1-based position in the list.
+ * @param  string $seo_title Pre-built SEO title.
+ * @param  string $seo_desc  Pre-built SEO description.
+ * @return array
+ */
+if ( ! function_exists( 'asraa_feed_build_jsonld_item' ) ) {
+	function asraa_feed_build_jsonld_item( array $listing, int $position, string $seo_title, string $seo_desc ): array {
+		$f         = asraa_feed_seo_fragments( $listing );
+		$current   = isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( home_url( wp_unslash( $_SERVER['REQUEST_URI'] ) ) ) : home_url( '/' );
+		$anchor_id = 'asraa-listing-' . absint( $listing['id'] ?? $position );
+
+		$item = [
+			'@type'       => 'RealEstateListing',
+			'name'        => $seo_title,
+			'description' => $seo_desc,
+			'url'         => $current . '#' . $anchor_id,
+		];
+
+		if ( ! empty( $listing['image_url'] ) ) {
+			$item['image'] = esc_url_raw( $listing['image_url'] );
+		}
+
+		$price = floatval( $listing['price'] ?? 0 );
+		if ( $price > 0 ) {
+			$item['offers'] = [
+				'@type'         => 'Offer',
+				'price'         => (string) round( $price, 2 ),
+				'priceCurrency' => 'INR',
+				'availability'  => 'https://schema.org/InStock',
+				'businessFunction' => ( 'rent' === strtolower( $listing['transaction_type'] ?? '' ) || 'lease' === strtolower( $listing['transaction_type'] ?? '' ) )
+					? 'http://purl.org/goodrelations/v1#LeaseOut'
+					: 'http://purl.org/goodrelations/v1#Sell',
+			];
+		}
+
+		if ( '' !== $f['city'] || '' !== $f['locality'] ) {
+			$item['address'] = array_filter( [
+				'@type'           => 'PostalAddress',
+				'addressLocality' => '' !== $f['locality'] ? $f['locality'] : $f['city'],
+				'addressRegion'   => $f['city'],
+				'addressCountry'  => 'IN',
+			] );
+		}
+
+		return $item;
+	}
+}
 ?>
 
-<div class="asraa-broker-feed" id="asraa-broker-feed">
+<section class="asraa-broker-feed" id="asraa-broker-feed" aria-labelledby="asraa-broker-feed-heading">
 
 	<?php if ( empty( $listings ) ) : ?>
 		<div class="asraa-feed-empty">
@@ -73,18 +279,35 @@ if ( ! function_exists( 'asraa_feed_placeholder_image' ) ) {
 			<p><?php esc_html_e( 'No listings are available right now. Please check back soon.', 'asraa-crm' ); ?></p>
 		</div>
 
-	<?php else : ?>
+	<?php else :
+
+		$jsonld_items = [];
+	?>
+
+		<header class="asraa-feed-header">
+			<p class="asraa-feed-header__eyebrow"><?php esc_html_e( 'Verified Broker Network', 'asraa-crm' ); ?></p>
+			<h2 class="asraa-feed-header__title" id="asraa-broker-feed-heading">
+				<?php
+				echo esc_html(
+					apply_filters( 'asraa_feed_section_heading', __( 'Latest Property Listings', 'asraa-crm' ) )
+				);
+				?>
+			</h2>
+		</header>
 
 		<div
 			class="asraa-feed-carousel"
 			id="asraa-feed-carousel"
 			role="region"
 			aria-label="<?php esc_attr_e( 'Property listings carousel', 'asraa-crm' ); ?>"
+			tabindex="0"
 		>
 			<div class="asraa-feed-track-wrap">
 				<div class="asraa-feed-track">
-					<?php foreach ( $listings as $listing ) :
+					<?php
+					foreach ( $listings as $index => $listing ) :
 						$image_url    = ! empty( $listing['image_url'] ) ? esc_url( $listing['image_url'] ) : asraa_feed_placeholder_image();
+						$has_real_img = ! empty( $listing['image_url'] );
 						$project_name = sanitize_text_field( $listing['project_name'] ?? '' );
 						$title        = sanitize_text_field( $listing['title'] ?? '' );
 						$config       = sanitize_text_field( $listing['configuration'] ?? '' );
@@ -95,20 +318,35 @@ if ( ! function_exists( 'asraa_feed_placeholder_image' ) ) {
 						$price_raw    = floatval( $listing['price'] ?? 0 );
 						$price_fmt    = asraa_feed_format_price( $price_raw );
 						$trans_type   = sanitize_text_field( $listing['transaction_type'] ?? '' );
+
+						// ── SEO layer: derived purely from the fields above, no broker input required.
+						$seo_title = asraa_feed_build_seo_title( $listing );
+						$seo_alt   = asraa_feed_build_alt_text( $listing, $seo_title );
+						$seo_desc  = asraa_feed_build_description( $listing );
+						$anchor_id = 'asraa-listing-' . absint( $listing['id'] ?? $index );
+
+						if ( $has_real_img ) {
+							$jsonld_items[] = asraa_feed_build_jsonld_item( $listing, $index + 1, $seo_title, $seo_desc );
+						}
+
+						// First visible cards (roughly one desktop viewport) get high fetch priority
+						// and eager loading; everything after that stays lazy for Core Web Vitals.
+						$is_priority = $index < 3;
 					?>
-					<article class="asraa-feed-card" aria-label="<?php echo esc_attr( $title ); ?>">
+					<article class="asraa-feed-card" id="<?php echo esc_attr( $anchor_id ); ?>" aria-labelledby="<?php echo esc_attr( $anchor_id . '-title' ); ?>">
 
 						<div class="asraa-feed-card__image-wrap">
 							<img
 								class="asraa-feed-card__image"
 								src="<?php echo esc_url( $image_url ); ?>"
-								alt="<?php echo esc_attr( $title ); ?>"
-								loading="lazy"
+								alt="<?php echo esc_attr( $seo_alt ); ?>"
+								<?php echo $is_priority ? 'loading="eager" fetchpriority="high"' : 'loading="lazy" fetchpriority="low"'; ?>
+								decoding="async"
 								width="800"
 								height="500"
 							/>
 							<?php if ( ! empty( $trans_type ) ) : ?>
-								<span class="asraa-feed-card__badge asraa-badge--<?php echo esc_attr( $trans_type ); ?>">
+								<span class="asraa-feed-card__badge asraa-badge--<?php echo esc_attr( strtolower( $trans_type ) ); ?>">
 									<?php echo esc_html( ucfirst( $trans_type ) ); ?>
 								</span>
 							<?php endif; ?>
@@ -120,7 +358,9 @@ if ( ! function_exists( 'asraa_feed_placeholder_image' ) ) {
 								<p class="asraa-feed-card__project"><?php echo esc_html( $project_name ); ?></p>
 							<?php endif; ?>
 
-							<h3 class="asraa-feed-card__title"><?php echo esc_html( $title ); ?></h3>
+							<h3 class="asraa-feed-card__title" id="<?php echo esc_attr( $anchor_id . '-title' ); ?>"><?php echo esc_html( $title ); ?></h3>
+
+							<p class="asraa-feed-card__seo-desc screen-reader-text"><?php echo esc_html( $seo_desc ); ?></p>
 
 							<ul class="asraa-feed-card__meta">
 
@@ -222,6 +462,25 @@ if ( ! function_exists( 'asraa_feed_placeholder_image' ) ) {
 
 		</div><!-- /.asraa-feed-carousel -->
 
+		<?php if ( ! empty( $jsonld_items ) ) :
+			$list_items = [];
+			foreach ( $jsonld_items as $i => $item ) {
+				$list_items[] = [
+					'@type'    => 'ListItem',
+					'position' => $i + 1,
+					'item'     => $item,
+				];
+			}
+			$jsonld = [
+				'@context'        => 'https://schema.org',
+				'@type'           => 'ItemList',
+				'name'            => apply_filters( 'asraa_feed_section_heading', __( 'Latest Property Listings', 'asraa-crm' ) ),
+				'itemListElement' => $list_items,
+			];
+			?>
+			<script type="application/ld+json"><?php echo wp_json_encode( $jsonld, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ); ?></script>
+		<?php endif; ?>
+
 	<?php endif; ?>
 
-</div>
+</section>
