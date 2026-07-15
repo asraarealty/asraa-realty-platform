@@ -265,6 +265,34 @@
 		wrap.addEventListener( 'focusin',    stopAutoplay );
 		wrap.addEventListener( 'focusout',   startAutoplay );
 
+		/* ─── Pause when off-screen or tab hidden (perf / battery) ───── */
+
+		var inViewport = true;
+		var tabVisible = ( typeof document.hidden === 'boolean' ) ? ! document.hidden : true;
+
+		function syncAutoplay() {
+			if ( inViewport && tabVisible ) {
+				startAutoplay();
+			} else {
+				stopAutoplay();
+			}
+		}
+
+		if ( 'IntersectionObserver' in window ) {
+			var observer = new IntersectionObserver( function ( entries ) {
+				entries.forEach( function ( entry ) {
+					inViewport = entry.isIntersecting;
+				} );
+				syncAutoplay();
+			}, { threshold: 0.15 } );
+			observer.observe( wrap );
+		}
+
+		document.addEventListener( 'visibilitychange', function () {
+			tabVisible = ! document.hidden;
+			syncAutoplay();
+		} );
+
 		/* ─── Arrow buttons ─────────────────────────────────────────── */
 
 		if ( prevBtn ) {
