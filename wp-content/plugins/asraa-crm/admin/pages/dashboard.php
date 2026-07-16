@@ -112,30 +112,7 @@ $today_followups_list = $is_admin
     ", $user_id));
 ?>
 
-<style>
-.asraa-dashboard{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:20px;margin-top:20px
-}
-.asraa-card{
-    background:#fff;border-radius:10px;padding:22px;
-    border-left:6px solid #2271b1;
-    box-shadow:0 2px 6px rgba(0,0,0,.06);
-    text-decoration:none;color:inherit
-}
-.asraa-card.green{border-color:#46b450}
-.asraa-card.orange{border-color:#ffb900}
-.asraa-card.red{border-color:#dc3232}
-.asraa-card h2{margin:0;font-size:34px}
-.asraa-card p{margin:6px 0 0;color:#555}
-.asraa-reminder{background:#fff;padding:14px;margin-bottom:12px;border-left:5px solid}
-.asraa-reminder.overdue{border-color:#dc3232}
-.asraa-reminder.today{border-color:#ffb900}
-</style>
-
 <div class="wrap">
-<h1>Asraa CRM Dashboard</h1>
 
 <div class="asraa-dashboard">
 

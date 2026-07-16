@@ -75,38 +75,38 @@ jQuery(function ($) {
     var $countLabel = $('#asraa-selected-count');
 
     function updateBulkToolbar() {
-        var count = $('.asraa-lead-cb:checked').length;
+        var count = $('.asraa-row-cb:checked').length;
         if (count > 0) {
             $toolbar.css('display', 'flex');
-            $countLabel.text(count + ' lead' + (count === 1 ? '' : 's') + ' selected');
+            $countLabel.text(count + ' item' + (count === 1 ? '' : 's') + ' selected');
         } else {
             $toolbar.hide();
         }
     }
 
     $(document).on('change', '#asraa-select-all', function () {
-        $('.asraa-lead-cb').prop('checked', this.checked);
+        $('.asraa-row-cb').prop('checked', this.checked);
         updateBulkToolbar();
     });
 
-    $(document).on('change', '.asraa-lead-cb', function () {
-        var all = $('.asraa-lead-cb').length;
-        var checked = $('.asraa-lead-cb:checked').length;
+    $(document).on('change', '.asraa-row-cb', function () {
+        var all = $('.asraa-row-cb').length;
+        var checked = $('.asraa-row-cb:checked').length;
         $('#asraa-select-all').prop('checked', all === checked).prop('indeterminate', checked > 0 && checked < all);
         updateBulkToolbar();
     });
 
     $('#asraa-deselect-all-btn').on('click', function () {
-        $('.asraa-lead-cb, #asraa-select-all').prop('checked', false);
+        $('.asraa-row-cb, #asraa-select-all').prop('checked', false);
         updateBulkToolbar();
     });
 
     function getSelectedLeadIds() {
-        return $('.asraa-lead-cb:checked').map(function () { return $(this).val(); }).get();
+        return $('.asraa-row-cb:checked').map(function () { return $(this).val(); }).get();
     }
 
     function getSelectedLeadsInfo() {
-        return $('.asraa-lead-cb:checked').map(function () {
+        return $('.asraa-row-cb:checked').map(function () {
             return {
                 id:    $(this).val(),
                 name:  $(this).data('name'),

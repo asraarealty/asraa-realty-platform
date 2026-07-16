@@ -10,9 +10,7 @@ $filter_project = (int) ( $_GET['project_id'] ?? 0 );
 ?>
 
 <div class="wrap">
-<h1 class="wp-heading-inline">🏢 Towers</h1>
-<button id="asraa-add-tower-btn" class="page-title-action">+ Add Tower</button>
-<hr class="wp-header-end">
+<p><button id="asraa-add-tower-btn" class="page-title-action">+ Add Tower</button></p>
 
 <!-- Project filter -->
 <form method="get" style="margin:14px 0; display:flex; gap:10px; align-items:center;">
@@ -28,7 +26,8 @@ $filter_project = (int) ( $_GET['project_id'] ?? 0 );
     </select>
 </form>
 
-<table class="wp-list-table widefat fixed striped">
+<div class="leads-table-wrapper">
+<table class="leads-table">
     <thead>
     <tr>
         <th width="60">ID</th>
@@ -58,9 +57,11 @@ $filter_project = (int) ( $_GET['project_id'] ?? 0 );
             <td><?php echo esc_html( $tower['total_floors'] ?: '—' ); ?></td>
             <td><?php echo esc_html( asraa_crm_format_date( $tower['created_at'] ?? '' ) ); ?></td>
             <td>
+                <span class="row-actions">
                 <button class="button button-small asraa-tower-edit">✏️ Edit</button>
                 <button class="button button-small asraa-tower-delete"
                         data-id="<?php echo esc_attr( $tower['id'] ); ?>">🗑️</button>
+                </span>
             </td>
         </tr>
     <?php endforeach; ?>
@@ -69,6 +70,7 @@ $filter_project = (int) ( $_GET['project_id'] ?? 0 );
     <?php endif; ?>
     </tbody>
 </table>
+</div>
 </div>
 
 <!-- ADD / EDIT MODAL -->
@@ -123,8 +125,8 @@ $filter_project = (int) ( $_GET['project_id'] ?? 0 );
 
 <script>
 (function($){
-    const nonce   = '<?php echo esc_js( wp_create_nonce( 'asraa_crm_nonce' ) ); ?>';
-    const ajaxurl = '<?php echo esc_js( admin_url( 'admin-ajax.php' ) ); ?>';
+    const nonce = '<?php echo esc_js( wp_create_nonce( 'asraa_crm_nonce' ) ); ?>';
+    // ajaxurl is already defined globally by WP core on every wp-admin page.
 
     function openModal(data) {
         $('#asraa-tower-modal-title').text(data ? '✏️ Edit Tower' : '➕ Add Tower');

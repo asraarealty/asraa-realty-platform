@@ -2,6 +2,23 @@
    Asraa CRM Enhanced – Main CSS
 ================================================================ */
 
+/* ---- Shared page chrome ---- */
+.asraa-page-head {
+    margin: 0 0 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.asraa-page-head__title {
+    margin: 0;
+}
+
+/* Interim: hide each page's own legacy <h1> now that the shared page-head
+   above supplies it. Removed page-by-page once a page's retrofit pass runs. */
+.asraa-crm-wrap .wrap > h1 {
+    display: none;
+}
+
 /* ---- General ---- */
 .crm-form-section {
     background: #fff;
@@ -65,6 +82,22 @@
 
 .leads-table tbody tr:hover {
     background: #f9f9f9;
+}
+
+/* ---- Row actions (reveal on row hover/focus, standard WP list-table convention) ---- */
+.leads-table .row-actions {
+    display: flex;
+    gap: 8px;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.leads-table tbody tr:hover .row-actions,
+.leads-table tbody tr:focus-within .row-actions,
+.leads-table .row-actions:focus-within {
+    visibility: visible;
+    opacity: 1;
 }
 
 /* ---- Bulk toolbar ---- */
@@ -179,6 +212,16 @@
     margin: 6px 0 0;
     color: #555;
 }
+
+.asraa-reminder {
+    background: #fff;
+    padding: 14px;
+    margin-bottom: 12px;
+    border-left: 5px solid;
+}
+
+.asraa-reminder.overdue { border-color: #dc3232; }
+.asraa-reminder.today   { border-color: #ffb900; }
 
 /* ---- Campaign Dashboard ---- */
 .asraa-campaign-wrap .asraa-campaign-subtitle {

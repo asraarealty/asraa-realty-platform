@@ -58,7 +58,6 @@ if (isset($_POST['save_group'])) {
 ?>
 
 <div class="wrap">
-<h1><?php esc_html_e('Add New Group', 'asraa-crm'); ?></h1>
 
 <?php if ($error): ?>
     <div class="notice notice-error"><p><?php echo esc_html($error); ?></p></div>

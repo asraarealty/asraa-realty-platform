@@ -6,7 +6,6 @@ $projects = $projects ?? [];
 ?>
 
 <div class="wrap">
-<h1>📊 Inventory Reports</h1>
 
 <div style="margin:16px 0;">
     <button class="button asraa-report-tab-btn button-primary" data-tab="by_project">Available by Project</button>
@@ -27,8 +26,8 @@ $projects = $projects ?? [];
 
 <script>
 (function($){
-    const nonce   = '<?php echo esc_js( wp_create_nonce( 'asraa_crm_nonce' ) ); ?>';
-    const ajaxurl = '<?php echo esc_js( admin_url( 'admin-ajax.php' ) ); ?>';
+    const nonce = '<?php echo esc_js( wp_create_nonce( 'asraa_crm_nonce' ) ); ?>';
+    // ajaxurl is already defined globally by WP core on every wp-admin page.
 
     $(document).on('click', '.asraa-report-tab-btn', function(){
         const $btn = $(this);

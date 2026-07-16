@@ -51,7 +51,7 @@ $msg_history  = is_array( $msg_history ) ? $msg_history : array();
 ?>
 
 <div class="wrap">
-<h1>👤 <?php echo esc_html($lead['name']); ?></h1>
+<h2>👤 <?php echo esc_html($lead['name']); ?></h2>
 
 <form id="asraa-lead-edit-form">
     <input type="hidden" name="lead_id" value="<?php echo esc_attr($lead_id); ?>">

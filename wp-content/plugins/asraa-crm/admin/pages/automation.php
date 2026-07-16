@@ -25,9 +25,7 @@ $action_labels = [
 ?>
 
 <div class="wrap">
-<h1>Automation Workflows
-<a href="<?php echo admin_url('admin.php?page=asraa-crm-automation&tab=add'); ?>" class="page-title-action">+ Add Rule</a>
-</h1>
+<p><a href="<?php echo admin_url('admin.php?page=asraa-crm-automation&tab=add'); ?>" class="page-title-action">+ Add Rule</a></p>
 
 <?php if (!empty($_GET['saved'])): ?><div class="notice notice-success is-dismissible"><p>Rule saved.</p></div><?php endif; ?>
 <?php if (!empty($_GET['updated'])): ?><div class="notice notice-success is-dismissible"><p>Rule updated.</p></div><?php endif; ?>
@@ -40,7 +38,8 @@ $action_labels = [
 </nav>
 
 <?php if ($tab === 'rules'): ?>
-<table class="wp-list-table widefat fixed striped" style="margin-top:16px;">
+<div class="leads-table-wrapper">
+<table class="leads-table" style="margin-top:16px;">
 <thead><tr>
 <th>Rule Name</th><th>Trigger</th><th>Actions</th><th>Status</th><th>Created</th><th>Manage</th>
 </tr></thead>
@@ -62,6 +61,7 @@ $action_labels = [
 </td>
 <td><?php echo date('d M Y', strtotime($rule['created_at'])); ?></td>
 <td>
+<span class="row-actions">
 <form method="POST" action="<?php echo admin_url('admin-post.php'); ?>" style="display:inline;">
 <?php wp_nonce_field('asraa_crm_toggle_automation'); ?>
 <input type="hidden" name="action" value="asraa_crm_toggle_automation">
@@ -69,11 +69,13 @@ $action_labels = [
 <button type="submit" class="button button-small"><?php echo $rule['is_active'] ? 'Deactivate' : 'Activate'; ?></button>
 </form>
 <a href="<?php echo wp_nonce_url(admin_url('admin-post.php?action=asraa_crm_delete_automation&rule_id='.$rule['id']), 'asraa_crm_delete_automation'); ?>" class="button button-small" onclick="return confirm('Delete this rule?')">Delete</a>
+</span>
 </td>
 </tr>
 <?php endforeach; ?>
 </tbody>
 </table>
+</div>
 
 <?php elseif ($tab === 'add'): ?>
 <div style="background:#fff;padding:24px;border:1px solid #ddd;border-radius:8px;max-width:700px;margin-top:16px;">
@@ -147,7 +149,8 @@ updateActionFields();
 
 <?php elseif ($tab === 'logs'): ?>
 <h2 style="margin-top:16px;">Execution Logs</h2>
-<table class="wp-list-table widefat fixed striped">
+<div class="leads-table-wrapper">
+<table class="leads-table">
 <thead><tr>
 <th>Rule</th><th>Trigger</th><th>Status</th><th>Notes</th><th>Executed At</th>
 </tr></thead>
@@ -169,6 +172,7 @@ updateActionFields();
 <?php endforeach; ?>
 </tbody>
 </table>
+</div>
 <?php endif; ?>
 
 </div>

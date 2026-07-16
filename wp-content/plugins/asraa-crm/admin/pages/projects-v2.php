@@ -6,15 +6,14 @@ $projects = $projects ?? [];
 ?>
 
 <div class="wrap">
-<h1 class="wp-heading-inline">🏙️ Projects</h1>
-<button id="asraa-add-project-btn" class="page-title-action">+ Add Project</button>
-<hr class="wp-header-end">
+<p><button id="asraa-add-project-btn" class="page-title-action">+ Add Project</button></p>
 
 <?php if ( ! empty( $_GET['saved'] ) ) : ?>
 	<div class="notice notice-success is-dismissible"><p>Project saved.</p></div>
 <?php endif; ?>
 
-<table id="asraa-projects-table" class="wp-list-table widefat fixed striped">
+<div class="leads-table-wrapper">
+<table id="asraa-projects-table" class="leads-table">
 	<thead>
 	<tr>
 		<th width="60">ID</th>
@@ -47,9 +46,11 @@ $projects = $projects ?? [];
 				</span>
 			</td>
 			<td>
+				<span class="row-actions">
 				<button class="button button-small asraa-proj-edit">✏️ Edit</button>
 				<button class="button button-small asraa-proj-delete"
 				        data-id="<?php echo esc_attr( $proj['id'] ); ?>">🗑️</button>
+				</span>
 			</td>
 		</tr>
 	<?php endforeach; ?>
@@ -58,6 +59,7 @@ $projects = $projects ?? [];
 	<?php endif; ?>
 	</tbody>
 </table>
+</div>
 </div>
 
 <!-- ADD / EDIT MODAL -->
@@ -123,8 +125,8 @@ $projects = $projects ?? [];
 
 <script>
 (function($){
-    const nonce   = '<?php echo esc_js( wp_create_nonce( 'asraa_crm_nonce' ) ); ?>';
-    const ajaxurl = '<?php echo esc_js( admin_url( 'admin-ajax.php' ) ); ?>';
+    const nonce = '<?php echo esc_js( wp_create_nonce( 'asraa_crm_nonce' ) ); ?>';
+    // ajaxurl is already defined globally by WP core on every wp-admin page.
 
     function openModal(data) {
         $('#asraa-proj-modal-title').text(data ? '✏️ Edit Project' : '➕ Add Project');
