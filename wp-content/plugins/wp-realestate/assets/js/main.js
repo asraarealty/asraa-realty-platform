@@ -1026,42 +1026,56 @@
 
             // search autocomplete location
             if ( wp_realestate_opts.map_service == 'google-map' ) {
-                if (typeof google === 'object' && typeof google.maps === 'object') {
-                    function search_location_initialize() {
-                        
-                        $('input[name="filter-center-location"]').each(function(){
-                            var $id = $(this).attr('id');
-                            
-                            if ( typeof $id !== 'undefined' ) {
-                                var container = $('#'+$id).closest('.form-group-inner');
-                                var input = document.getElementById($id);
-                                var autocomplete = new google.maps.places.Autocomplete(input);
-                                autocomplete.setTypes([]);
+                function search_location_initialize() {
 
-                                if ( wp_realestate_opts.geocoder_country ) {
-                                    autocomplete.setComponentRestrictions({
-                                        country: [wp_realestate_opts.geocoder_country],
-                                    });
-                                }
+                    $('input[name="filter-center-location"]').each(function(){
+                        var $id = $(this).attr('id');
 
-                                autocomplete.addListener( 'place_changed', function () {
-                                    var place = autocomplete.getPlace();
-                                    place.toString();
+                        if ( typeof $id !== 'undefined' ) {
+                            var container = $('#'+$id).closest('.form-group-inner');
+                            var input = document.getElementById($id);
+                            var autocomplete = new google.maps.places.Autocomplete(input);
+                            autocomplete.setTypes([]);
 
-                                    if (!place.geometry) {
-                                        window.alert("No details available for input: '" + place.name + "'");
-                                        return;
-                                    }
-
-                                    container.find('input[name=filter-center-latitude]').val(place.geometry.location.lat());
-                                    container.find('input[name=filter-center-longitude]').val(place.geometry.location.lng());
-                                    
+                            if ( wp_realestate_opts.geocoder_country ) {
+                                autocomplete.setComponentRestrictions({
+                                    country: [wp_realestate_opts.geocoder_country],
                                 });
                             }
-                        });
-                    }
-                    google.maps.event.addDomListener(window, 'load', search_location_initialize);
+
+                            autocomplete.addListener( 'place_changed', function () {
+                                var place = autocomplete.getPlace();
+                                place.toString();
+
+                                if (!place.geometry) {
+                                    window.alert("No details available for input: '" + place.name + "'");
+                                    return;
+                                }
+
+                                container.find('input[name=filter-center-latitude]').val(place.geometry.location.lat());
+                                container.find('input[name=filter-center-longitude]').val(place.geometry.location.lng());
+
+                            });
+                        }
+                    });
                 }
+
+                // Google Maps is now loaded with loading=async, so it may not be
+                // ready yet at this point. Poll for readiness instead of the
+                // deprecated google.maps.event.addDomListener(window, 'load', ...)
+                // pattern, which assumed synchronous/blocking script loading.
+                (function wait_for_google_maps(retries) {
+                    if (typeof google === 'object' && typeof google.maps === 'object' && google.maps.places) {
+                        search_location_initialize();
+                        return;
+                    }
+                    retries = (retries === undefined) ? 0 : retries;
+                    if (retries >= 25) {
+                        // ~5 seconds elapsed – Maps API did not load (network error / bad key).
+                        return;
+                    }
+                    setTimeout(function () { wait_for_google_maps(retries + 1); }, 200);
+                })();
             } else {
                 if ( typeof L.Control.Geocoder.Nominatim != 'undefined' ) {
                     if ( wp_realestate_opts.geocoder_country ) {
