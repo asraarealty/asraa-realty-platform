@@ -37,7 +37,7 @@ class Asraa_Notification_Service {
             esc_html($lead['name']),
             esc_html($lead['phone'] ?? ''),
             esc_html($lead['email'] ?? ''),
-            admin_url('admin.php?page=asraa-crm-leads&lead_id=' . (int) $lead['id'])
+            admin_url('admin.php?page=asraa-crm-lead-view&lead_id=' . (int) $lead['id'])
         );
 
         return $this->send_agent_notification($agent->user_email, $subject, $message);

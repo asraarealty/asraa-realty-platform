@@ -159,7 +159,7 @@ $today_followups_list = $is_admin
 <strong><?php echo esc_html($f->lead_name); ?></strong><br>
 Due: <?php echo esc_html( wp_date( 'd M Y', strtotime( $f->follow_date ) ) ); ?><br>
 <a class="button button-small"
-href="<?php echo esc_url( admin_url('admin.php?page=asraa-crm-leads&lead_id=' . $f->lead_id) ); ?>">
+href="<?php echo esc_url( admin_url('admin.php?page=asraa-crm-lead-view&lead_id=' . $f->lead_id) ); ?>">
 Open Lead
 </a>
 </div>
@@ -169,7 +169,7 @@ Open Lead
 <div class="asraa-reminder today">
 <strong><?php echo esc_html($f->lead_name); ?></strong><br>
 <a class="button button-small"
-href="<?php echo esc_url( admin_url('admin.php?page=asraa-crm-leads&lead_id=' . $f->lead_id) ); ?>">
+href="<?php echo esc_url( admin_url('admin.php?page=asraa-crm-lead-view&lead_id=' . $f->lead_id) ); ?>">
 Open Lead
 </a>
 </div>

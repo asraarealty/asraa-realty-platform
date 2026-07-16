@@ -48,6 +48,21 @@ class Asraa_CRM_Admin_Menu {
                 'before'
             );
         }
+
+        // Groups module styling — was written but never enqueued, so the
+        // groups list rendered with no card/grid styling at all.
+        $groups_css = ASRAA_CRM_URL . 'assets/css/groups.css';
+        if ( file_exists( ASRAA_CRM_PATH . 'assets/css/groups.css' ) ) {
+            wp_enqueue_style( 'asraa-crm-groups', $groups_css, array( 'asraa-crm-admin' ), ASRAA_CRM_VERSION );
+        }
+
+        // Properties page behavior (Add/Edit modal, delete) — was written but
+        // never enqueued, so "+ Add Property" and the row Edit/Delete buttons
+        // did nothing. Depends on window.asraaCRM from crm-enhanced.js above.
+        $properties_js = ASRAA_CRM_URL . 'assets/js/properties.js';
+        if ( file_exists( ASRAA_CRM_PATH . 'assets/js/properties.js' ) ) {
+            wp_enqueue_script( 'asraa-crm-properties', $properties_js, array( 'jquery', 'asraa-crm-enhanced' ), ASRAA_CRM_VERSION, true );
+        }
     }
 
     public static function register() {
@@ -79,6 +94,19 @@ class Asraa_CRM_Admin_Menu {
         global $submenu;
         if ( isset( $submenu[ self::SLUG ][0][0] ) ) {
             $submenu[ self::SLUG ][0][0] = __( 'Dashboard', 'asraa-crm' );
+        }
+
+        // Hide detail-only pages from the sidebar nav — they're only meant to be
+        // reached via a direct link with query args (e.g. &lead_id=123), and
+        // clicking them from the sidebar with no args just shows a "not found"
+        // notice. Still fully registered/capability-checked, just not listed.
+        $hidden_from_nav = array( 'asraa-crm-lead-view' );
+        if ( isset( $submenu[ self::SLUG ] ) ) {
+            foreach ( $submenu[ self::SLUG ] as $key => $item ) {
+                if ( in_array( $item[2], $hidden_from_nav, true ) ) {
+                    unset( $submenu[ self::SLUG ][ $key ] );
+                }
+            }
         }
     }
 
@@ -129,7 +157,34 @@ class Asraa_CRM_Admin_Menu {
         if ( file_exists( $header_partial ) ) {
             include $header_partial;
         }
-        if ( file_exists( $file ) ) {
+
+        // Some pages need controller-fetched data (project/tower/unit lists from
+        // their own repositories) rather than a bare include of the view file —
+        // the view alone only has empty-array fallbacks for those variables.
+        $controller_dispatch = array(
+            'asraa-crm-projects'          => array( 'asraa_crm_project_controller', 'projects_page' ),
+            'asraa-crm-towers'            => array( 'asraa_crm_project_controller', 'towers_page' ),
+            'asraa-crm-inventory'         => array( 'asraa_crm_inventory_controller', 'inventory_page' ),
+            'asraa-crm-inventory-reports' => array( 'asraa_crm_inventory_controller', 'reports_page' ),
+        );
+
+        if ( isset( $controller_dispatch[ $slug ] ) ) {
+            list( $global_var, $method ) = $controller_dispatch[ $slug ];
+            $controller = $GLOBALS[ $global_var ] ?? null;
+            if ( $controller && method_exists( $controller, $method ) ) {
+                try {
+                    $controller->$method();
+                } catch ( \Throwable $e ) {
+                    Asraa_CRM_Logger::log( 'error', 'AdminPage', $e->getMessage(), $file, $e->getLine(), $e->getTraceAsString() );
+                    echo '<div class="notice notice-error"><p>' . esc_html( $e->getMessage() ) . '</p></div>';
+                }
+            } elseif ( file_exists( $file ) ) {
+                // Fallback so the page still renders (with empty-array defaults)
+                // if the controller somehow isn't available.
+                Asraa_CRM_Logger::log( 'warning', 'AdminPage', 'Controller unavailable for ' . $slug . ', falling back to bare include', $file, 0 );
+                include $file;
+            }
+        } elseif ( file_exists( $file ) ) {
             try {
                 include $file;
             } catch ( \Throwable $e ) {

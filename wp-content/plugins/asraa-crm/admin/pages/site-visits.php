@@ -88,7 +88,7 @@ $base_url = admin_url( 'admin.php?page=asraa-crm-site-visits' );
     ?>
         <tr data-id="<?php echo esc_attr( $v['id'] ); ?>">
             <td>
-                <a href="<?php echo esc_url( admin_url( 'admin.php?page=asraa-crm-leads&lead_id=' . $v['lead_id'] ) ); ?>">
+                <a href="<?php echo esc_url( admin_url( 'admin.php?page=asraa-crm-lead-view&lead_id=' . $v['lead_id'] ) ); ?>">
                     <?php echo esc_html( $v['lead_name'] ?? 'Lead #' . $v['lead_id'] ); ?>
                 </a>
             </td>
