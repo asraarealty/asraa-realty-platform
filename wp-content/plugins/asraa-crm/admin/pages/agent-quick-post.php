@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly to prevent execution tracing exploration.
 }
 
-error_log( '[ASRAA CRM] AGENT QUICK POST SYSTEM RENDERING ENHANCED TEMPLATE' );
+Asraa_CRM_Logger::log( 'info', 'AgentQuickPost', 'Rendering enhanced template' );
 
 // Isolate and process active system identity profiles safely from server session contexts.
 $current_authenticated_user = wp_get_current_user();
@@ -32,9 +32,6 @@ if ( empty( $rendered_broker_telephone ) ) {
 ?>
 
 <div class="wrap asraa-crm-form-wrap">
-	<h1 class="wp-heading-inline"><?php echo esc_html__( 'Asraa CRM — Agent Quick Post', 'asraa-crm' ); ?></h1>
-	<hr class="wp-header-end">
-
 	<?php if ( isset( $_GET['success'] ) && '1' === $_GET['success'] ) : ?>
 		<div class="notice notice-success is-dismissible">
 			<p><strong><?php echo esc_html__( 'Success!', 'asraa-crm' ); ?></strong> <?php echo esc_html__( 'Property registration data submitted successfully for administrative queue authentication validation.', 'asraa-crm' ); ?></p>

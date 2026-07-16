@@ -150,13 +150,6 @@ $masked_key = $api_key ? '**********' : '';
 ?>
 
 <div class="wrap">
-    <h1>
-        <?php esc_html_e(
-            'AI Assistant Settings',
-            'asraa-crm'
-        ); ?>
-    </h1>
-
     <?php if ($saved): ?>
         <div class="notice notice-success is-dismissible">
             <p>

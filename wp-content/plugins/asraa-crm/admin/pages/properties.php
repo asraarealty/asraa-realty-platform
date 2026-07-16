@@ -30,9 +30,7 @@ $properties = isset($properties) && is_array($properties) ? $properties : [];
 
 <div class="wrap">
 
-    <h1 class="wp-heading-inline">🏢 Properties</h1>
-    <button id="asraa-add-property-btn" class="page-title-action">+ Add Property</button>
-    <hr class="wp-header-end">
+    <p><button id="asraa-add-property-btn" class="page-title-action">+ Add Property</button></p>
 
     <!-- FILTER -->
     <div style="margin:15px 0; display:flex; gap:10px;">
@@ -48,20 +46,23 @@ $properties = isset($properties) && is_array($properties) ? $properties : [];
     <form method="post">
         <?php wp_nonce_field('bulk_delete_properties'); ?>
 
-        <p>
+        <div id="asraa-bulk-toolbar" style="display:none;">
+            <span id="asraa-selected-count"></span>
             <button type="submit"
                     name="delete_selected"
                     class="button button-secondary"
                     onclick="return confirm('Delete selected properties?');">
                 Bulk Delete
             </button>
-        </p>
+            <button type="button" id="asraa-deselect-all-btn" class="button">Clear selection</button>
+        </div>
 
-        <table id="asraa-properties-table" class="wp-list-table widefat fixed striped">
+        <div class="leads-table-wrapper">
+        <table id="asraa-properties-table" class="leads-table">
             <thead>
             <tr>
                 <th width="40">
-                    <input type="checkbox" id="select-all-properties">
+                    <input type="checkbox" id="asraa-select-all">
                 </th>
                 <th width="60">ID</th>
                 <th>Image</th>
@@ -100,7 +101,7 @@ $properties = isset($properties) && is_array($properties) ? $properties : [];
                 data-status="<?php echo esc_attr($status); ?>"
             >
                 <td>
-                    <input type="checkbox" name="bulk_delete[]" value="<?php echo esc_attr($id); ?>">
+                    <input type="checkbox" name="bulk_delete[]" class="asraa-row-cb" value="<?php echo esc_attr($id); ?>">
                 </td>
 
                 <td><?php echo esc_html($id); ?></td>
@@ -121,14 +122,17 @@ $properties = isset($properties) && is_array($properties) ? $properties : [];
                 <td class="col-status"><?php echo esc_html($status ? ucfirst($status) : '-'); ?></td>
 
                 <td>
+                    <span class="row-actions">
                     <button class="button button-small asraa-edit">✏️ Edit</button>
                     <button class="button button-small asraa-delete">🗑 Delete</button>
+                    </span>
                 </td>
             </tr>
 
             <?php endforeach; ?>
             </tbody>
         </table>
+        </div>
     </form>
 </div>
 
@@ -200,9 +204,3 @@ $properties = isset($properties) && is_array($properties) ? $properties : [];
 }
 </style>
 
-<script>
-document.getElementById('select-all-properties').addEventListener('click', function() {
-    let checkboxes = document.querySelectorAll('input[name="bulk_delete[]"]');
-    checkboxes.forEach(cb => cb.checked = this.checked);
-});
-</script>

@@ -41,7 +41,6 @@ $templates = $repo->get_all();
 ?>
 
 <div class="wrap">
-    <h1>📧 Email Templates</h1>
     <p>Create reusable email templates with dynamic variables for quick communication with leads.</p>
 
     <div class="crm-form-section">
@@ -155,11 +154,13 @@ $templates = $repo->get_all();
                         <?php endif; ?>
                     </td>
                     <td>
-                        <a href="?page=asraa-crm-email-templates&edit=<?php echo $t['id']; ?>" 
+                        <span class="row-actions">
+                        <a href="?page=asraa-crm-email-templates&edit=<?php echo $t['id']; ?>"
                            class="button button-small">✏️ Edit</a>
-                        <a href="?page=asraa-crm-email-templates&delete=<?php echo $t['id']; ?>&_wpnonce=<?php echo wp_create_nonce('delete_template_' . $t['id']); ?>" 
+                        <a href="?page=asraa-crm-email-templates&delete=<?php echo $t['id']; ?>&_wpnonce=<?php echo wp_create_nonce('delete_template_' . $t['id']); ?>"
                            class="button button-small"
                            onclick="return confirm('Are you sure you want to delete this template?')">🗑️ Delete</a>
+                        </span>
                     </td>
                 </tr>
             <?php endforeach; else: ?>

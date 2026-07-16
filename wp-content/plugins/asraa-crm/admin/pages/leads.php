@@ -169,34 +169,37 @@ $followupRepo = new Asraa_CRM_Followup_Repository();
 ?>
 
 <div class="wrap">
-<h1><?php echo $is_trash ? 'Trash – Deleted Leads' : 'Leads'; ?></h1>
 
-<a href="<?php echo esc_url(admin_url('admin.php?page=asraa-crm-leads')); ?>" class="button">Active</a>
-<a href="<?php echo esc_url(admin_url('admin.php?page=asraa-crm-leads&view=trash')); ?>" class="button">Trash</a>
+<a href="<?php echo esc_url(admin_url('admin.php?page=asraa-crm-leads')); ?>" class="button<?php echo !$is_trash ? ' button-primary' : ''; ?>">Active</a>
+<a href="<?php echo esc_url(admin_url('admin.php?page=asraa-crm-leads&view=trash')); ?>" class="button<?php echo $is_trash ? ' button-primary' : ''; ?>">Trash</a>
 
 <hr>
 
 <form method="post">
 <?php wp_nonce_field('bulk_leads_action'); ?>
 
-<select name="bulk_action">
-    <option value="">Bulk Actions</option>
-    <?php if (!$is_trash): ?>
-        <option value="trash">Move to Trash</option>
-    <?php else: ?>
-        <option value="restore">Restore</option>
-        <?php if ($is_admin): ?>
-            <option value="delete_forever">Delete Forever</option>
+<div id="asraa-bulk-toolbar" style="display:none;">
+    <span id="asraa-selected-count"></span>
+    <select name="bulk_action">
+        <option value="">Bulk Actions</option>
+        <?php if (!$is_trash): ?>
+            <option value="trash">Move to Trash</option>
+        <?php else: ?>
+            <option value="restore">Restore</option>
+            <?php if ($is_admin): ?>
+                <option value="delete_forever">Delete Forever</option>
+            <?php endif; ?>
         <?php endif; ?>
-    <?php endif; ?>
-</select>
+    </select>
+    <button class="button">Apply</button>
+    <button type="button" id="asraa-deselect-all-btn" class="button">Clear selection</button>
+</div>
 
-<button class="button">Apply</button>
-
-<table class="widefat striped">
+<div class="leads-table-wrapper">
+<table class="leads-table">
 <thead>
 <tr>
-    <th style="width:24px;"><input type="checkbox" id="asraa-cb-select-all-leads" data-testid="leads-select-all"></th>
+    <th style="width:24px;"><input type="checkbox" id="asraa-select-all" data-testid="leads-select-all"></th>
     <th>Name</th>
     <th>Phone</th>
     <th>Intent</th>
@@ -217,7 +220,7 @@ $followupRepo = new Asraa_CRM_Followup_Repository();
 
 <tr>
 <td>
-<input type="checkbox" name="lead_ids[]" value="<?php echo esc_attr($lead['id']); ?>">
+<input type="checkbox" name="lead_ids[]" class="asraa-row-cb" value="<?php echo esc_attr($lead['id']); ?>">
 </td>
 
 <td><?php echo esc_html($lead['name'] ?? ''); ?></td>
@@ -231,7 +234,9 @@ $followupRepo = new Asraa_CRM_Followup_Repository();
 <td><?php echo esc_html($lead['lead_stage'] ?? 'new'); ?></td>
 
 <td>
+<span class="row-actions">
 <a href="<?php echo esc_url(admin_url('admin.php?page=asraa-crm-leads&lead_id=' . $lead['id'])); ?>" class="button button-small">Open</a>
+</span>
 </td>
 
 </tr>
@@ -247,17 +252,6 @@ $followupRepo = new Asraa_CRM_Followup_Repository();
 
 </tbody>
 </table>
+</div>
 </form>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    var master = document.getElementById('asraa-cb-select-all-leads');
-    if (!master) return;
-    master.addEventListener('change', function () {
-        document.querySelectorAll('input[name="lead_ids[]"]').forEach(function (cb) {
-            cb.checked = master.checked;
-        });
-    });
-});
-</script>

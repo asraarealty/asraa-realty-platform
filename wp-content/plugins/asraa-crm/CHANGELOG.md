@@ -1,5 +1,155 @@
 # Asraa CRM — Changelog
 
+## 5.3.0 — 2026-07-16 (Admin Redesign, SEO Guard & Logger Audit)
+
+Wires up the admin design system that shipped alongside the plugin but was
+never actually enqueued, standardizes bulk/row-action UI across every wp-admin
+screen, adds shortcode-based search/sitemap exclusion for private tool pages,
+and closes out the broker feed's page-level SEO gap. No business logic (lead
+scoring, follow-up scheduling, commission calc, automation rules, etc.) was
+touched — this is a UI/wiring/audit release.
+
+### Files changed
+
+- **`includes/admin/class-admin-menu.php`** — *changes:*
+  - `enqueue()` now enqueues `assets/css/crm-enhanced.css` and
+    `assets/js/crm-enhanced.js` on every CRM admin page (previously built but
+    orphaned — never loaded anywhere).
+  - Nonce/ajaxurl localization switched from `wp_localize_script` to
+    `wp_add_inline_script` with an `Object.assign` merge, so it can no longer
+    silently overwrite `lead-view.php`'s own inline `window.asraaCRM.leadViewId`
+    assignment.
+  - `render_page()` now includes a new shared `admin/partials/page-header.php`
+    before each page's own content, so every screen gets a consistent title
+    treatment without duplicating markup per page.
+
+- **`admin/partials/page-header.php`** *(new)* — shared page-title chrome used
+  by all 24 admin screens.
+
+- **`assets/css/crm-enhanced.css`** — *changes:*
+  - Added `.asraa-page-head` styles for the new shared header partial.
+  - Added hover-reveal `.row-actions` styling (`visibility`/`opacity`
+    transition on `tbody tr:hover`), the standard pattern now used for
+    Edit/Delete/etc. links across every retrofitted table.
+  - Migrated `.asraa-reminder` / `.asraa-reminder.overdue` / `.asraa-reminder.today`
+    rules out of `dashboard.php`'s old inline `<style>` block.
+
+- **`assets/js/crm-enhanced.js`** — *changes:*
+  - Renamed the bulk-select checkbox class `.asraa-lead-cb` → `.asraa-row-cb`
+    and generalized the "X lead(s) selected" toolbar label to "X item(s)
+    selected", since the bulk toolbar now drives more than just the leads list.
+
+- **`admin/pages/leads.php`, `lead-view.php`, `followups.php`, `dashboard.php`,
+  `commissions.php`, `deals.php`, `properties.php`, `inventory.php`,
+  `notes.php`, `groups.php`, `groups-add.php`, `groups-edit.php`,
+  `leads-add.php`, `leads-import.php`, `projects-v2.php`, `towers.php`,
+  `inventory-reports.php`, `site-visits.php`, `broker-feed.php`,
+  `agent-hierarchy.php`, `agent-quick-post.php`, `email-templates.php`,
+  `whatsapp-templates.php`, `automation.php`, `ai-settings.php`** — *changes:*
+  - Removed each page's own static `<h1>` (now rendered once by the shared
+    header partial); pages whose heading carried a functional button
+    (Add Lead/Property/Project/Tower/Rule/etc.) or dynamic content
+    (lead-view's lead name) kept that content, just moved out of the `<h1>`.
+  - Swapped `widefat striped` / `wp-list-table widefat fixed striped` table
+    classes for the shared `.leads-table` skin, wrapped in
+    `.leads-table-wrapper`.
+  - Wrapped row-level action links/buttons in `.row-actions` so they reveal on
+    hover instead of always being visible.
+  - Where a bulk-select toolbar already existed (leads, followups, properties,
+    inventory), standardized the markup to `#asraa-bulk-toolbar` /
+    `.asraa-row-cb` / `#asraa-select-all` and removed each page's own
+    now-redundant inline "select all" script, since `crm-enhanced.js` now
+    handles it centrally. Pages without bulk-select were **not** given new
+    bulk functionality — restyle only, per scope.
+  - Removed dead/redundant code encountered along the way: guarded-but-unused
+    DataTables `<script>` blocks (`commissions.php`, `deals.php`), and
+    redundant local `const ajaxurl = '...'` redeclarations that shadowed WP
+    core's own global `ajaxurl` (`projects-v2.php`, `towers.php`,
+    `inventory-reports.php`, `site-visits.php`; `inventory.php`'s own
+    `id="asraa-select-all"` was also renamed to `asraa-inv-select-all` to
+    avoid colliding with the new global bulk-toolbar handler).
+
+- **`admin/pages/agent-quick-post.php`** — *fixes:*
+  - Migrated a raw `error_log()` call to `Asraa_CRM_Logger::log( 'info', ... )`
+    so it flows through the plugin's own structured logging system instead of
+    the server error log.
+
+- **`includes/core/class-seo-guard.php`** *(new)* — keeps
+  `[asraa_broker_post_form]` and `[asraa_dashboard]` pages (private
+  submission-form / logged-in dashboard tools, not public content) out of
+  search indexes and sitemaps:
+  - `wp_robots_noindex` on any singular page hosting either shortcode.
+  - Excluded from WP core's native `/wp-sitemap.xml` via
+    `wp_sitemaps_posts_query_args`.
+  - Excluded from the Growth Engine plugin's custom sitemap (if active) via a
+    `pre_get_posts` hook gated on that plugin's `asraa_sitemap` query var.
+  - Excluded-ID lookup is cached in a transient, invalidated on `save_post`.
+  - Deliberately does **not** cover `[asraa_broker_feed]` — that page is the
+    public listings landing page and must stay fully indexed and crawlable.
+
+- **`public/class-broker-feed-shortcode.php`** — *fixes:*
+  - The page hosting `[asraa_broker_feed]` previously fell through to Growth
+    Engine's hardcoded front-page title (`Site Name | Tagline`) with no way to
+    override it. Added a priority-20 `pre_get_document_title` filter that
+    substitutes "Property Listings | {site name}" (filterable via
+    `asraa_feed_page_title`) whenever the shortcode is present and no manual
+    `_asraa_meta_title` has been set.
+  - Added a `save_post` hook that auto-populates `_asraa_meta_description`
+    with a sensible default the first time a page with `[asraa_broker_feed]`
+    is saved with that field still empty — Growth Engine's `Meta.php` already
+    reads this key on any singular page, it previously just had nothing to
+    read. Per-card SEO (titles, alt text, JSON-LD `ItemList`/`RealEstateListing`
+    schema) was already implemented in `templates/broker-feed.php` — untouched.
+
+- **`asraa-crm.php`** — *changes:*
+  - Registers and instantiates `Asraa_CRM_Seo_Guard` alongside the other core
+    classes.
+  - Bumped `Version:` header and `ASRAA_CRM_VERSION` constant `5.2.0` → `5.3.0`.
+
+## 5.2.0 — 2026-07-15 (Broker Portal & Feed — Backfilled)
+
+Undocumented feature work that shipped under the `5.0.1` version string over
+several days before the plugin header/constant were actually bumped (see
+`27d2693` below) — the version-gated DB upgrade routine never ran on existing
+installs as a result. Backfilled here for the historical record; nothing in
+this entry is new work.
+
+### Highlights
+
+- **Broker Property Submission System** (`5bfe771`, `6b7b1a9`) — new
+  broker-facing property submission flow, plus a code-review pass hardening
+  referer sanitization, function-exists guards, price escaping, and image
+  upload feedback.
+- **Broker portal auth & hardening** (`1306c58`, `fffa557`, `a9a20c1`,
+  `fab23fd`, `efddbc7`, `a235321`, `b3ea9c3`, `44c1962`, `4c4befb`) — broker
+  login/auth screen, WhatsApp contact button, `broker_email` support, and
+  several rounds of security/robustness/compatibility hardening driven by
+  automated code review.
+- **Broker feed visibility & routing** (`ac15714`, `9c0ee6b`, `dd53c4d`) —
+  fixed listing visibility bugs and tightened which routes the public feed
+  exposes; the per-listing detail-page route was deliberately retired as part
+  of this work (listings render as cards in the shared feed page only).
+- **Broker page/admin layout redesign** (`6f096c6`, `09be645`, `168b65e`,
+  `7979606`) — premium two-column broker page layout, quick-post field-name
+  fixes, responsive admin layout, and broker display-name fallback handling.
+- **Premium responsive carousel** (`83155cb`, `e9a44ac`, `b1cc085`) — upgraded
+  the broker feed to a responsive property carousel, with a follow-up pass on
+  gap sizing, keyboard navigation, and `user-select` behavior.
+- **Broker Mobile Number field** (`562d486`, `27d2693`) — added the required
+  broker mobile number field to the property submission form; a follow-up fix
+  caught that the DB migration adding the `source_agent_phone` column never
+  ran on already-installed sites, because the plugin version constant had been
+  left at `5.0.1` despite this feature being tagged `@since 5.2.0` — bumped
+  `ASRAA_CRM_VERSION` to `5.2.0` (this commit) so the version-gated upgrade
+  routine finally executes, and added a defensive `SHOW COLUMNS`-guarded
+  `ALTER TABLE` fallback for the same column.
+- **Broker Feed SEO/schema + CWV** (`36baf02`) — SEO/schema and semantic HTML
+  redesign for the broker feed template (including JSON-LD `ItemList` of
+  `RealEstateListing` for cards with images), Core Web Vitals tweaks, and a
+  fix so `Asraa_CRM_Inventory_Automation_Service` (which registers its own
+  site-visit-completion hooks in its constructor) actually gets instantiated
+  during bootstrap.
+
 ## 5.0.1 — 2026-07-11 (Full Fix & Repackage)
 
 Backend / admin patch release. Zero new features. Every change is a bug fix

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Asraa CRM
  * Description: SaaS-ready CRM for real estate – lead pipeline, property management, deals, campaigns, automation, and client portal management.
- * Version: 5.2.0
+ * Version: 5.3.0
  * Author: Asraa Realty
  * Text Domain: asraa-crm
  * Requires at least: 6.0
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! defined( 'ASRAA_CRM_PATH' ) )    define( 'ASRAA_CRM_PATH', plugin_dir_path( __FILE__ ) );
 if ( ! defined( 'ASRAA_CRM_URL' ) )     define( 'ASRAA_CRM_URL', plugin_dir_url( __FILE__ ) );
 if ( ! defined( 'ASRAA_CRM_FILE' ) )    define( 'ASRAA_CRM_FILE', __FILE__ );
-if ( ! defined( 'ASRAA_CRM_VERSION' ) ) define( 'ASRAA_CRM_VERSION', '5.2.0' );
+if ( ! defined( 'ASRAA_CRM_VERSION' ) ) define( 'ASRAA_CRM_VERSION', '5.3.0' );
 if ( ! defined( 'ASRAA_CRM_LOG_DIR' ) ) define( 'ASRAA_CRM_LOG_DIR', ASRAA_CRM_PATH . 'logs' );
 
 /* ============================================================
@@ -602,6 +602,13 @@ asraa_crm_safe_require( 'includes/helpers.php' );
 ============================================================ */
 asraa_crm_safe_require( 'includes/core/class-roles.php' );
 asraa_crm_safe_require( 'includes/core/class-subscriptions.php' );
+asraa_crm_safe_require( 'includes/core/class-seo-guard.php' );
+if ( class_exists( 'Asraa_CRM_Seo_Guard' ) ) {
+    global $asraa_crm_seo_guard;
+    if ( ! isset( $asraa_crm_seo_guard ) || ! $asraa_crm_seo_guard instanceof Asraa_CRM_Seo_Guard ) {
+        $asraa_crm_seo_guard = new Asraa_CRM_Seo_Guard();
+    }
+}
 
 /* ============================================================
    AUTO-LOAD REPOSITORIES (all files)

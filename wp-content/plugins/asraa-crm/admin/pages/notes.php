@@ -31,11 +31,11 @@ if ( ! isset( $notes ) || ! is_array( $notes ) ) {
 ?>
 
 <div class="wrap">
-    <h1>Notes</h1>
 
     <?php if (!empty($notes)) : ?>
 
-        <table class="widefat striped">
+        <div class="leads-table-wrapper">
+        <table class="leads-table">
             <thead>
                 <tr>
                     <th width="60">ID</th>
@@ -64,6 +64,7 @@ if ( ! isset( $notes ) || ! is_array( $notes ) ) {
                 <?php endforeach; ?>
             </tbody>
         </table>
+        </div>
 
     <?php else : ?>
         <p>No notes found.</p>

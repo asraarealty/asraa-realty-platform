@@ -96,8 +96,6 @@ $added = $_GET['added'] ?? '';
 
 <div class="wrap">
 
-<h1>Add New Lead</h1>
-
 <?php if ($added): ?>
 <div class="notice notice-success is-dismissible">
     <p>Lead added successfully.</p>

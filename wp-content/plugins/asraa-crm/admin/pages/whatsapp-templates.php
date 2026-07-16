@@ -40,7 +40,6 @@ $templates = $repo->get_all();
 ?>
 
 <div class="wrap">
-    <h1>💬 WhatsApp Templates</h1>
     <p>Create reusable WhatsApp message templates with dynamic variables for quick communication with leads.</p>
 
     <div class="crm-form-section">
@@ -110,7 +109,8 @@ $templates = $repo->get_all();
 
     <h2>📋 Saved Templates</h2>
 
-    <table class="widefat striped">
+    <div class="leads-table-wrapper">
+    <table class="leads-table">
         <thead>
             <tr>
                 <th>ID</th>
@@ -134,10 +134,12 @@ $templates = $repo->get_all();
                     <?php endif; ?>
                 </td>
                 <td>
+                    <span class="row-actions">
                     <a href="?page=asraa-crm-whatsapp&edit=<?php echo $t['id']; ?>" class="button button-small">✏️ Edit</a>
                     <a href="<?php echo wp_nonce_url('?page=asraa-crm-whatsapp&delete=' . $t['id'], 'delete_wa_template_' . $t['id']); ?>"
                        class="button button-small"
                        onclick="return confirm('Delete this template?')">🗑️ Delete</a>
+                    </span>
                 </td>
             </tr>
         <?php endforeach; else: ?>
@@ -145,4 +147,5 @@ $templates = $repo->get_all();
         <?php endif; ?>
         </tbody>
     </table>
+    </div>
 </div>

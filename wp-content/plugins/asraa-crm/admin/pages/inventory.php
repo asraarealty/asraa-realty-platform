@@ -32,9 +32,7 @@ $base_url = admin_url( 'admin.php?page=asraa-crm-inventory' );
 ?>
 
 <div class="wrap">
-<h1 class="wp-heading-inline">📦 Inventory</h1>
-<button id="asraa-add-unit-btn" class="page-title-action">+ Add Unit</button>
-<hr class="wp-header-end">
+<p><button id="asraa-add-unit-btn" class="page-title-action">+ Add Unit</button></p>
 
 <!-- FILTER BAR -->
 <div class="asraa-inv-filters" style="display:flex;flex-wrap:wrap;gap:10px;margin:14px 0;align-items:flex-end;">
@@ -106,10 +104,11 @@ $base_url = admin_url( 'admin.php?page=asraa-crm-inventory' );
 
 <!-- RESULTS TABLE -->
 <div id="asraa-inv-table-wrap">
-<table class="wp-list-table widefat fixed striped" id="asraa-inventory-table">
+<div class="leads-table-wrapper">
+<table class="leads-table" id="asraa-inventory-table">
     <thead>
     <tr>
-        <th width="32"><input type="checkbox" id="asraa-select-all"></th>
+        <th width="32"><input type="checkbox" id="asraa-inv-select-all"></th>
         <th>Unit No.</th>
         <th>Project</th>
         <th>Tower</th>
@@ -141,10 +140,12 @@ $base_url = admin_url( 'admin.php?page=asraa-crm-inventory' );
                 </span>
             </td>
             <td>
+                <span class="row-actions">
                 <button class="button button-small asraa-unit-edit"
                         data-unit='<?php echo esc_attr( wp_json_encode( $unit ) ); ?>'>✏️</button>
                 <button class="button button-small asraa-unit-delete"
                         data-id="<?php echo esc_attr( $unit['id'] ); ?>">🗑️</button>
+                </span>
             </td>
         </tr>
     <?php endforeach; ?>
@@ -153,6 +154,7 @@ $base_url = admin_url( 'admin.php?page=asraa-crm-inventory' );
     <?php endif; ?>
     </tbody>
 </table>
+</div>
 
 <!-- Pagination -->
 <?php if ( $num_pages > 1 ) : ?>
@@ -256,8 +258,8 @@ $base_url = admin_url( 'admin.php?page=asraa-crm-inventory' );
 
 <script>
 (function($){
-    const nonce   = '<?php echo esc_js( wp_create_nonce( 'asraa_crm_nonce' ) ); ?>';
-    const ajaxurl = '<?php echo esc_js( admin_url( 'admin-ajax.php' ) ); ?>';
+    const nonce = '<?php echo esc_js( wp_create_nonce( 'asraa_crm_nonce' ) ); ?>';
+    // ajaxurl is already defined globally by WP core on every wp-admin page.
 
     // Cascade towers when project changes inside the modal.
     function escHtml(str) {
@@ -355,7 +357,7 @@ $base_url = admin_url( 'admin.php?page=asraa-crm-inventory' );
     });
 
     // Select all checkbox.
-    $('#asraa-select-all').on('change', function(){
+    $('#asraa-inv-select-all').on('change', function(){
         $('.asraa-unit-cb').prop('checked', this.checked);
         updateBulkBar();
     });
@@ -409,7 +411,8 @@ $base_url = admin_url( 'admin.php?page=asraa-crm-inventory' );
                     $tr.append($('<td>').append($badge));
                     const $editBtn = $('<button>').addClass('button button-small asraa-unit-edit').text('✏️').attr('data-unit', JSON.stringify(u));
                     const $delBtn  = $('<button>').addClass('button button-small asraa-unit-delete').text('🗑️').attr('data-id', u.id);
-                    $tr.append($('<td>').append($editBtn).append(' ').append($delBtn));
+                    const $actions = $('<span>').addClass('row-actions').append($editBtn).append(' ').append($delBtn);
+                    $tr.append($('<td>').append($actions));
                     html += $tr[0].outerHTML;
                 });
             }

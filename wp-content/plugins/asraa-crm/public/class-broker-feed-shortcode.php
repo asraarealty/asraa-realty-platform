@@ -32,6 +32,66 @@ if ( ! class_exists( 'Asraa_Broker_Feed_Shortcode' ) ) {
 		public function __construct() {
 			add_shortcode( 'asraa_broker_feed', array( $this, 'render' ) );
 			add_action( 'wp_enqueue_scripts', array( $this, 'maybe_enqueue_assets' ) );
+			// Priority 20: runs after Growth Engine's Title.php (priority 10, default),
+			// which otherwise hardcodes the front-page title before this could apply.
+			add_filter( 'pre_get_document_title', array( $this, 'maybe_override_title' ), 20 );
+			add_action( 'save_post', array( $this, 'maybe_populate_meta_description' ) );
+		}
+
+		/**
+		 * Override the page title with something on-topic when the current
+		 * singular page hosts [asraa_broker_feed] and no manual title override
+		 * (_asraa_meta_title) has already been set by an admin.
+		 *
+		 * Safe no-op if Growth Engine isn't active — this filter just never
+		 * gets a chance to matter, since nothing reads pre_get_document_title
+		 * output differently either way.
+		 *
+		 * @since 5.3.0
+		 * @param string $title The title WordPress core / other filters have produced so far.
+		 * @return string
+		 */
+		public function maybe_override_title( $title ) {
+			if ( ! $this->page_has_shortcode( 'asraa_broker_feed' ) ) {
+				return $title;
+			}
+			global $post;
+			if ( $post instanceof WP_Post && get_post_meta( $post->ID, '_asraa_meta_title', true ) ) {
+				return $title; // Respect a manually-set title.
+			}
+			/**
+			 * Filter the default title used for the page hosting [asraa_broker_feed].
+			 *
+			 * @since 5.3.0
+			 * @param string $default_title
+			 */
+			$default_title = apply_filters( 'asraa_feed_page_title', __( 'Property Listings', 'asraa-crm' ) . ' | ' . get_bloginfo( 'name' ) );
+			return $default_title;
+		}
+
+		/**
+		 * On save, populate a sensible default meta description for the page
+		 * hosting [asraa_broker_feed], if one hasn't already been set manually.
+		 * Growth Engine's Meta.php already reads _asraa_meta_description on any
+		 * singular page — this just gives it something to read. Safe no-op if
+		 * Growth Engine isn't active.
+		 *
+		 * @since 5.3.0
+		 * @param int $post_id
+		 */
+		public function maybe_populate_meta_description( $post_id ) {
+			$post = get_post( $post_id );
+			if ( ! ( $post instanceof WP_Post ) || ! has_shortcode( $post->post_content, 'asraa_broker_feed' ) ) {
+				return;
+			}
+			if ( get_post_meta( $post_id, '_asraa_meta_description', true ) ) {
+				return; // Don't clobber a manually-set description.
+			}
+			update_post_meta(
+				$post_id,
+				'_asraa_meta_description',
+				__( "Browse the latest verified property listings from Asraa Realty's broker network.", 'asraa-crm' )
+			);
 		}
 
 		/**

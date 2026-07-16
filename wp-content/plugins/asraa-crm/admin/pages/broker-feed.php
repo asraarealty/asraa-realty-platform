@@ -54,8 +54,6 @@ if ( isset( $_GET['asraa_msg'] ) ) {
 }
 ?>
 <div class="wrap asraa-feed-wrap">
-	<h1 class="wp-heading-inline"><?php esc_html_e( 'Broker Feed', 'asraa-crm' ); ?></h1>
-	<hr class="wp-header-end">
 	<style>
 		.asraa-feed-wrap .asraa-toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin:16px 0 12px}.asraa-feed-wrap .asraa-toolbar .field{display:flex;flex-direction:column;gap:4px}.asraa-feed-wrap .asraa-toolbar .field label{font-size:12px;font-weight:600}.asraa-feed-wrap .asraa-responsive-table{overflow-x:auto}.asraa-feed-wrap table{min-width:980px}.asraa-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase}.asraa-badge-pending{background:#fef3c7;color:#92400e}.asraa-badge-approved{background:#dcfce7;color:#166534}.asraa-badge-rejected{background:#fee2e2;color:#991b1b}.asraa-thumb{width:56px;height:56px;object-fit:cover;border-radius:6px;border:1px solid #d0d7de;background:#f6f7f7}.asraa-actions-flex{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.asraa-actions-flex .button{padding:0 8px;min-height:28px;line-height:26px}.asraa-modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100000;display:none;align-items:center;justify-content:center;padding:20px}.asraa-modal-content{background:#fff;border-radius:8px;max-width:760px;width:100%;max-height:90vh;overflow:auto}.asraa-modal-header,.asraa-modal-footer{padding:16px 20px;background:#f6f7f7}.asraa-modal-body{padding:20px}.asraa-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px}.asraa-modal-footer{display:flex;justify-content:flex-end;gap:10px}@media (max-width:782px){.asraa-grid-2{grid-template-columns:1fr}}
 	</style>
@@ -78,8 +76,8 @@ if ( isset( $_GET['asraa_msg'] ) ) {
 			</div>
 			<div class="tablenav-pages" style="float:right;"><span class="displaying-num"><?php echo esc_html( $total_items ); ?> items</span></div>
 		</div>
-		<div class="asraa-responsive-table">
-			<table class="wp-list-table widefat fixed striped">
+		<div class="asraa-responsive-table leads-table-wrapper">
+			<table class="leads-table">
 				<thead>
 					<tr><td class="check-column"><input type="checkbox" id="cb-select-all-1"></td><th>Cover</th><th>Property</th><th>Project</th><th>Type</th><th>Intent</th><th>City</th><th>Broker</th><th>Phone</th><th>Status</th><th>Actions</th></tr>
 				</thead>
@@ -108,7 +106,7 @@ if ( isset( $_GET['asraa_msg'] ) ) {
 								</td>
 								<td><span class="asraa-badge <?php echo esc_attr( $badge ); ?>"><?php echo esc_html( $status ); ?></span></td>
 								<td>
-									<div class="asraa-actions-flex">
+									<div class="row-actions asraa-actions-flex">
 										<button type="button" class="button button-secondary asraa-edit-trigger-btn" data-record-payload="<?php echo esc_attr( wp_json_encode( $record ) ); ?>"><span class="dashicons dashicons-edit"></span></button>
 										<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=asraa_broker_feed_single_action&feed_action=approve&id=' . $row_id ), 'asraa_single_action_' . $row_id ) ); ?>" class="button button-secondary">Approve</a>
 										<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=asraa_broker_feed_single_action&feed_action=reject&id=' . $row_id ), 'asraa_single_action_' . $row_id ) ); ?>" class="button button-secondary">Reject</a>

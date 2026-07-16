@@ -171,7 +171,6 @@ $users = is_array( $fetched_users ) ? $fetched_users : [];
 ?>
 
 <div class="wrap">
-<h1>Follow-ups</h1>
 
 <!-- ADD / EDIT FORM -->
 <form method="post">
@@ -256,7 +255,8 @@ $users = is_array( $fetched_users ) ? $fetched_users : [];
 <form method="post">
 <?php wp_nonce_field('asraa_bulk_followup_delete'); ?>
 
-<div style="margin-bottom:15px;">
+<div id="asraa-bulk-toolbar" style="display:none;">
+    <span id="asraa-selected-count"></span>
     <select name="bulk_action">
         <option value="">Bulk Actions</option>
         <option value="delete">Delete Selected</option>
@@ -264,13 +264,15 @@ $users = is_array( $fetched_users ) ? $fetched_users : [];
     </select>
 
     <button type="submit" class="button">Apply</button>
+    <button type="button" id="asraa-deselect-all-btn" class="button">Clear selection</button>
 </div>
 
-<table class="widefat striped">
+<div class="leads-table-wrapper">
+<table class="leads-table">
 <thead>
 <tr>
     <th>
-        <input type="checkbox" id="select-all-followups">
+        <input type="checkbox" id="asraa-select-all">
     </th>
     <th>ID</th>
     <th>Lead</th>
@@ -295,6 +297,7 @@ $email = $f['lead_email'] ?? '';
     <td>
         <input type="checkbox"
                name="followup_ids[]"
+               class="asraa-row-cb"
                value="<?php echo (int) $f['id']; ?>">
     </td>
 
@@ -336,6 +339,7 @@ $email = $f['lead_email'] ?? '';
     </td>
 
     <td>
+        <span class="row-actions">
         <a class="button button-small"
            href="<?php echo admin_url('admin.php?page=asraa-crm-followups&edit=' . $f['id']); ?>">
            Edit
@@ -349,6 +353,7 @@ $email = $f['lead_email'] ?? '';
            )); ?>">
            Delete
         </a>
+        </span>
     </td>
 </tr>
 
@@ -362,13 +367,6 @@ $email = $f['lead_email'] ?? '';
 
 </tbody>
 </table>
+</div>
 </form>
 </div>
-
-<script>
-document.getElementById('select-all-followups').addEventListener('change', function () {
-    document.querySelectorAll('input[name="followup_ids[]"]').forEach(function (checkbox) {
-        checkbox.checked = document.getElementById('select-all-followups').checked;
-    });
-});
-</script>

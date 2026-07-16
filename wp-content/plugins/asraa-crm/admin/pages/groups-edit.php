@@ -83,7 +83,6 @@ $form = [
 ?>
 
 <div class="wrap">
-<h1><?php esc_html_e('Edit Group', 'asraa-crm'); ?></h1>
 
 <?php if ($error): ?>
     <div class="notice notice-error"><p><?php echo esc_html($error); ?></p></div>

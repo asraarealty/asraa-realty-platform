@@ -26,6 +26,28 @@ class Asraa_CRM_Admin_Menu {
         if ( file_exists( ASRAA_CRM_PATH . 'assets/js/admin.js' ) ) {
             wp_enqueue_script( 'asraa-crm-admin', $js, array( 'jquery' ), ASRAA_CRM_VERSION, true );
         }
+
+        $enhanced_css = ASRAA_CRM_URL . 'assets/css/crm-enhanced.css';
+        if ( file_exists( ASRAA_CRM_PATH . 'assets/css/crm-enhanced.css' ) ) {
+            wp_enqueue_style( 'asraa-crm-enhanced', $enhanced_css, array( 'asraa-crm-admin' ), ASRAA_CRM_VERSION );
+        }
+        $enhanced_js = ASRAA_CRM_URL . 'assets/js/crm-enhanced.js';
+        if ( file_exists( ASRAA_CRM_PATH . 'assets/js/crm-enhanced.js' ) ) {
+            wp_enqueue_script( 'asraa-crm-enhanced', $enhanced_js, array( 'jquery' ), ASRAA_CRM_VERSION, true );
+            // Merge onto window.asraaCRM rather than overwrite it — some pages
+            // (e.g. lead-view.php) set properties like leadViewId on this same
+            // object inline, earlier in the page body, before this footer script
+            // prints; a plain wp_localize_script() `var asraaCRM = {...}` here
+            // would silently wipe those out.
+            wp_add_inline_script(
+                'asraa-crm-enhanced',
+                'window.asraaCRM = Object.assign( window.asraaCRM || {}, ' . wp_json_encode( array(
+                    'ajaxurl' => admin_url( 'admin-ajax.php' ),
+                    'nonce'   => asraa_crm_nonce(),
+                ) ) . ' );',
+                'before'
+            );
+        }
     }
 
     public static function register() {
@@ -102,6 +124,11 @@ class Asraa_CRM_Admin_Menu {
         }
         $file = ASRAA_CRM_PATH . 'admin/pages/' . $pages[ $slug ]['file'];
         echo '<div class="wrap asraa-crm-wrap">';
+        $title = $pages[ $slug ]['title'];
+        $header_partial = ASRAA_CRM_PATH . 'admin/partials/page-header.php';
+        if ( file_exists( $header_partial ) ) {
+            include $header_partial;
+        }
         if ( file_exists( $file ) ) {
             try {
                 include $file;

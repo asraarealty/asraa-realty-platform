@@ -53,10 +53,7 @@ $groups = $wpdb->get_results(
 ?>
 
 <div class="wrap">
-<h1 class="wp-heading-inline">Groups</h1>
-<a href="<?php echo esc_url(admin_url('admin.php?page=asraa-crm-groups-add')); ?>" class="page-title-action">Add New Group</a>
-
-<hr class="wp-header-end">
+<p><a href="<?php echo esc_url(admin_url('admin.php?page=asraa-crm-groups-add')); ?>" class="page-title-action">Add New Group</a></p>
 
 <?php if (!empty($_GET['deleted'])): ?>
     <div class="notice notice-success is-dismissible"><p><?php esc_html_e('Group deleted.', 'asraa-crm'); ?></p></div>

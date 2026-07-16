@@ -68,7 +68,7 @@ function asraa_render_hierarchy_node($nodes, $by_manager, $role_labels, $depth =
             <td>" . esc_html($node['manager_name'] ?? '—') . "</td>
             <td>Level " . (int)$node['level'] . "</td>
             <td>" . esc_html($node['user_email']) . "</td>
-            <td><a class='button button-small' href='" . esc_url($remove_url) . "' onclick='return confirm(\"Remove?\")'>Remove</a></td>
+            <td><span class='row-actions'><a class='button button-small' href='" . esc_url($remove_url) . "' onclick='return confirm(\"Remove?\")'>Remove</a></span></td>
         </tr>";
         if (!empty($by_manager[$node['user_id']])) {
             asraa_render_hierarchy_node($by_manager[$node['user_id']], $by_manager, $role_labels, $depth + 1);
@@ -79,7 +79,6 @@ function asraa_render_hierarchy_node($nodes, $by_manager, $role_labels, $depth =
 ?>
 
 <div class="wrap">
-<h1>Agent Hierarchy</h1>
 <p style="color:#555;">Define the multi-level organizational structure of your agents and teams.</p>
 
 <div style="display:grid;grid-template-columns:1fr 2fr;gap:24px;align-items:start;">
@@ -119,7 +118,8 @@ function asraa_render_hierarchy_node($nodes, $by_manager, $role_labels, $depth =
 <!-- HIERARCHY TREE -->
 <div>
 <h3>Organization Chart</h3>
-<table class="wp-list-table widefat fixed striped">
+<div class="leads-table-wrapper">
+<table class="leads-table">
 <thead><tr>
 <th>Agent</th><th>Role</th><th>Reports To</th><th>Level</th><th>Email</th><th>Actions</th>
 </tr></thead>
@@ -134,6 +134,7 @@ if (!empty($top_level)) {
 ?>
 </tbody>
 </table>
+</div>
 </div>
 
 </div>

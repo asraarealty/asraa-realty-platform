@@ -21,9 +21,7 @@ $base_url = admin_url( 'admin.php?page=asraa-crm-site-visits' );
 ?>
 
 <div class="wrap">
-<h1 class="wp-heading-inline">🚗 Site Visits</h1>
-<button id="asraa-add-visit-btn" class="page-title-action">+ Schedule Visit</button>
-<hr class="wp-header-end">
+<p><button id="asraa-add-visit-btn" class="page-title-action">+ Schedule Visit</button></p>
 
 <!-- FILTERS -->
 <form method="get" style="display:flex;flex-wrap:wrap;gap:10px;margin:14px 0;align-items:flex-end;">
@@ -71,7 +69,8 @@ $base_url = admin_url( 'admin.php?page=asraa-crm-site-visits' );
 </form>
 
 <!-- TABLE -->
-<table class="wp-list-table widefat fixed striped">
+<div class="leads-table-wrapper">
+<table class="leads-table">
     <thead>
     <tr>
         <th>Lead</th>
@@ -99,10 +98,12 @@ $base_url = admin_url( 'admin.php?page=asraa-crm-site-visits' );
             <td><?php echo esc_html( ucfirst( str_replace( '_', ' ', $v['visit_outcome'] ?? '' ) ) ?: '—' ); ?></td>
             <td><?php echo esc_html( wp_trim_words( $v['feedback'] ?? '', 10 ) ?: '—' ); ?></td>
             <td>
+                <span class="row-actions">
                 <button class="button button-small asraa-visit-edit"
                         data-visit='<?php echo esc_attr( wp_json_encode( $v ) ); ?>'>✏️</button>
                 <button class="button button-small asraa-visit-delete"
                         data-id="<?php echo esc_attr( $v['id'] ); ?>">🗑️</button>
+                </span>
             </td>
         </tr>
     <?php endforeach; ?>
@@ -111,6 +112,7 @@ $base_url = admin_url( 'admin.php?page=asraa-crm-site-visits' );
     <?php endif; ?>
     </tbody>
 </table>
+</div>
 
 <!-- Pagination -->
 <?php if ( $num_pages > 1 ) : ?>
@@ -206,8 +208,8 @@ $base_url = admin_url( 'admin.php?page=asraa-crm-site-visits' );
 
 <script>
 (function($){
-    const nonce   = '<?php echo esc_js( wp_create_nonce( 'asraa_crm_nonce' ) ); ?>';
-    const ajaxurl = '<?php echo esc_js( admin_url( 'admin-ajax.php' ) ); ?>';
+    const nonce = '<?php echo esc_js( wp_create_nonce( 'asraa_crm_nonce' ) ); ?>';
+    // ajaxurl is already defined globally by WP core on every wp-admin page.
 
     $('#asraa-add-visit-btn').on('click', function(){
         $('#asraa-visit-modal-title').text('➕ Schedule Site Visit');

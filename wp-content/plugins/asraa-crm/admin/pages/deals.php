@@ -31,9 +31,8 @@ $agents      = get_users(['role__in' => ['administrator', 'editor', 'agent']]);
 ?>
 
 <div class="wrap">
-<h1>Deal Pipeline
-<a href="<?php echo admin_url('admin.php?page=asraa-crm-deals&deal_id=new'); ?>" class="page-title-action">+ Add Deal</a>
-</h1>
+
+<p><a href="<?php echo admin_url('admin.php?page=asraa-crm-deals&deal_id=new'); ?>" class="page-title-action">+ Add Deal</a></p>
 
 <?php if (!empty($_GET['saved'])): ?><div class="notice notice-success is-dismissible"><p>Deal saved.</p></div><?php endif; ?>
 <?php if (!empty($_GET['deleted'])): ?><div class="notice notice-success is-dismissible"><p>Deal deleted.</p></div><?php endif; ?>
@@ -104,7 +103,8 @@ foreach ($stages as $key => $st):
 </div>
 
 <!-- DEALS TABLE -->
-<table class="wp-list-table widefat fixed striped" id="asraa-deals-table">
+<div class="leads-table-wrapper">
+<table class="leads-table">
 <thead><tr>
 <th>Title</th><th>Lead</th><th>Agent</th><th>Value</th><th>Stage</th><th>Close Date</th><th>Actions</th>
 </tr></thead>
@@ -118,17 +118,16 @@ foreach ($stages as $key => $st):
 <td><span style="background:<?php echo $stages[$deal['stage']]['color'] ?? '#ddd'; ?>;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;"><?php echo esc_html($stages[$deal['stage']]['label'] ?? $deal['stage']); ?></span></td>
 <td><?php echo $deal['expected_close_date'] ? date('d M Y', strtotime($deal['expected_close_date'])) : '-'; ?></td>
 <td>
+<span class="row-actions">
 <a class="button button-small" href="<?php echo admin_url('admin.php?page=asraa-crm-deals&deal_id='.$deal['id']); ?>">Edit</a>
 <a class="button button-small" href="<?php echo wp_nonce_url(admin_url('admin-post.php?action=asraa_crm_delete_deal&deal_id='.$deal['id']), 'asraa_crm_delete_deal'); ?>" onclick="return confirm('Delete this deal?')">Delete</a>
+</span>
 </td>
 </tr>
 <?php endforeach; ?>
 </tbody>
 </table>
-
-<script>
-jQuery(function($){ if($.fn.DataTable && $('#asraa-deals-table').length) $('#asraa-deals-table').DataTable({order:[[5,'desc']]}); });
-</script>
+</div>
 
 <?php endif; ?>
 </div>

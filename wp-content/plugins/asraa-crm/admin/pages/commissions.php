@@ -10,7 +10,6 @@ $summary     = $service->get_agent_summary();
 ?>
 
 <div class="wrap">
-<h1>Commission Management</h1>
 
 <?php if (!empty($_GET['saved'])): ?><div class="notice notice-success is-dismissible"><p>Saved successfully.</p></div><?php endif; ?>
 <?php if (!empty($_GET['updated'])): ?><div class="notice notice-success is-dismissible"><p>Commission updated.</p></div><?php endif; ?>
@@ -25,7 +24,8 @@ $summary     = $service->get_agent_summary();
 
 <?php if ($tab === 'commissions'): ?>
 
-<table class="wp-list-table widefat fixed striped" style="margin-top:16px;" id="commissions-table">
+<div class="leads-table-wrapper">
+<table class="leads-table" style="margin-top:16px;">
 <thead><tr>
 <th>Deal</th><th>Agent</th><th>Plan</th><th>Deal Value</th><th>Rate</th><th>Commission</th><th>Status</th><th>Created</th><th>Actions</th>
 </tr></thead>
@@ -48,23 +48,27 @@ $summary     = $service->get_agent_summary();
 <td><?php echo date('d M Y', strtotime($c['created_at'])); ?></td>
 <td>
 <?php if ($c['status'] !== 'paid'): ?>
+<span class="row-actions">
 <form method="POST" action="<?php echo admin_url('admin-post.php'); ?>" style="display:inline;">
 <?php wp_nonce_field('asraa_crm_mark_paid'); ?>
 <input type="hidden" name="action" value="asraa_crm_mark_paid">
 <input type="hidden" name="commission_id" value="<?php echo $c['id']; ?>">
 <button type="submit" class="button button-small button-primary">Mark Paid</button>
 </form>
+</span>
 <?php endif; ?>
 </td>
 </tr>
 <?php endforeach; ?>
 </tbody>
 </table>
+</div>
 
 <?php elseif ($tab === 'summary'): ?>
 
 <h2 style="margin-top:16px;">Agent Commission Summary</h2>
-<table class="wp-list-table widefat fixed striped">
+<div class="leads-table-wrapper">
+<table class="leads-table">
 <thead><tr>
 <th>Agent</th><th>Deals</th><th>Total Earned</th><th>Paid</th><th>Pending</th>
 </tr></thead>
@@ -80,6 +84,7 @@ $summary     = $service->get_agent_summary();
 <?php endforeach; ?>
 </tbody>
 </table>
+</div>
 
 <?php elseif ($tab === 'plans'): ?>
 
@@ -87,7 +92,8 @@ $summary     = $service->get_agent_summary();
 <a href="#add-plan" class="page-title-action">+ Add Plan</a>
 </h2>
 
-<table class="wp-list-table widefat fixed striped" style="margin-bottom:24px;">
+<div class="leads-table-wrapper">
+<table class="leads-table" style="margin-bottom:24px;">
 <thead><tr><th>Plan Name</th><th>Type</th><th>Rate</th><th>Description</th><th>Actions</th></tr></thead>
 <tbody>
 <?php foreach ($plans as $p): ?>
@@ -97,12 +103,15 @@ $summary     = $service->get_agent_summary();
 <td><?php echo $p['type'] === 'flat' ? '₹' . number_format($p['rate']) : $p['rate'] . '%'; ?></td>
 <td><?php echo esc_html($p['description'] ?? '-'); ?></td>
 <td>
+<span class="row-actions">
 <a href="<?php echo wp_nonce_url(admin_url('admin-post.php?action=asraa_crm_delete_commission_plan&plan_id='.$p['id']), 'asraa_crm_delete_plan'); ?>" class="button button-small" onclick="return confirm('Delete this plan?')">Delete</a>
+</span>
 </td>
 </tr>
 <?php endforeach; ?>
 </tbody>
 </table>
+</div>
 
 <div id="add-plan" style="background:#fff;padding:24px;border:1px solid #ddd;border-radius:8px;max-width:500px;">
 <h3>Add Commission Plan</h3>
@@ -124,8 +133,4 @@ $summary     = $service->get_agent_summary();
 </div>
 
 <?php endif; ?>
-
-<script>
-jQuery(function($){ if($.fn.DataTable) $('#commissions-table').DataTable({order:[[7,'desc']]}); });
-</script>
 </div>

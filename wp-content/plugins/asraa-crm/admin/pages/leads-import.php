@@ -161,8 +161,6 @@ if (isset($_POST['import_csv'])) {
 ?>
 
 <div class="wrap">
-    <h1><?php esc_html_e('Import Leads (CSV)', 'asraa-crm'); ?></h1>
-
     <form method="post" enctype="multipart/form-data">
         <?php wp_nonce_field('asraa_import_leads'); ?>
 
