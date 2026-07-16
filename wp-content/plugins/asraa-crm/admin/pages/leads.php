@@ -235,7 +235,7 @@ $followupRepo = new Asraa_CRM_Followup_Repository();
 
 <td>
 <span class="row-actions">
-<a href="<?php echo esc_url(admin_url('admin.php?page=asraa-crm-leads&lead_id=' . $lead['id'])); ?>" class="button button-small">Open</a>
+<a href="<?php echo esc_url(admin_url('admin.php?page=asraa-crm-lead-view&lead_id=' . $lead['id'])); ?>" class="button button-small">Open</a>
 </span>
 </td>
 
