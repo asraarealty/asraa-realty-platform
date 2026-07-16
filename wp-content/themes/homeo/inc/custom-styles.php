@@ -183,12 +183,22 @@ if ( !function_exists ('homeo_custom_styles') ) {
 			<?php endif; ?>
 
 			<?php if ( homeo_get_config('header_mobile_color') != "" ) : ?>
-				
+
 				.header-mobile{
 					background-color: <?php echo esc_html( homeo_get_config('header_mobile_color') ) ?>;
 					border-color: <?php echo esc_html( homeo_get_config('header_mobile_color') ) ?>;
 				}
 			<?php endif; ?>
+
+			/* Property single v5: keep the sidebar contact form in view while scrolling past the taller Locations/Plans/Reviews sections. */
+			@media (min-width: 992px) {
+				.property-single-v5 .sidebar-property {
+					position: -webkit-sticky;
+					position: sticky;
+					top: 20px;
+					z-index: 2;
+				}
+			}
 
 	<?php
 		$content = ob_get_clean();

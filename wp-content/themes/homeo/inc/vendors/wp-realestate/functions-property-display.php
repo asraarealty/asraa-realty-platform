@@ -635,3 +635,36 @@ function homeo_property_print_btn($post, $show_title = false) {
         <?php
     }
 }
+
+/**
+ * Property single v5: main.js removes #property_chart_wrapper when the
+ * "Page Views" chart AJAX call comes back with an error status (e.g. no
+ * traffic data yet), leaving behind an empty .property-page_views section
+ * with just its heading. Hide that section once the canvas is gone.
+ */
+function homeo_property_v5_hide_empty_page_views_script() {
+	if ( ! is_singular( 'property' ) ) {
+		return;
+	}
+	?>
+	<script>
+	( function () {
+		document.addEventListener( 'DOMContentLoaded', function () {
+			var section = document.querySelector( '.property-single-v5 .property-page_views' );
+			var canvas  = document.getElementById( 'property_chart_wrapper' );
+			if ( ! section || ! canvas || ! canvas.parentNode ) {
+				return;
+			}
+			var observer = new MutationObserver( function () {
+				if ( ! document.getElementById( 'property_chart_wrapper' ) ) {
+					section.style.display = 'none';
+					observer.disconnect();
+				}
+			} );
+			observer.observe( canvas.parentNode, { childList: true } );
+		} );
+	} )();
+	</script>
+	<?php
+}
+add_action( 'wp_footer', 'homeo_property_v5_hide_empty_page_views_script' );
