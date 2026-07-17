@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Asraa CRM
  * Description: SaaS-ready CRM for real estate – lead pipeline, property management, deals, campaigns, automation, and client portal management.
- * Version: 5.3.0
+ * Version: 5.3.1
  * Author: Asraa Realty
  * Text Domain: asraa-crm
  * Requires at least: 6.0
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! defined( 'ASRAA_CRM_PATH' ) )    define( 'ASRAA_CRM_PATH', plugin_dir_path( __FILE__ ) );
 if ( ! defined( 'ASRAA_CRM_URL' ) )     define( 'ASRAA_CRM_URL', plugin_dir_url( __FILE__ ) );
 if ( ! defined( 'ASRAA_CRM_FILE' ) )    define( 'ASRAA_CRM_FILE', __FILE__ );
-if ( ! defined( 'ASRAA_CRM_VERSION' ) ) define( 'ASRAA_CRM_VERSION', '5.3.0' );
+if ( ! defined( 'ASRAA_CRM_VERSION' ) ) define( 'ASRAA_CRM_VERSION', '5.3.1' );
 if ( ! defined( 'ASRAA_CRM_LOG_DIR' ) ) define( 'ASRAA_CRM_LOG_DIR', ASRAA_CRM_PATH . 'logs' );
 
 /* ============================================================
@@ -510,8 +510,9 @@ function asraa_crm_run_properties_table_migrations() {
         return;
     }
     $columns = array(
-        'area'     => "ALTER TABLE {$properties_table} ADD area VARCHAR(150) NOT NULL DEFAULT ''",
-        'location' => "ALTER TABLE {$properties_table} ADD location VARCHAR(255) NOT NULL DEFAULT ''",
+        'area'            => "ALTER TABLE {$properties_table} ADD area VARCHAR(150) NOT NULL DEFAULT ''",
+        'location'        => "ALTER TABLE {$properties_table} ADD location VARCHAR(255) NOT NULL DEFAULT ''",
+        'source_post_id'  => "ALTER TABLE {$properties_table} ADD source_post_id BIGINT UNSIGNED DEFAULT NULL, ADD KEY source_post_id (source_post_id)",
     );
     foreach ( $columns as $column => $sql ) {
         $exists = $wpdb->get_results( $wpdb->prepare( "SHOW COLUMNS FROM {$properties_table} LIKE %s", $column ) );

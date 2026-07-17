@@ -78,6 +78,33 @@ function asraa_ajax_update_lead() {
 
 
 /* ------------------------------------------------------------
+   NOTE DELETE
+------------------------------------------------------------ */
+add_action('wp_ajax_asraa_delete_note', 'asraa_ajax_delete_note');
+
+function asraa_ajax_delete_note() {
+    asraa_crm_verify_ajax_nonce();
+    asraa_crm_require_ajax_cap();
+
+    $note_id = intval($_POST['note_id'] ?? 0);
+    if (!$note_id) {
+        wp_send_json_error(['message' => 'Invalid note ID.']);
+    }
+
+    $note_repo = new Asraa_CRM_Note_Repository();
+    $deleted = $note_repo->delete($note_id);
+
+    if ($deleted === false) {
+        error_log('Asraa CRM: asraa_delete_note DB delete failed for note_id=' . $note_id);
+        wp_send_json_error(['message' => 'Database delete failed. Please try again.']);
+    }
+
+    asraa_crm_debug_log('Asraa CRM: note deleted id=' . $note_id);
+    wp_send_json_success(['message' => 'Note deleted successfully.']);
+}
+
+
+/* ------------------------------------------------------------
    WEBSITE LEAD SUBMISSION
 ------------------------------------------------------------ */
 add_action('wp_ajax_nopriv_asraa_submit_website_lead','asraa_ajax_submit_website_lead');

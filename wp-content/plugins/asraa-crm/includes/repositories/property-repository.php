@@ -29,6 +29,17 @@ class Asraa_Property_Repository {
         );
     }
 
+    public function get_by_source_post_id( $post_id ) {
+        global $wpdb;
+        return $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT * FROM {$this->table} WHERE source_post_id = %d",
+                (int) $post_id
+            ),
+            ARRAY_A
+        );
+    }
+
     public function create( array $data ) {
         global $wpdb;
         $data['created_at'] = current_time('mysql');

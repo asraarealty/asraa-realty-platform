@@ -26,6 +26,9 @@ if (
 
 /** @var array $properties */
 $properties = isset($properties) && is_array($properties) ? $properties : [];
+
+/** @var WP_Post[] $site_listings */
+$site_listings = isset($site_listings) && is_array($site_listings) ? $site_listings : [];
 ?>
 
 <div class="wrap">
@@ -90,6 +93,10 @@ $properties = isset($properties) && is_array($properties) ? $properties : [];
                 $image       = is_array($prop) ? ($prop['image_url'] ?? '') : ($prop->image_url ?? '');
             ?>
 
+            <?php
+                $location       = is_array($prop) ? ($prop['location'] ?? '') : ($prop->location ?? '');
+                $source_post_id = is_array($prop) ? ($prop['source_post_id'] ?? '') : ($prop->source_post_id ?? '');
+            ?>
             <tr
                 data-id="<?php echo esc_attr($id); ?>"
                 data-title="<?php echo esc_attr($title); ?>"
@@ -97,8 +104,10 @@ $properties = isset($properties) && is_array($properties) ? $properties : [];
                 data-type="<?php echo esc_attr($type); ?>"
                 data-builder="<?php echo esc_attr($builder); ?>"
                 data-city="<?php echo esc_attr($city); ?>"
+                data-location="<?php echo esc_attr($location); ?>"
                 data-price="<?php echo esc_attr($price); ?>"
                 data-status="<?php echo esc_attr($status); ?>"
+                data-source-post-id="<?php echo esc_attr($source_post_id); ?>"
             >
                 <td>
                     <input type="checkbox" name="bulk_delete[]" class="asraa-row-cb" value="<?php echo esc_attr($id); ?>">
@@ -148,6 +157,20 @@ $properties = isset($properties) && is_array($properties) ? $properties : [];
             <input type="hidden" name="action" value="asraa_save_property">
             <input type="hidden" name="nonce" value="<?php echo esc_attr(wp_create_nonce('asraa_crm_nonce')); ?>">
             <input type="hidden" name="id" id="prop-id">
+            <input type="hidden" name="source_post_id" id="prop-source-post-id" value="">
+
+            <?php if (!empty($site_listings)) : ?>
+            <div style="margin-bottom:14px;">
+                <label style="display:block;font-weight:600;margin-bottom:3px;">Import from existing listing (optional)</label>
+                <select id="asraa-import-listing" style="width:100%;">
+                    <option value="">— Select a site listing to pre-fill —</option>
+                    <?php foreach ($site_listings as $listing) : ?>
+                        <option value="<?php echo esc_attr($listing->ID); ?>"><?php echo esc_html($listing->post_title); ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <div id="asraa-import-msg" style="margin-top:6px;"></div>
+            </div>
+            <?php endif; ?>
 
             <div class="asraa-grid">
                 <input type="text" name="title" placeholder="Property Title" required>
@@ -160,6 +183,7 @@ $properties = isset($properties) && is_array($properties) ? $properties : [];
                 <input type="text" name="property_type" placeholder="Type">
                 <input type="text" name="builder_name" placeholder="Builder">
                 <input type="text" name="city" placeholder="City">
+                <input type="text" name="location" placeholder="Location / Address">
                 <input type="number" name="price" placeholder="Price">
 
                 <select name="status">
