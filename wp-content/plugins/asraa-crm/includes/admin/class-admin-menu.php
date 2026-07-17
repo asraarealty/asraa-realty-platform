@@ -14,6 +14,7 @@ class Asraa_CRM_Admin_Menu {
     public static function init() {
         add_action( 'admin_menu', array( __CLASS__, 'register' ) );
         add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue' ) );
+        add_action( 'admin_head', array( __CLASS__, 'hide_nav_css' ) );
     }
 
     public static function enqueue( $hook ) {
@@ -95,19 +96,25 @@ class Asraa_CRM_Admin_Menu {
         if ( isset( $submenu[ self::SLUG ][0][0] ) ) {
             $submenu[ self::SLUG ][0][0] = __( 'Dashboard', 'asraa-crm' );
         }
+    }
 
-        // Hide detail-only pages from the sidebar nav — they're only meant to be
-        // reached via a direct link with query args (e.g. &lead_id=123), and
-        // clicking them from the sidebar with no args just shows a "not found"
-        // notice. Still fully registered/capability-checked, just not listed.
+    /**
+     * Detail-only pages (e.g. Lead View) are only meant to be reached via a
+     * direct link with query args (&lead_id=123) — clicking them from the
+     * sidebar with no args just shows a "not found" notice. Hide their <li>
+     * from the rendered nav with CSS rather than unset()-ing the $submenu
+     * entry, so the page stays fully registered/routable/capability-checked
+     * (direct links and admin_url() lookups keep working); it's just not
+     * listed for sidebar browsing.
+     */
+    public static function hide_nav_css() {
         $hidden_from_nav = array( 'asraa-crm-lead-view' );
-        if ( isset( $submenu[ self::SLUG ] ) ) {
-            foreach ( $submenu[ self::SLUG ] as $key => $item ) {
-                if ( in_array( $item[2], $hidden_from_nav, true ) ) {
-                    unset( $submenu[ self::SLUG ][ $key ] );
-                }
-            }
+        $selectors = array();
+        foreach ( $hidden_from_nav as $slug ) {
+            $selectors[] = '#adminmenu a[href*="page=' . esc_attr( $slug ) . '"]';
         }
+        if ( ! $selectors ) return;
+        echo '<style>' . implode( ',', $selectors ) . '{display:none !important;}</style>';
     }
 
     /**
