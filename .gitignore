@@ -46,3 +46,11 @@ wp-config.php
 # Note: If you wish to whitelist themes,
 # uncomment the next line
 #/wp-content/themes
+
+# Third-party/vendor plugins — not maintained in this repo, untracked to
+# keep the repo focused on our own code. Files stay on the live server.
+/wp-content/plugins/contact-form-7/
+/wp-content/plugins/elementor/
+/wp-content/plugins/google-site-kit/
+/wp-content/plugins/cmb2/
+/wp-content/plugins/apus-framework/
