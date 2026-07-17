@@ -27,10 +27,45 @@ jQuery(function ($) {
     $('#asraa-add-property-btn').on('click', function () {
         $('#asraa-property-form')[0].reset();
         $('#prop-id').val('');
+        $('#prop-source-post-id').val('');
+        $('#asraa-import-listing').val('');
+        $('#asraa-import-msg').html('');
         $('input[name=action]').val('asraa_save_property');
         $('#asraa-modal-title').text('➕ Add Property');
         $('#asraa-property-modal').fadeIn(200);
         console.log('[Asraa CRM] Add Property modal opened');
+    });
+
+    /* ---- Import from existing site listing ---- */
+    $(document).on('change', '#asraa-import-listing', function () {
+        var postId = $(this).val();
+        var $msg = $('#asraa-import-msg');
+        $msg.html('');
+
+        if (!postId) return;
+
+        $.post(ajaxurl, { action: 'asraa_import_site_listing', nonce: nonce, post_id: postId }, function (resp) {
+            if (!resp.success) {
+                $msg.html('<span style="color:red;">✗ ' + (resp.data && resp.data.message ? resp.data.message : 'Could not load listing') + '</span>');
+                return;
+            }
+
+            var d = resp.data;
+            $('input[name=title]').val(d.title);
+            if (d.price) $('input[name=price]').val(d.price);
+            if (d.location) $('input[name=location]').val(d.location);
+            if (d.property_type) $('input[name=property_type]').val(d.property_type);
+            if (d.transaction_type) $('select[name=transaction_type]').val(d.transaction_type);
+            $('#prop-source-post-id').val(d.post_id);
+
+            if (d.already_imported) {
+                $msg.html('<span style="color:#b45309;">⚠ Already imported as Property #' + d.already_imported + '. Saving will be blocked to avoid a duplicate.</span>');
+            } else {
+                $msg.html('<span style="color:green;">✓ Pre-filled — review the fields below, then Save.</span>');
+            }
+        }).fail(function () {
+            $msg.html('<span style="color:red;">✗ AJAX request failed.</span>');
+        });
     });
 
     /* ---- Close Modal ---- */
@@ -48,8 +83,12 @@ jQuery(function ($) {
         $('input[name=property_type]').val(row.data('type'));
         $('input[name=builder_name]').val(row.data('builder'));
         $('input[name=city]').val(row.data('city'));
+        $('input[name=location]').val(row.data('location'));
         $('input[name=price]').val(row.data('price'));
         $('select[name=status]').val(row.data('status'));
+        $('#prop-source-post-id').val(row.data('source-post-id') || '');
+        $('#asraa-import-listing').val('');
+        $('#asraa-import-msg').html('');
 
         $('input[name=action]').val('asraa_update_property');
         $('#asraa-modal-title').text('✏️ Edit Property');

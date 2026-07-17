@@ -43,12 +43,13 @@ if ( ! isset( $notes ) || ! is_array( $notes ) ) {
                     <th>Lead</th>
                     <th>Added By</th>
                     <th>Date</th>
+                    <th width="80">Actions</th>
                 </tr>
             </thead>
 
             <tbody>
                 <?php foreach ($notes as $note) : ?>
-                    <tr>
+                    <tr data-id="<?php echo esc_attr($note['id']); ?>">
                         <td><?php echo esc_html($note['id']); ?></td>
 
                         <td style="max-width:400px;">
@@ -60,6 +61,12 @@ if ( ! isset( $notes ) || ! is_array( $notes ) ) {
                         <td><?php echo esc_html($note['agent_name'] ?? '—'); ?></td>
 
                         <td><?php echo esc_html(date('d M Y, h:i A', strtotime($note['created_at']))); ?></td>
+
+                        <td>
+                            <span class="row-actions">
+                                <button type="button" class="button button-small asraa-note-delete" data-id="<?php echo esc_attr($note['id']); ?>">Delete</button>
+                            </span>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -70,3 +77,27 @@ if ( ! isset( $notes ) || ! is_array( $notes ) ) {
         <p>No notes found.</p>
     <?php endif; ?>
 </div>
+
+<script>
+(function($){
+    const nonce = '<?php echo esc_js( wp_create_nonce( 'asraa_crm_nonce' ) ); ?>';
+    // ajaxurl is already defined globally by WP core on every wp-admin page.
+
+    $(document).on('click', '.asraa-note-delete', function(){
+        if (!confirm('Delete this note?')) return;
+
+        const id  = $(this).data('id');
+        const row = $(this).closest('tr');
+
+        $.post(ajaxurl, { action: 'asraa_delete_note', note_id: id, nonce: nonce }, function(res){
+            if (res.success) {
+                row.fadeOut(150, function(){ row.remove(); });
+            } else {
+                alert(res.data && res.data.message ? res.data.message : 'Delete failed.');
+            }
+        }).fail(function(){
+            alert('AJAX request failed.');
+        });
+    });
+})(jQuery);
+</script>

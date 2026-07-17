@@ -17,6 +17,10 @@ class Asraa_Property_Service {
         return $this->repo->get_by_id($id);
     }
 
+    public function find_by_source_post_id( $post_id ) {
+        return $this->repo->get_by_source_post_id($post_id);
+    }
+
     public function save( array $data ) {
         if (!empty($data['id'])) {
             $id = (int) $data['id'];
