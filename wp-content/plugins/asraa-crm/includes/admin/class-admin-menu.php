@@ -169,6 +169,7 @@ class Asraa_CRM_Admin_Menu {
         // their own repositories) rather than a bare include of the view file —
         // the view alone only has empty-array fallbacks for those variables.
         $controller_dispatch = array(
+            'asraa-crm-properties'        => array( 'asraa_property_controller', 'properties_page' ),
             'asraa-crm-projects'          => array( 'asraa_crm_project_controller', 'projects_page' ),
             'asraa-crm-towers'            => array( 'asraa_crm_project_controller', 'towers_page' ),
             'asraa-crm-inventory'         => array( 'asraa_crm_inventory_controller', 'inventory_page' ),
