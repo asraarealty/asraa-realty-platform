@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Asraa CRM
  * Description: SaaS-ready CRM for real estate – lead pipeline, property management, deals, campaigns, automation, and client portal management.
- * Version: 5.3.1
+ * Version: 5.3.2
  * Author: Asraa Realty
  * Text Domain: asraa-crm
  * Requires at least: 6.0
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! defined( 'ASRAA_CRM_PATH' ) )    define( 'ASRAA_CRM_PATH', plugin_dir_path( __FILE__ ) );
 if ( ! defined( 'ASRAA_CRM_URL' ) )     define( 'ASRAA_CRM_URL', plugin_dir_url( __FILE__ ) );
 if ( ! defined( 'ASRAA_CRM_FILE' ) )    define( 'ASRAA_CRM_FILE', __FILE__ );
-if ( ! defined( 'ASRAA_CRM_VERSION' ) ) define( 'ASRAA_CRM_VERSION', '5.3.1' );
+if ( ! defined( 'ASRAA_CRM_VERSION' ) ) define( 'ASRAA_CRM_VERSION', '5.3.2' );
 if ( ! defined( 'ASRAA_CRM_LOG_DIR' ) ) define( 'ASRAA_CRM_LOG_DIR', ASRAA_CRM_PATH . 'logs' );
 
 /* ============================================================
@@ -204,6 +204,32 @@ function asraa_crm_install() {
             KEY status (status),
             KEY transaction_type (transaction_type),
             KEY property_type (property_type)
+        ) {$charset_collate};
+    " );
+
+    // PROJECTS TABLE
+    // No CREATE TABLE existed for this in version control before now — the
+    // live table predates this migration system. Columns/types below are
+    // confirmed against the live table via direct inspection: status is
+    // varchar(50) (not 20), and location/builder/project_type are nullable
+    // (not NOT NULL DEFAULT ''). id/name/created_at/updated_at are still
+    // inferred from code only, not independently confirmed — dbDelta will
+    // only ADD missing columns/keys here, never drop extras the live table
+    // may have, so this stays safe even if those four are also off.
+    $projects_table = $wpdb->prefix . 'asraa_crm_projects';
+    dbDelta( "
+        CREATE TABLE {$projects_table} (
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            name VARCHAR(255) NOT NULL DEFAULT '',
+            location VARCHAR(255) DEFAULT NULL,
+            builder VARCHAR(255) DEFAULT NULL,
+            project_type VARCHAR(100) DEFAULT NULL,
+            status VARCHAR(50) NOT NULL DEFAULT 'active',
+            created_at DATETIME NOT NULL,
+            updated_at DATETIME NOT NULL,
+            PRIMARY KEY (id),
+            KEY status (status),
+            KEY project_type (project_type)
         ) {$charset_collate};
     " );
 
@@ -522,6 +548,23 @@ function asraa_crm_run_properties_table_migrations() {
     }
 }
 
+function asraa_crm_run_projects_table_migrations() {
+    global $wpdb;
+    $projects_table = $wpdb->prefix . 'asraa_crm_projects';
+    if ( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $projects_table ) ) !== $projects_table ) {
+        return;
+    }
+    $columns = array(
+        'source_post_id'  => "ALTER TABLE {$projects_table} ADD source_post_id BIGINT UNSIGNED DEFAULT NULL, ADD KEY source_post_id (source_post_id)",
+    );
+    foreach ( $columns as $column => $sql ) {
+        $exists = $wpdb->get_results( $wpdb->prepare( "SHOW COLUMNS FROM {$projects_table} LIKE %s", $column ) );
+        if ( empty( $exists ) ) {
+            $wpdb->query( $sql );
+        }
+    }
+}
+
 function asraa_crm_run_broker_feed_table_migration() {
     global $wpdb;
     require_once ABSPATH . 'wp-admin/includes/upgrade.php';
@@ -587,6 +630,7 @@ function asraa_crm_maybe_upgrade_database() {
     if ( version_compare( $current, ASRAA_CRM_VERSION, '<' ) ) {
         asraa_crm_run_leads_table_migrations();
         asraa_crm_run_properties_table_migrations();
+        asraa_crm_run_projects_table_migrations();
         asraa_crm_run_broker_feed_table_migration();
         update_option( 'asraa_crm_db_version', ASRAA_CRM_VERSION, false );
     }

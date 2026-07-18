@@ -173,6 +173,20 @@ $followupRepo = new Asraa_CRM_Followup_Repository();
 <a href="<?php echo esc_url(admin_url('admin.php?page=asraa-crm-leads')); ?>" class="button<?php echo !$is_trash ? ' button-primary' : ''; ?>">Active</a>
 <a href="<?php echo esc_url(admin_url('admin.php?page=asraa-crm-leads&view=trash')); ?>" class="button<?php echo $is_trash ? ' button-primary' : ''; ?>">Trash</a>
 
+<?php if (!$is_trash && !empty($all_groups)): ?>
+<form method="get" style="display:inline-block; margin-left:10px;">
+    <input type="hidden" name="page" value="asraa-crm-leads">
+    <select name="group_id" onchange="this.form.submit()">
+        <option value="0">— Filter by group —</option>
+        <?php foreach ($all_groups as $g): ?>
+            <option value="<?php echo esc_attr($g['id']); ?>" <?php selected($filter_group_id, (int) $g['id']); ?>>
+                <?php echo esc_html($g['group_name']); ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+</form>
+<?php endif; ?>
+
 <hr>
 
 <form method="post">
@@ -184,6 +198,9 @@ $followupRepo = new Asraa_CRM_Followup_Repository();
         <option value="">Bulk Actions</option>
         <?php if (!$is_trash): ?>
             <option value="trash">Move to Trash</option>
+            <?php foreach ($all_groups as $g): ?>
+                <option value="set_group_<?php echo esc_attr($g['id']); ?>">Assign to: <?php echo esc_html($g['group_name']); ?></option>
+            <?php endforeach; ?>
         <?php else: ?>
             <option value="restore">Restore</option>
             <?php if ($is_admin): ?>

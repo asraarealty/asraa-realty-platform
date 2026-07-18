@@ -26,12 +26,39 @@ class Asraa_CRM_Project_Controller {
 		add_action( 'wp_ajax_asraa_save_tower',           [ $this, 'ajax_save_tower' ] );
 		add_action( 'wp_ajax_asraa_delete_tower',         [ $this, 'ajax_delete_tower' ] );
 		add_action( 'wp_ajax_asraa_get_towers_by_project',[ $this, 'ajax_get_towers_by_project' ] );
+		add_action( 'wp_ajax_asraa_import_project_listing',[ $this, 'ajax_import_from_listing' ] );
 	}
 
 	// ── Page renderers ───────────────────────────────────────────────────────
 
 	public function projects_page() {
 		$projects = $this->project_repo->get_all();
+
+		// Site listings available to import from — `property` posts tagged
+		// "under-construction" (property_status) or "new-launch" (property_label),
+		// the two taxonomy terms confirmed live as representing projects rather
+		// than ready/individual listings.
+		$site_listings = get_posts( [
+			'post_type'      => 'property',
+			'post_status'    => 'publish',
+			'numberposts'    => 300,
+			'orderby'        => 'title',
+			'order'          => 'ASC',
+			'tax_query'      => [
+				'relation' => 'OR',
+				[
+					'taxonomy' => 'property_status',
+					'field'    => 'slug',
+					'terms'    => 'under-construction',
+				],
+				[
+					'taxonomy' => 'property_label',
+					'field'    => 'slug',
+					'terms'    => 'new-launch',
+				],
+			],
+		] );
+
 		include ASRAA_CRM_PATH . 'admin/pages/projects-v2.php';
 	}
 
@@ -43,6 +70,38 @@ class Asraa_CRM_Project_Controller {
 
 	// ── AJAX handlers ────────────────────────────────────────────────────────
 
+	/**
+	 * Pre-fill data for the "Import from existing listing" dropdown.
+	 * Only returns fields that map cleanly onto the CRM project form —
+	 * doesn't auto-save anything, the admin still reviews and clicks Save.
+	 */
+	public function ajax_import_from_listing() {
+		asraa_crm_verify_ajax_nonce();
+		asraa_crm_require_ajax_cap();
+
+		$post_id = intval( $_POST['post_id'] ?? 0 );
+		$post    = $post_id ? get_post( $post_id ) : null;
+
+		if ( ! $post || $post->post_type !== 'property' || $post->post_status !== 'publish' ) {
+			wp_send_json_error( [ 'message' => 'Listing not found.' ] );
+		}
+
+		$location = get_post_meta( $post_id, '_property_map_location_address', true );
+
+		$type_terms   = get_the_terms( $post_id, 'property_type' );
+		$project_type = ( ! is_wp_error( $type_terms ) && ! empty( $type_terms ) ) ? $type_terms[0]->name : '';
+
+		$existing = $this->project_repo->get_by_source_post_id( $post_id );
+
+		wp_send_json_success( [
+			'post_id'          => $post_id,
+			'name'             => $post->post_title,
+			'location'         => $location ?: '',
+			'project_type'     => $project_type,
+			'already_imported' => $existing ? (int) $existing['id'] : 0,
+		] );
+	}
+
 	public function ajax_save_project() {
 		asraa_crm_verify_ajax_nonce();
 		asraa_crm_require_ajax_cap();
@@ -52,6 +111,13 @@ class Asraa_CRM_Project_Controller {
 
 		if ( empty( $data['name'] ) ) {
 			wp_send_json_error( [ 'message' => 'Project name is required.' ] );
+		}
+
+		if ( ! empty( $data['source_post_id'] ) ) {
+			$existing = $this->project_repo->get_by_source_post_id( $data['source_post_id'] );
+			if ( $existing && (int) $existing['id'] !== $id ) {
+				wp_send_json_error( [ 'message' => 'This listing was already imported as Project #' . $existing['id'] . '.' ] );
+			}
 		}
 
 		if ( $id ) {
@@ -140,11 +206,12 @@ class Asraa_CRM_Project_Controller {
 
 	private function sanitize_project( array $input ) {
 		return [
-			'name'         => sanitize_text_field( $input['name'] ?? '' ),
-			'location'     => sanitize_text_field( $input['location'] ?? '' ),
-			'builder'      => sanitize_text_field( $input['builder'] ?? '' ),
-			'project_type' => sanitize_text_field( $input['project_type'] ?? '' ),
-			'status'       => sanitize_text_field( $input['status'] ?? 'active' ),
+			'name'            => sanitize_text_field( $input['name'] ?? '' ),
+			'location'        => sanitize_text_field( $input['location'] ?? '' ),
+			'builder'         => sanitize_text_field( $input['builder'] ?? '' ),
+			'project_type'    => sanitize_text_field( $input['project_type'] ?? '' ),
+			'status'          => sanitize_text_field( $input['status'] ?? 'active' ),
+			'source_post_id'  => intval( $input['source_post_id'] ?? 0 ) ?: null,
 		];
 	}
 
