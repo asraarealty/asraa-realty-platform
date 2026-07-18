@@ -207,6 +207,32 @@ function asraa_crm_install() {
         ) {$charset_collate};
     " );
 
+    // PROJECTS TABLE
+    // No CREATE TABLE existed for this in version control before now — the
+    // live table predates this migration system. Columns/types below are
+    // confirmed against the live table via direct inspection: status is
+    // varchar(50) (not 20), and location/builder/project_type are nullable
+    // (not NOT NULL DEFAULT ''). id/name/created_at/updated_at are still
+    // inferred from code only, not independently confirmed — dbDelta will
+    // only ADD missing columns/keys here, never drop extras the live table
+    // may have, so this stays safe even if those four are also off.
+    $projects_table = $wpdb->prefix . 'asraa_crm_projects';
+    dbDelta( "
+        CREATE TABLE {$projects_table} (
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            name VARCHAR(255) NOT NULL DEFAULT '',
+            location VARCHAR(255) DEFAULT NULL,
+            builder VARCHAR(255) DEFAULT NULL,
+            project_type VARCHAR(100) DEFAULT NULL,
+            status VARCHAR(50) NOT NULL DEFAULT 'active',
+            created_at DATETIME NOT NULL,
+            updated_at DATETIME NOT NULL,
+            PRIMARY KEY (id),
+            KEY status (status),
+            KEY project_type (project_type)
+        ) {$charset_collate};
+    " );
+
     // BROKER FEED TABLE
     asraa_crm_run_broker_feed_table_migration();
 
