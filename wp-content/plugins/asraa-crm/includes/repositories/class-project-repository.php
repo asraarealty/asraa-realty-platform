@@ -66,6 +66,23 @@ class Asraa_CRM_Project_Repository {
 		) ?: null;
 	}
 
+	/**
+	 * Return the project imported from a given source `property` post, if any.
+	 *
+	 * @param int $post_id
+	 * @return array|null
+	 */
+	public function get_by_source_post_id( $post_id ) {
+		global $wpdb;
+		return $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT * FROM {$this->table} WHERE source_post_id = %d",
+				(int) $post_id
+			),
+			ARRAY_A
+		) ?: null;
+	}
+
 	// ── Write ────────────────────────────────────────────────────────────────
 
 	/**

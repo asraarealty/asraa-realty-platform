@@ -3,6 +3,9 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 /** @var array[] $projects  Injected by Asraa_CRM_Project_Controller::projects_page() */
 $projects = $projects ?? [];
+
+/** @var WP_Post[] $site_listings  Injected by Asraa_CRM_Project_Controller::projects_page() */
+$site_listings = isset( $site_listings ) && is_array( $site_listings ) ? $site_listings : [];
 ?>
 
 <div class="wrap">
@@ -34,6 +37,7 @@ $projects = $projects ?? [];
 			data-builder="<?php echo esc_attr( $proj['builder'] ?? '' ); ?>"
 			data-project_type="<?php echo esc_attr( $proj['project_type'] ?? '' ); ?>"
 			data-status="<?php echo esc_attr( $proj['status'] ?? 'active' ); ?>"
+			data-source_post_id="<?php echo esc_attr( $proj['source_post_id'] ?? '' ); ?>"
 		>
 			<td><?php echo esc_html( $proj['id'] ); ?></td>
 			<td><strong><?php echo esc_html( $proj['name'] ); ?></strong></td>
@@ -72,6 +76,20 @@ $projects = $projects ?? [];
 			<input type="hidden" name="action" value="asraa_save_project">
 			<input type="hidden" name="nonce" value="<?php echo esc_attr( wp_create_nonce( 'asraa_crm_nonce' ) ); ?>">
 			<input type="hidden" name="id" id="proj-id" value="0">
+			<input type="hidden" name="source_post_id" id="proj-source-post-id" value="">
+
+			<?php if ( ! empty( $site_listings ) ) : ?>
+			<div style="margin-bottom:14px;">
+				<label style="display:block;font-weight:600;margin-bottom:3px;">Import from existing listing (optional)</label>
+				<select id="asraa-import-project-listing" style="width:100%;">
+					<option value="">— Select a site listing to pre-fill —</option>
+					<?php foreach ( $site_listings as $listing ) : ?>
+						<option value="<?php echo esc_attr( $listing->ID ); ?>"><?php echo esc_html( $listing->post_title ); ?></option>
+					<?php endforeach; ?>
+				</select>
+				<div id="asraa-import-project-msg" style="margin-top:6px;"></div>
+			</div>
+			<?php endif; ?>
 
 			<div class="asraa-grid">
 				<div>
@@ -134,6 +152,9 @@ $projects = $projects ?? [];
         ['name','location','builder'].forEach(f => $('#proj-' + f).val(data ? data[f] : ''));
         $('#proj-type').val(data ? data.project_type : '');
         $('#proj-status').val(data ? data.status : 'active');
+        $('#proj-source-post-id').val(data && data.source_post_id ? data.source_post_id : '');
+        $('#asraa-import-project-listing').val('');
+        $('#asraa-import-project-msg').html('');
         $('#asraa-proj-msg').text('');
         $('#asraa-project-modal').fadeIn(150);
     }
@@ -143,6 +164,36 @@ $projects = $projects ?? [];
     $(document).on('click', '.asraa-proj-edit', function(){
         const tr = $(this).closest('tr');
         openModal(tr.data());
+    });
+
+    /* ---- Import from existing site listing ---- */
+    $(document).on('change', '#asraa-import-project-listing', function(){
+        const postId = $(this).val();
+        const $msg = $('#asraa-import-project-msg');
+        $msg.html('');
+
+        if (!postId) return;
+
+        $.post(ajaxurl, { action: 'asraa_import_project_listing', nonce: nonce, post_id: postId }, function(resp){
+            if (!resp.success) {
+                $msg.html('<span style="color:red;">✗ ' + (resp.data && resp.data.message ? resp.data.message : 'Could not load listing') + '</span>');
+                return;
+            }
+
+            const d = resp.data;
+            $('#proj-name').val(d.name);
+            if (d.location) $('#proj-location').val(d.location);
+            if (d.project_type) $('#proj-type').val(d.project_type);
+            $('#proj-source-post-id').val(d.post_id);
+
+            if (d.already_imported) {
+                $msg.html('<span style="color:#b45309;">⚠ Already imported as Project #' + d.already_imported + '. Saving will be blocked to avoid a duplicate.</span>');
+            } else {
+                $msg.html('<span style="color:green;">✓ Pre-filled — review the fields below, then Save.</span>');
+            }
+        }).fail(function(){
+            $msg.html('<span style="color:red;">✗ AJAX request failed.</span>');
+        });
     });
 
     $('#asraa-proj-modal-close, .asraa-modal-overlay').on('click', function(){
