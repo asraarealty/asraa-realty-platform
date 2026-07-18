@@ -30,8 +30,15 @@ class WP_RealEstate_Social {
      * @return string
      */
     public static function open_graph_meta() {
+        // Rank Math already outputs a complete, correct Open Graph block —
+        // this fallback was firing unconditionally alongside it, producing
+        // a duplicate/conflicting og:title ahead of Rank Math's own.
+        if ( defined( 'RANK_MATH_VERSION' ) ) {
+            return;
+        }
+
         if ( is_singular() ) {
-            echo '<meta property="og:title" content="' . get_the_title() . '" />';
+            echo '<meta property="og:title" content="' . esc_attr( get_the_title() ) . '" />';
             $thumbnail_id = get_post_thumbnail_id();
             if ( ! empty( $thumbnail_id ) ) {
                 $image = wp_get_attachment_image_src( $thumbnail_id, 'full' );
