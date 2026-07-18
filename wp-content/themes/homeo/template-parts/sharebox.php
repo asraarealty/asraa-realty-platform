@@ -16,7 +16,7 @@ global $post;
 			</a>
 		<?php endif; ?>
 		<?php if ( homeo_get_config('linkedin_share', 1) ): ?>
- 			<a class="bo-social-linkedin"  data-toggle="tooltip" data-original-title="LinkedIn" href="http://linkedin.com/shareArticle?mini=true&amp;url=<?php the_permalink(); ?>&amp;title=<?php the_title(); ?>" target="_blank" title="<?php echo esc_html__('Share on LinkedIn', 'homeo'); ?>">
+ 			<a class="bo-social-linkedin"  data-toggle="tooltip" data-original-title="LinkedIn" href="https://www.linkedin.com/sharing/share-offsite/?url=<?php echo urlencode( get_permalink() ); ?>" target="_blank" title="<?php echo esc_html__('Share on LinkedIn', 'homeo'); ?>">
 				<i class="fab fa-linkedin-in"></i>
 			</a>
 		<?php endif; ?>
