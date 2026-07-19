@@ -92,6 +92,14 @@ if (isset($_POST['import_csv'])) {
             // Build column-index map for flexible column ordering.
             $col = array_flip($header);
 
+            // Column aliases: the classic simple format uses "group"; the
+            // group Export feature's CSV uses "Group Name", "Source" and
+            // "Date Added" instead. Recognise both so a re-imported Export
+            // CSV round-trips correctly without breaking the old format.
+            $group_col  = $col['group']  ?? $col['group name'] ?? null;
+            $source_col = $col['source'] ?? null;
+            $date_col   = $col['date added'] ?? $col['created_at'] ?? null;
+
             while (($row = fgetcsv($file)) !== false) {
 
                 $name  = sanitize_text_field($row[ $col['name']  ] ?? '');
@@ -100,8 +108,33 @@ if (isset($_POST['import_csv'])) {
 
                 // Group column is optional.
                 $group_name = '';
-                if (isset($col['group'], $row[ $col['group'] ])) {
-                    $group_name = sanitize_text_field(trim($row[ $col['group'] ]));
+                if (null !== $group_col && isset($row[ $group_col ])) {
+                    $group_name = sanitize_text_field(trim($row[ $group_col ]));
+                }
+
+                // Source column is optional.
+                $source = '';
+                if (null !== $source_col && isset($row[ $source_col ])) {
+                    $source = sanitize_text_field(trim($row[ $source_col ]));
+                }
+
+                // Date Added column is optional; falls back to now when
+                // absent or unparseable. A value already in MySQL datetime
+                // format (as the group Export feature produces) is kept
+                // verbatim to avoid any timezone drift from re-parsing it;
+                // other formats are interpreted with strtotime() as a
+                // best-effort fallback.
+                $created_at = current_time('mysql');
+                if (null !== $date_col && !empty($row[ $date_col ])) {
+                    $raw_date = trim($row[ $date_col ]);
+                    if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $raw_date)) {
+                        $created_at = $raw_date;
+                    } else {
+                        $parsed_date = strtotime($raw_date);
+                        if (false !== $parsed_date) {
+                            $created_at = date('Y-m-d H:i:s', $parsed_date);
+                        }
+                    }
                 }
 
                 // Skip empty rows.
@@ -133,8 +166,12 @@ if (isset($_POST['import_csv'])) {
                     'phone'       => $phone,
                     'status'      => 'new',
                     'assigned_to' => get_current_user_id(),
-                    'created_at'  => current_time('mysql'),
+                    'created_at'  => $created_at,
                 ];
+
+                if ('' !== $source) {
+                    $insert_data['source'] = $source;
+                }
 
                 if (null !== $group_id) {
                     $insert_data['group_id'] = $group_id;
@@ -184,9 +221,10 @@ if (isset($_POST['import_csv'])) {
     <p>
         <?php esc_html_e('Required columns:', 'asraa-crm'); ?>
         <code>name, email, phone</code><br>
-        <?php esc_html_e('Optional column:', 'asraa-crm'); ?>
-        <code>group</code>
-        &mdash; <?php esc_html_e('Assign the lead to a group. Auto-creates the group if it does not exist. Defaults to "Client" if omitted.', 'asraa-crm'); ?>
+        <?php esc_html_e('Optional columns:', 'asraa-crm'); ?>
+        <code>group</code> (<?php esc_html_e('or', 'asraa-crm'); ?> <code>Group Name</code>),
+        <code>Source</code>, <code>Date Added</code>
+        &mdash; <?php esc_html_e('Group assigns the lead to a group (auto-created if it does not exist, defaults to "Client" if omitted). Source and Date Added are also accepted so a CSV exported from the Groups page re-imports with its original values intact.', 'asraa-crm'); ?>
     </p>
     <p><strong><?php esc_html_e('Example:', 'asraa-crm'); ?></strong></p>
     <pre>name,email,phone,group
