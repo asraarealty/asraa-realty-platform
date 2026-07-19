@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! defined( 'ASRAA_CRM_PATH' ) )    define( 'ASRAA_CRM_PATH', plugin_dir_path( __FILE__ ) );
 if ( ! defined( 'ASRAA_CRM_URL' ) )     define( 'ASRAA_CRM_URL', plugin_dir_url( __FILE__ ) );
 if ( ! defined( 'ASRAA_CRM_FILE' ) )    define( 'ASRAA_CRM_FILE', __FILE__ );
-if ( ! defined( 'ASRAA_CRM_VERSION' ) ) define( 'ASRAA_CRM_VERSION', '5.3.2' );
+if ( ! defined( 'ASRAA_CRM_VERSION' ) ) define( 'ASRAA_CRM_VERSION', '5.3.3' );
 if ( ! defined( 'ASRAA_CRM_LOG_DIR' ) ) define( 'ASRAA_CRM_LOG_DIR', ASRAA_CRM_PATH . 'logs' );
 
 /* ============================================================
@@ -117,7 +117,6 @@ function asraa_crm_install() {
             phone VARCHAR(50) NOT NULL DEFAULT '',
             status VARCHAR(30) NOT NULL DEFAULT 'new',
             lead_stage VARCHAR(30) NOT NULL DEFAULT 'new',
-            stage_id BIGINT UNSIGNED NOT NULL DEFAULT 1,
             assigned_to BIGINT UNSIGNED DEFAULT NULL,
             assigned_agent BIGINT UNSIGNED DEFAULT NULL,
             group_id BIGINT UNSIGNED DEFAULT NULL,
@@ -509,7 +508,6 @@ function asraa_crm_run_leads_table_migrations() {
         return;
     }
     $columns = array(
-        'stage_id'       => "ALTER TABLE {$leads_table} ADD stage_id BIGINT UNSIGNED NOT NULL DEFAULT 1",
         'group_id'       => "ALTER TABLE {$leads_table} ADD group_id BIGINT UNSIGNED DEFAULT NULL",
         'intent'         => "ALTER TABLE {$leads_table} ADD intent VARCHAR(30) NOT NULL DEFAULT ''",
         'location'       => "ALTER TABLE {$leads_table} ADD location VARCHAR(255) NOT NULL DEFAULT ''",
@@ -526,6 +524,15 @@ function asraa_crm_run_leads_table_migrations() {
         if ( empty( $exists ) ) {
             $wpdb->query( $sql );
         }
+    }
+
+    // stage_id is superseded by lead_stage as the single source of truth for
+    // a lead's pipeline stage (it referenced a separate, unrelated stages
+    // table and nothing kept it in sync with lead_stage in practice). Drop it
+    // if a prior version of this migration already added it.
+    $stage_id_exists = $wpdb->get_results( $wpdb->prepare( "SHOW COLUMNS FROM {$leads_table} LIKE %s", 'stage_id' ) );
+    if ( ! empty( $stage_id_exists ) ) {
+        $wpdb->query( "ALTER TABLE {$leads_table} DROP COLUMN stage_id" );
     }
 }
 

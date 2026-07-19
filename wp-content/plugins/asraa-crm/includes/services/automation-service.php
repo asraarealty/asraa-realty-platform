@@ -147,24 +147,6 @@ class Asraa_Automation_Service {
                 }
                 break;
 
-            case 'change_stage':
-                $lead_id = $context['lead_id'] ?? ($context['lead']['id'] ?? null);
-
-                if ($lead_id && !empty($action['stage_id'])) {
-                    global $wpdb;
-
-                    $wpdb->update(
-                        $wpdb->prefix . 'asraa_crm_leads',
-                        [
-                            'stage_id' => (int) $action['stage_id']
-                        ],
-                        [
-                            'id' => (int) $lead_id
-                        ]
-                    );
-                }
-                break;
-
             case 'add_followup':
                 $lead_id = $context['lead_id'] ?? ($context['lead']['id'] ?? null);
 

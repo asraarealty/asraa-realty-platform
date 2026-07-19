@@ -19,7 +19,6 @@ $action_labels = [
     'send_email'    => 'Send Email',
     'send_whatsapp' => 'Send WhatsApp',
     'assign_agent'  => 'Assign Agent',
-    'change_stage'  => 'Change Stage',
     'add_followup'  => 'Add Follow-up',
 ];
 ?>
