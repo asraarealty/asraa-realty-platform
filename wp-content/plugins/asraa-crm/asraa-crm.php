@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! defined( 'ASRAA_CRM_PATH' ) )    define( 'ASRAA_CRM_PATH', plugin_dir_path( __FILE__ ) );
 if ( ! defined( 'ASRAA_CRM_URL' ) )     define( 'ASRAA_CRM_URL', plugin_dir_url( __FILE__ ) );
 if ( ! defined( 'ASRAA_CRM_FILE' ) )    define( 'ASRAA_CRM_FILE', __FILE__ );
-if ( ! defined( 'ASRAA_CRM_VERSION' ) ) define( 'ASRAA_CRM_VERSION', '5.3.3' );
+if ( ! defined( 'ASRAA_CRM_VERSION' ) ) define( 'ASRAA_CRM_VERSION', '5.3.4' );
 if ( ! defined( 'ASRAA_CRM_LOG_DIR' ) ) define( 'ASRAA_CRM_LOG_DIR', ASRAA_CRM_PATH . 'logs' );
 
 /* ============================================================
@@ -264,19 +264,6 @@ function asraa_crm_install() {
             ) ) );
         }
     }
-
-    // STAGES
-    $stages_table = $wpdb->prefix . 'asraa_crm_stages';
-    dbDelta( "
-        CREATE TABLE {$stages_table} (
-            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-            name VARCHAR(50) NOT NULL,
-            sort_order INT NOT NULL DEFAULT 0,
-            is_final TINYINT(1) DEFAULT 0,
-            PRIMARY KEY (id),
-            UNIQUE KEY name (name)
-        ) {$charset_collate};
-    " );
 
     // WHATSAPP TEMPLATES
     $wa_table = $wpdb->prefix . 'asraa_crm_whatsapp_templates';
@@ -632,6 +619,17 @@ function asraa_crm_run_broker_feed_table_migration() {
     }
 }
 
+function asraa_crm_run_stages_table_cleanup() {
+    global $wpdb;
+    // wp_asraa_crm_stages backed the "Pipeline Stage" dropdown that was
+    // removed along with the leads.stage_id column -- nothing reads this
+    // table anymore, so drop it if a prior version created it.
+    $stages_table = $wpdb->prefix . 'asraa_crm_stages';
+    if ( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $stages_table ) ) === $stages_table ) {
+        $wpdb->query( "DROP TABLE {$stages_table}" );
+    }
+}
+
 function asraa_crm_maybe_upgrade_database() {
     $current = (string) get_option( 'asraa_crm_db_version', '0.0.0' );
     if ( version_compare( $current, ASRAA_CRM_VERSION, '<' ) ) {
@@ -639,6 +637,7 @@ function asraa_crm_maybe_upgrade_database() {
         asraa_crm_run_properties_table_migrations();
         asraa_crm_run_projects_table_migrations();
         asraa_crm_run_broker_feed_table_migration();
+        asraa_crm_run_stages_table_cleanup();
         update_option( 'asraa_crm_db_version', ASRAA_CRM_VERSION, false );
     }
 }
