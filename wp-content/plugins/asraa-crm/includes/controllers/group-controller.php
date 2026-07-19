@@ -11,6 +11,7 @@ if (!defined('ABSPATH')) exit;
 add_action('wp_ajax_asraa_save_group',   'asraa_ajax_save_group');
 add_action('wp_ajax_asraa_delete_group', 'asraa_ajax_delete_group');
 add_action('wp_ajax_asraa_get_groups',   'asraa_ajax_get_groups');
+add_action('admin_post_asraa_crm_export_group_leads', 'asraa_crm_export_group_leads');
 
 /* ------------------------------------------------------------
    SAVE (create or update) GROUP
@@ -115,6 +116,67 @@ function asraa_ajax_delete_group() {
     asraa_crm_fire_trigger('group_deleted', ['id' => $id]);
 
     wp_send_json_success(['message' => 'Group deleted.']);
+}
+
+/* ------------------------------------------------------------
+   EXPORT GROUP'S LEADS TO CSV (read-only)
+------------------------------------------------------------ */
+function asraa_crm_export_group_leads() {
+    $group_id = isset($_GET['group_id']) ? (int) $_GET['group_id'] : 0;
+
+    check_admin_referer('asraa_crm_export_group_' . $group_id);
+    asraa_crm_require_admin_cap();
+
+    if (!$group_id) {
+        wp_die('Invalid group.');
+    }
+
+    global $wpdb;
+    $groups_table = $wpdb->prefix . 'asraa_crm_groups';
+    $leads_table  = $wpdb->prefix . 'asraa_crm_leads';
+
+    $group = $wpdb->get_row(
+        $wpdb->prepare("SELECT id, group_name FROM {$groups_table} WHERE id = %d", $group_id),
+        ARRAY_A
+    );
+
+    if (!$group) {
+        wp_die('Group not found.');
+    }
+
+    $leads = $wpdb->get_results(
+        $wpdb->prepare(
+            "SELECT name, phone, email, source, created_at
+             FROM {$leads_table}
+             WHERE group_id = %d AND is_deleted = 0
+             ORDER BY created_at ASC",
+            $group_id
+        ),
+        ARRAY_A
+    );
+
+    $filename = sanitize_title($group['group_name']) . '-leads-' . current_time('Y-m-d') . '.csv';
+
+    nocache_headers();
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+
+    $out = fopen('php://output', 'w');
+    fputcsv($out, ['Name', 'Phone', 'Email', 'WhatsApp number', 'Source', 'Date Added', 'Group Name']);
+
+    foreach ($leads as $lead) {
+        fputcsv($out, [
+            $lead['name'],
+            $lead['phone'],
+            $lead['email'],
+            $lead['phone'],
+            $lead['source'],
+            $lead['created_at'],
+            $group['group_name'],
+        ]);
+    }
+    fclose($out);
+    exit;
 }
 
 /* ------------------------------------------------------------

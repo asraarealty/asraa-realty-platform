@@ -86,6 +86,16 @@ $groups = $wpdb->get_results(
         <div class="asraa-group-card-actions">
             <a href="<?php echo esc_url(admin_url('admin.php?page=asraa-crm-groups-edit&group_id=' . $group['id'])); ?>"
                class="button button-small">Edit</a>
+            <a href="<?php echo esc_url(
+                wp_nonce_url(
+                    admin_url('admin-post.php?action=asraa_crm_export_group_leads&group_id=' . $group['id']),
+                    'asraa_crm_export_group_' . $group['id']
+                )
+            ); ?>"
+               class="button button-small"
+               title="<?php esc_attr_e('Export this group\'s leads to CSV', 'asraa-crm'); ?>">
+                Export
+            </a>
             <?php if ($lead_count === 0): ?>
                 <a href="<?php echo esc_url(
                     wp_nonce_url(
