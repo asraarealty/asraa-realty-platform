@@ -108,8 +108,17 @@ $groups = $wpdb->get_results(
                     Delete
                 </a>
             <?php else: ?>
-                <span class="button button-small" title="<?php esc_attr_e('Cannot delete: has contacts', 'asraa-crm'); ?>"
-                      style="opacity:0.5; cursor:not-allowed;">Delete</span>
+                <?php
+                $delete_blocked_msg = sprintf(
+                    /* translators: %d: number of contacts currently in this group */
+                    __("Can't delete \u{2014} reassign or remove this group's %d contact(s) first.", 'asraa-crm'),
+                    $lead_count
+                );
+                ?>
+                <span class="button button-small"
+                      title="<?php echo esc_attr($delete_blocked_msg); ?>"
+                      style="opacity:0.5; cursor:not-allowed;"
+                      onclick="alert('<?php echo esc_js($delete_blocked_msg); ?>'); return false;">Delete</span>
             <?php endif; ?>
         </div>
     </div>
