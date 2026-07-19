@@ -150,6 +150,7 @@ $added = $_GET['added'] ?? '';
     <option value="">Select intent</option>
     <option value="buy">Buy</option>
     <option value="sell">Sell</option>
+    <option value="rent">Rent</option>
     <option value="invest">Invest</option>
 </select>
 </td>
@@ -165,7 +166,7 @@ $added = $_GET['added'] ?? '';
 <tr class="asraa-property-req-row">
 <th>Budget</th>
 <td>
-<input type="text" name="budget" class="regular-text" placeholder="e.g. 15000000 or 1.5 Cr">
+<input type="text" name="budget" class="regular-text" placeholder="e.g. 1.5 Cr, or 45,000/mo for rent">
 </td>
 </tr>
 

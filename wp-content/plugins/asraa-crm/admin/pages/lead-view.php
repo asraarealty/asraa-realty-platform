@@ -87,6 +87,7 @@ $msg_history  = is_array( $msg_history ) ? $msg_history : array();
                     <option value="">Select intent</option>
                     <option value="buy" <?php selected($lead['intent'] ?? '', 'buy'); ?>>Buy</option>
                     <option value="sell" <?php selected($lead['intent'] ?? '', 'sell'); ?>>Sell</option>
+                    <option value="rent" <?php selected($lead['intent'] ?? '', 'rent'); ?>>Rent</option>
                     <option value="invest" <?php selected($lead['intent'] ?? '', 'invest'); ?>>Invest</option>
                 </select>
             </td>
@@ -104,7 +105,7 @@ $msg_history  = is_array( $msg_history ) ? $msg_history : array();
             <td>
                 <input type="text" name="budget" class="regular-text"
                        value="<?php echo esc_attr($lead['budget'] ?? ''); ?>"
-                       placeholder="e.g. 15000000">
+                       placeholder="e.g. 1.5 Cr, or 45,000/mo for rent">
             </td>
         </tr>
         <tr>
