@@ -3,13 +3,13 @@ if (!defined('ABSPATH')) exit;
 
 global $wpdb;
 
-$table = $wpdb->prefix . 'asraa_crm_leads';
+$table        = $wpdb->prefix . 'asraa_crm_leads';
+$groups_table = $wpdb->prefix . 'asraa_crm_groups';
 
-/* ===============================
-   LOAD PIPELINE STAGES
-================================ */
-$stage_repo = new Asraa_CRM_Stage_Repository();
-$stages = $stage_repo->get_all() ?: [];
+$all_groups = $wpdb->get_results(
+    "SELECT id, group_name FROM {$groups_table} ORDER BY group_name ASC",
+    ARRAY_A
+);
 
 $lead_stages = function_exists('asraa_crm_get_lead_stages')
     ? asraa_crm_get_lead_stages()
@@ -37,9 +37,9 @@ if (isset($_POST['add_lead'])) {
     $property_type = sanitize_text_field($_POST['property_type'] ?? '');
     $source        = sanitize_text_field($_POST['source'] ?? 'Manual Admin');
 
-    $stage_id      = !empty($_POST['stage_id']) ? intval($_POST['stage_id']) : 1;
     $lead_stage    = asraa_crm_sanitize_lead_stage($_POST['lead_stage'] ?? 'new');
     $agent_id      = !empty($_POST['assigned_agent']) ? intval($_POST['assigned_agent']) : 0;
+    $group_id      = !empty($_POST['group_id']) ? intval($_POST['group_id']) : null;
 
     if (empty($name)) {
         wp_die('Lead name is required.');
@@ -66,7 +66,7 @@ if (isset($_POST['add_lead'])) {
         'source'         => $source ?: 'Manual Admin',
         'status'         => asraa_crm_get_status_for_stage($lead_stage),
         'lead_stage'     => $lead_stage,
-        'stage_id'       => $stage_id,
+        'group_id'       => $group_id,
         'assigned_to'    => $agent_id ?: null,
         'assigned_agent' => $agent_id ?: null,
         'lead_score'     => asraa_crm_calculate_ai_lead_score($score_data),
@@ -130,6 +130,20 @@ $added = $_GET['added'] ?? '';
 </tr>
 
 <tr>
+<th>Group</th>
+<td>
+<select name="group_id" id="lead-group-select">
+<option value="0">— No group —</option>
+<?php foreach ($all_groups as $g): ?>
+<option value="<?php echo esc_attr($g['id']); ?>" data-name="<?php echo esc_attr($g['group_name']); ?>">
+<?php echo esc_html($g['group_name']); ?>
+</option>
+<?php endforeach; ?>
+</select>
+</td>
+</tr>
+
+<tr class="asraa-property-req-row">
 <th>Intent</th>
 <td>
 <select name="intent">
@@ -141,21 +155,21 @@ $added = $_GET['added'] ?? '';
 </td>
 </tr>
 
-<tr>
+<tr class="asraa-property-req-row">
 <th>Location</th>
 <td>
 <input type="text" name="location" class="regular-text">
 </td>
 </tr>
 
-<tr>
+<tr class="asraa-property-req-row">
 <th>Budget</th>
 <td>
 <input type="text" name="budget" class="regular-text" placeholder="e.g. 15000000 or 1.5 Cr">
 </td>
 </tr>
 
-<tr>
+<tr class="asraa-property-req-row">
 <th>Property Type</th>
 <td>
 <input type="text" name="property_type" class="regular-text">
@@ -165,25 +179,12 @@ $added = $_GET['added'] ?? '';
 <tr>
 <th>Source</th>
 <td>
-<input type="text" name="source" class="regular-text" value="Manual Admin">
-</td>
-</tr>
-
-<tr>
-<th>Pipeline Stage</th>
-<td>
-<select name="stage_id" required>
-
-<?php if (!empty($stages)): ?>
-    <?php foreach ($stages as $stage): ?>
-        <option value="<?php echo esc_attr($stage->id); ?>">
-            <?php echo esc_html($stage->name); ?>
-        </option>
-    <?php endforeach; ?>
-<?php else: ?>
-    <option value="1">New</option>
-<?php endif; ?>
-
+<select name="source">
+<option value="Manual Admin" selected>Manual Admin</option>
+<option value="AI Chatbot">AI Chatbot</option>
+<option value="Website Form">Website Form</option>
+<option value="Referral">Referral</option>
+<option value="WhatsApp">WhatsApp</option>
 </select>
 </td>
 </tr>
@@ -226,5 +227,26 @@ Save Lead
 </p>
 
 </form>
+
+<script>
+(function () {
+    var HIDDEN_FOR_GROUPS = ['agent', 'developer', 'mall brands'];
+    var select = document.getElementById('lead-group-select');
+    var rows = document.querySelectorAll('.asraa-property-req-row');
+    if (!select || !rows.length) return;
+
+    function toggle() {
+        var opt = select.options[select.selectedIndex];
+        var name = (opt && opt.getAttribute('data-name') || '').toLowerCase();
+        var hide = HIDDEN_FOR_GROUPS.indexOf(name) !== -1;
+        rows.forEach(function (row) {
+            row.style.display = hide ? 'none' : '';
+        });
+    }
+
+    select.addEventListener('change', toggle);
+    toggle();
+})();
+</script>
 
 </div>
