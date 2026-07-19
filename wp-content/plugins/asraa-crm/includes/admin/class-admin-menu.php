@@ -91,6 +91,23 @@ class Asraa_CRM_Admin_Menu {
             );
         }
 
+        // Campaigns (Bulk Message) is fully self-contained -- it renders its
+        // own <div class="wrap"> and does its own capability check, so it's
+        // registered directly rather than through render_page()/pages() to
+        // avoid a nested/duplicate wrap. The class was already loaded and
+        // functional (create/view/list campaigns) but never had a menu entry
+        // pointing at it, so it was unreachable from the admin UI.
+        if ( class_exists( 'Asraa_Campaign_Dashboard' ) ) {
+            add_submenu_page(
+                self::SLUG,
+                __( 'Campaigns', 'asraa-crm' ),
+                __( 'Campaigns', 'asraa-crm' ),
+                $cap,
+                'asraa-crm-campaigns',
+                array( 'Asraa_Campaign_Dashboard', 'render' )
+            );
+        }
+
         // Rename first submenu to Dashboard
         global $submenu;
         if ( isset( $submenu[ self::SLUG ][0][0] ) ) {

@@ -213,6 +213,12 @@
     color: #555;
 }
 
+.asraa-card-rate {
+    font-size: 16px;
+    font-weight: 400;
+    color: #777;
+}
+
 .asraa-reminder {
     background: #fff;
     padding: 14px;
@@ -298,4 +304,128 @@
     .asraa-campaign-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/* ---- Dashboard: Quick Actions + range filter ---- */
+.asraa-quick-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 16px 0;
+}
+
+.asraa-range-filter {
+    margin-left: auto;
+    display: flex;
+    gap: 6px;
+}
+
+/* ---- Dashboard: two-column layout ---- */
+.asraa-dashboard-layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 24px;
+    align-items: start;
+}
+
+.asraa-dashboard-sidebar {
+    background: #fff;
+    border-radius: 10px;
+    padding: 18px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .06);
+}
+
+@media (max-width: 960px) {
+    .asraa-dashboard-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ---- Dashboard: section cards (Pipeline / Source / Groups / By Agent) ---- */
+.asraa-dashboard-section {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .06);
+}
+
+.asraa-dashboard-section h2 {
+    margin: 0 0 14px;
+    font-size: 16px;
+}
+
+.asraa-dashboard-empty {
+    color: #777;
+    font-style: italic;
+    margin: 0;
+}
+
+/* ---- Dashboard: horizontal bar rows (Pipeline / Source) ---- */
+.asraa-bar-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.asraa-bar-row {
+    display: grid;
+    grid-template-columns: 120px 1fr 40px;
+    align-items: center;
+    gap: 10px;
+}
+
+.asraa-bar-label {
+    font-size: 13px;
+    color: #444;
+}
+
+.asraa-bar-track {
+    background: #f0f0f1;
+    border-radius: 4px;
+    height: 14px;
+    overflow: hidden;
+}
+
+.asraa-bar-fill {
+    display: block;
+    height: 100%;
+    background: #2271b1;
+    border-radius: 4px;
+}
+
+.asraa-bar-fill.orange {
+    background: #ffb900;
+}
+
+.asraa-bar-count {
+    font-size: 13px;
+    font-weight: 600;
+    text-align: right;
+}
+
+/* ---- Dashboard: groups snapshot ---- */
+.asraa-groups-snapshot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.asraa-groups-snapshot__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 90px;
+}
+
+.asraa-groups-snapshot__count {
+    font-size: 26px;
+    font-weight: 700;
+    color: #2271b1;
+}
+
+.asraa-groups-snapshot__label {
+    font-size: 12px;
+    color: #666;
 }
